@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/06/21 22:05:11 by dantremb         ###   ########.fr        #
+#    Updated: 2022/06/22 13:26:52 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,8 @@ NAME = minishell
 
 LIBFT = includes/libft/libft.a
 LIBFT_PATH = includes/libft/
-READLINE = includes/readline/libreadline.a
+READLINE_LINUX = includes/readline_linux/libreadline.a
+READLINE_MAC = includes/readline_mac/libreadline.a
 
 SRCS_FILES = minishell.c
 SRCS_PATH = srcs/
