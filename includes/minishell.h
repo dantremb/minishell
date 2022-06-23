@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/06/22 17:31:58 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/06/22 19:23:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,5 @@
 # include <stdio.h>
 # include <readline/readline.h>
 # include "libft/includes/libft.h"
-//# include "readline_linux/readline.h"
 
 #endif

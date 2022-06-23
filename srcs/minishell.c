@@ -6,15 +6,49 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/06/21 23:00:03 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/06/22 19:55:28 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+int	ft_print_variable(char *command)
+{
+	int	i;
+	(void)command;
+	
+	i = 0;
+	while (command[i])
+	{
+		ft_putchar(command[i++]);
+		if (command[i] == ')')
+			break ;
+	}
+	return(i + 2);
+}
+
 void	ft_echo(char *command)
 {
-	ft_printf("%s\n", command);
+	int	i;
+	int	jump;
+	char set[2];
+
+	set[0] = '"';
+	set[1] = '\0';
+	i = -1;
+	command = ft_strtrim(command, set);
+	while (command[++i])
+	{
+		jump = 0;
+		if (command[i] != '$')
+			ft_putchar(command[i]);
+		else
+		{
+			jump = ft_print_variable(command + 2);
+			i += jump;
+		}
+	}
+	ft_putchar('\n');
 }
 
 int	main(int ac, char **av, char **env)
@@ -22,8 +56,6 @@ int	main(int ac, char **av, char **env)
 	char	*buffer;
 	int		run;
 	int		i;
-	char	*command;
-	char	sep[2] = {34, 0};
 
 	i = 0;
 	run = 0;
@@ -37,9 +69,7 @@ int	main(int ac, char **av, char **env)
 		}
 		else if (ft_strncmp(buffer, "echo", 4) == 0)
 		{
-			command = ft_substr(buffer, 5, ft_strlen(buffer) - 5);
-			command = ft_strtrim(command, sep);
-			ft_echo(command);
+			ft_echo(buffer + 5);
 		}
 		else if (ft_strncmp(buffer, "exit", 4) == 0)
 		{

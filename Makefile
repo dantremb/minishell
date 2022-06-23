@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/06/22 13:26:52 by dantremb         ###   ########.fr        #
+#    Updated: 2022/06/22 18:54:33 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,7 +47,7 @@ init:
 	@printf "Compiling -"
 
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE) -lreadline -lncurses
+	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE_MAC) -lreadline -lncurses
 clean:
 	@$(REMOVE) $(OBJS)
 	@@$(MAKE) -s clean -C $(LIBFT_PATH)
