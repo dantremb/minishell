@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/06/22 18:54:33 by dantremb         ###   ########.fr        #
+#    Updated: 2022/06/22 22:49:27 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,8 +14,7 @@ NAME = minishell
 
 LIBFT = includes/libft/libft.a
 LIBFT_PATH = includes/libft/
-READLINE_LINUX = includes/readline_linux/libreadline.a
-READLINE_MAC = includes/readline_mac/libreadline.a
+READLINE = includes/readline/libreadline.a
 
 SRCS_FILES = minishell.c
 SRCS_PATH = srcs/
@@ -47,7 +46,7 @@ init:
 	@printf "Compiling -"
 
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE_MAC) -lreadline -lncurses
+	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE) -lreadline -lncurses
 clean:
 	@$(REMOVE) $(OBJS)
 	@@$(MAKE) -s clean -C $(LIBFT_PATH)
