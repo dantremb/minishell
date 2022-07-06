@@ -10,53 +10,74 @@
 #                                                                              #
 # **************************************************************************** #
 
+# Nom du Projet
 NAME = minishell
 
+# Flags
+AR = ar
+CC = gcc
+ARFLAGS = rcs
+CFLAGS = -Wall -Wextra -Werror -g
+RLFLAGS = -lreadline -lncurses
+
+# Includes
 LIBFT = includes/libft/libft.a
 LIBFT_PATH = includes/libft/
 READLINE = includes/readline/libreadline.a
 
+# Sources files
+S = srcs/
 SRCS_FILES = minishell.c
-SRCS_PATH = srcs/
-SRCS = $(addprefix $(SRCS_PATH), $(SRCS_FILES))
+SRCS = $(addprefix $S, $(SRCS_FILES))
 
-AR = ar
-CC = gcc
+# Objects conversion
+O = objs/
+OBJS= $(SRCS:$S%=$O%.o)
+$O%.o: $S%
+	@printf "$R■$W"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
-ARFLAGS = rcs
-CFLAGS = -Wall -Wextra -Werror -g
+# Main rule
+all: signature init $(NAME)
+	@echo "$G\n$(NAME) Compiled!$W"
 
-
-REMOVE = rm -rf
-COMMIT = $(shell date "+%d %B %T")
-
-OBJS= $(SRCS:%.c=%.o)
-%.o: %.c
-	@printf "-"
-	@$(CC) $(CFLAGS) -o $@ -c $<
-
-all: init $(NAME)
-	@echo "> Done!."
-	@echo "$(NAME) Compiled!"
-
+# Initialise librairies and making objs folder
 init:
-	@echo "Preparing Libft"
+	@mkdir -p $O
+	@echo "$GLibrary's initialization$W"
 	@$(MAKE) -s -C $(LIBFT_PATH)
-	@echo "Preparing $(NAME)"
-	@printf "Compiling -"
+	@printf "$CCreating $(NAME)\n$W"
 
+# Creating  executable
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE) -lreadline -lncurses
+	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE) $(RLFLAGS)
+
+# Cleaning
+REMOVE = rm -rf
+
 clean:
-	@$(REMOVE) $(OBJS)
-	@@$(MAKE) -s clean -C $(LIBFT_PATH)
+	@$(REMOVE) $O
+	@$(MAKE) -s clean -C $(LIBFT_PATH)
+
 fclean: clean
 	@$(REMOVE) $(NAME)
 	@$(MAKE) -s fclean -C $(LIBFT_PATH)
 
 re:	fclean all
 
+# Utilities
+COMMIT = $(shell date "+%d %B %T")
 git:
 	@git add .
 	@git commit -m "$(COMMIT)"
 	@git push
+
+R = $(shell tput -Txterm setaf 1)
+G = $(shell tput -Txterm setaf 2)
+C = $(shell tput -Txterm setaf 6)
+W = $(shell tput -Txterm setaf 7)
+
+signature:
+	@echo "\n$G+---+---+---+---+---+---+---+---+"
+	@echo "$G|$C	$(NAME) by Dantremb	$G|"
+	@echo "$G+---+---+---+---+---+---+---+---+"

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 15:30:15 by dantremb          #+#    #+#             */
-/*   Updated: 2022/05/17 23:40:01 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/07/05 11:21:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ char	*ft_strchr(const char *str, int nbr)
 	int	i;
 	int	len;
 
+	if (!str)
+		return (NULL);
 	i = -1;
 	len = ft_strlen(str);
 	while (++i < len + 1)

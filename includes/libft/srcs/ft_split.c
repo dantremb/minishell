@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 16:57:30 by dantremb          #+#    #+#             */
-/*   Updated: 2022/05/17 23:39:54 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/06/30 14:01:00 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,16 +35,18 @@
 static int	ft_count_word(char const *src, char sep)
 {
 	int		words;
+	int		i;
 
+	i = -1;
 	words = 0;
-	while (*src)
+	while (src[++i])
 	{
-		while (*src == sep)
-			src++;
-		if (*src != sep && *src)
+		while (src[i] == sep)
+			i++;
+		if (src[i] != sep && src[i])
 			words++;
-		while (*src != sep && *src)
-			src++;
+		while (src[i] != sep && src[i])
+			i++;
 	}
 	return (words);
 }
