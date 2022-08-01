@@ -9,7 +9,7 @@
 - ">" doit rediriger la sortie.
 - "<<" doit recevoir un délimiteur et lire l’input donné jusqu’à rencontrer une 		ligne contenant le délimiteur. l’historique n’a pas à être mis à jour
 - ">>" doit rediriger la sortie en mode append.
-- Implémenter les pipes (caractère |).
+- Implémenter les pipes.
 - Gérer les variables d’environnement (un $ suivi d’une séquence de caractères) 	qui doivent être substituées par leur contenu.
 - Gérer $? qui doit être substitué par le statut de sortie de la dernière 			pipeline exécutée au premier plan.
 - Gérer ctrl-C, ctrl-D et ctrl-\ qui doivent fonctionner comme dans bash.
