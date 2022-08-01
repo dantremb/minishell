@@ -1,4 +1,4 @@
-![Book logo](/minishell/assets/images/top.png)
+![Book logo](docs/assets/images/top.png)
 
 You can use the [editor on GitHub](https://github.com/dantremb/minishell/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
