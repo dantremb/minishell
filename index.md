@@ -16,7 +16,7 @@
 	- ctrl-C affiche un nouveau prompt sur une nouvelle ligne.
 	- ctrl-D quitte le shell.
 	- ctrl-\ ne fait rien.
-- Votre shell doit implémenter les builtins suivantes :
+- **Votre shell doit implémenter les builtins suivantes :**
 	- echo et l’option -n
 	- cd uniquement avec un chemin relatif ou absolu
 	- pwd sans aucune option
