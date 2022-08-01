@@ -1,4 +1,4 @@
-![Book logo](docs/assets/images/top.png)
+![Book logo](docs/assets/images/minishell.png)
 
 **Test**
 
