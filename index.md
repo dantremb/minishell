@@ -26,5 +26,3 @@
 	- exit sans aucune option
 
 ![engine](docs/assets/images/minishell_engine.png)
-
-[edit page](https://github.com/dantremb/minishell/edit/gh-pages/index.md)
