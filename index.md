@@ -1,4 +1,4 @@
-![Book logo](docs/assets/images/minishell_upper.png)
+![minishell](docs/assets/images/minishell_upper.png)
 
 - Afficher un prompt en l’attente d’une nouvelle commande.
 - Posséder un historique fonctionnel.
@@ -24,5 +24,7 @@
 	- unset sans aucune option
 	- env sans aucune option ni argument
 	- exit sans aucune option
+
+![engine](docs/assets/images/minishell_engine.png)
 
 [edit page](https://github.com/dantremb/minishell/edit/gh-pages/index.md)
