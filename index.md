@@ -1,4 +1,4 @@
-![Book logo](docs/assets/images/minishell_title.png)
+![Book logo](docs/assets/images/minishell_upper.png)
 
 - Afficher un prompt en l’attente d’une nouvelle commande.
 - Posséder un historique fonctionnel.
