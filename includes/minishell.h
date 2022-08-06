@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/06 13:33:44 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/06 18:44:38 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct		s_env
 {
 	char	*user;
 	char	*path;
+	int		nb_cmd;
 	t_cmd	**cmds;
 }					t_env;
 #endif

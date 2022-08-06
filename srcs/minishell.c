@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/06 13:53:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/06 18:52:54 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,23 @@
 
 t_env	variable;
 
-bool	ft_init_environement(char **env)
+bool	ft_init_environement(void)
 {
-	(void)env;
-
-	printf("\n");
+	printf("%s\n", "Init environment");
 	variable.user = getenv("USER");
 	variable.path = getenv("PATH");
-	printf("%s\n", variable.user);
-	printf("%s\n", variable.path);
+	variable.nb_cmd = 0;
+	variable.cmds = NULL;
+	if (!variable.user || !variable.path)
+		return (false);
+	printf("User = %s\n", variable.user);
+	printf("Path = %s\n", variable.path);
 	return (true);
 }
 
 void	ft_print_command_table(void)
 {
-	printf("here my table\n");
+	printf("here my command table\n");
 }
 
 void	ft_free_command_table(char	**t_cmd)
@@ -81,11 +83,11 @@ int	main(int ac, char **av, char **env)
 {
 	char	*buffer;
 
-	ft_init_environement(env);
+	ft_init_environement();
 	while (1)
 	{
 		buffer = readline(PROMPT);
-		if (!buffer || ft_strncmp(buffer, "\n", 1) == 0)// if buffer is empty
+		if (!buffer || ft_str)// if buffer is empty
 			printf("\n");
 		else if (ft_strncmp(buffer, "exit", 4) == 0)// exit program
 		{
