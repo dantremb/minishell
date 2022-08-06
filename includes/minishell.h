@@ -19,4 +19,15 @@
 # include <readline/readline.h>
 # include "libft/includes/libft.h"
 
+#define PROMPT "\033[0;32mMINISHELL->\033[0;37m"
+
+typedef struct		s_cmd
+{
+	int		infile;
+	int		outfile;
+	char	**options;
+	char	*path;
+	char	*cmd;
+}					t_cmd;
+
 #endif
