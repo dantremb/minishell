@@ -6,11 +6,43 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/06/22 19:55:28 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/06 13:53:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+t_env	variable;
+
+bool	ft_init_environement(char **env)
+{
+	(void)env;
+
+	printf("\n");
+	variable.user = getenv("USER");
+	variable.path = getenv("PATH");
+	printf("%s\n", variable.user);
+	printf("%s\n", variable.path);
+	return (true);
+}
+
+void	ft_print_command_table(void)
+{
+	printf("here my table\n");
+}
+
+void	ft_free_command_table(char	**t_cmd)
+{
+	int i;
+
+	i = 0;
+	while (t_cmd[i])
+	{
+		free(t_cmd[i]);
+		i++;
+	}
+	free(t_cmd);
+}
 
 int	ft_number_of_command(char *str)
 {
@@ -28,35 +60,45 @@ int	ft_number_of_command(char *str)
 	return (count);
 }
 
-int	ft_parse_command(char *buffer, char **env)
+bool	ft_execute_command_table(char *buffer)
 {
-	if (!buffer && !env)
-	{
-		printf("parsing\n");
-		return (0);
-	}
-	return (1);
+	printf("execute the table with = ");
+	if (!buffer)
+		return (false);
+	ft_print_command_table();
+	return (true);
 }
 
-void	ft_print_command_table(void)
+bool	ft_parse_command(char *buffer, char **env)
 {
-	printf("here my table\n");
+	if (!env || !buffer)
+		return (false);
+	printf("parsing\n");
+	return (true);
 }
 
 int	main(int ac, char **av, char **env)
 {
 	char	*buffer;
-	(void)ac;
-	(void)av;
 
-	error = 0;
+	ft_init_environement(env);
 	while (1)
 	{
 		buffer = readline(PROMPT);
-		if (ft_parse_command(buffer, env))//Parsing the buffer into the command table
-			ft_print_command_table();//Executing the command table
-		else if (ft_strncmp(buffer, "exit", 4) == 0)//leave program
-			exit (0);
-		free(buffer);
+		if (!buffer || ft_strncmp(buffer, "\n", 1) == 0)// if buffer is empty
+			printf("\n");
+		else if (ft_strncmp(buffer, "exit", 4) == 0)// exit program
+		{
+			free (buffer);// free buffer
+			exit (0);//	exit program
+		}
+		else
+		{
+			ft_parse_command(buffer, env);// parsing the buffer into the command table
+			ft_execute_command_table(buffer);// executing the command table
+			//ft_free_command_table(buffer);// free the command table
+		}
 	}
+	(void)ac;
+	(void)av;
 }
