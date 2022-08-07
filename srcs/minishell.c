@@ -19,12 +19,17 @@ bool	ft_init_environement(void)
 	printf("%s\n", "Init environment");
 	variable.user = getenv("USER");
 	variable.path = getenv("PATH");
+	variable.pwd = getenv("PWD");
+	variable.name = getenv("NAME");
 	variable.nb_cmd = 0;
 	variable.cmds = NULL;
 	if (!variable.user || !variable.path)
 		return (false);
 	printf("User = %s\n", variable.user);
-	printf("Path = %s\n", variable.path);
+	printf("Pwd = %s\n", variable.pwd);
+	//printf("Path = %s\n", variable.path);
+	printf("Name = %s\n", variable.name);
+
 	return (true);
 }
 
@@ -46,49 +51,92 @@ void	ft_free_command_table(char	**t_cmd)
 	free(t_cmd);
 }
 
-int	ft_number_of_command(char *str)
+int	ft_number_of_command(char *buffer)
 {
 	int i;
 	int count;
 
 	i = 0;
 	count = 0;
-	while (str[i] != '\0')
+	while (buffer[i] != '\0')
 	{
-		if (str[i] == '|')
+		if (buffer[i] == '|')
 			count++;
 		i++;
 	}
 	return (count);
 }
 
-bool	ft_execute_command_table(char *buffer)
+bool	ft_execute_command_table(void)
 {
-	printf("execute the table with = ");
-	if (!buffer)
+	if (!variable.nb_cmd == 0)
+	{
+		printf("Nothing to execute\n");
 		return (false);
+	}
+	printf("execute the table with = ");
 	ft_print_command_table();
 	return (true);
 }
 
-bool	ft_parse_command(char *buffer, char **env)
+bool	ft_parse_command(void)
 {
-	if (!env || !buffer)
+	if (!variable.nb_cmd == 0)
+	{
+		printf("Nothing to parse\n");
 		return (false);
+	}
 	printf("parsing\n");
 	return (true);
 }
 
-int	main(int ac, char **av, char **env)
+bool	ft_is_only_space(char *buffer)
+{
+	int i;
+
+	i = 0;
+	while (buffer[i] != '\0')
+	{
+		if (buffer[i] != ' ')
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
+char	*ft_get_prompt(void)
+{
+	char *prompt;
+
+	prompt = ft_strjoin("\033[0;32m", variable.user, 0); //username
+	prompt = ft_strjoin(prompt, "@", 1);
+	prompt = ft_strjoin(prompt, variable.name, 1); //hostname
+	prompt = ft_strjoin(prompt, ": ", 1);
+	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
+	prompt = ft_strjoin(prompt, variable.pwd, 1);
+	prompt = ft_strjoin(prompt, "> ", 1);
+	prompt = ft_strjoin(prompt, "\033[0m", 1);
+
+	return (prompt);
+}
+
+int	main(int ac, char **argv, char **env)
 {
 	char	*buffer;
-
+	(void)ac;
+	(void)argv;
+	(void)env;
+	/*while (*env)
+	{
+		printf("%s\n", env[0]);
+		env++;
+	}*/
 	ft_init_environement();
 	while (1)
 	{
-		buffer = readline(PROMPT);
-		if (!buffer || ft_str)// if buffer is empty
-			printf("\n");
+		buffer = readline(ft_get_prompt());
+		if (ft_is_only_space(buffer))// if buffer is empty
+			continue ;
 		else if (ft_strncmp(buffer, "exit", 4) == 0)// exit program
 		{
 			free (buffer);// free buffer
@@ -96,11 +144,9 @@ int	main(int ac, char **av, char **env)
 		}
 		else
 		{
-			ft_parse_command(buffer, env);// parsing the buffer into the command table
-			ft_execute_command_table(buffer);// executing the command table
+			ft_parse_command();// parsing the buffer into the command table
+			ft_execute_command_table();// executing the command table
 			//ft_free_command_table(buffer);// free the command table
 		}
 	}
-	(void)ac;
-	(void)av;
 }

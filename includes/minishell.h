@@ -17,7 +17,7 @@
 # include <stdio.h>
 # include <fcntl.h>
 # include <readline/readline.h>
-# include "libft/includes/libft.h"
+# include "../libs/libft/includes/libft.h"
 # include <stdbool.h>
 
 #define PROMPT "\033[0;32mMINISHELL->\033[0;37m"
@@ -35,6 +35,8 @@ typedef struct		s_env
 {
 	char	*user;
 	char	*path;
+	char	*pwd;
+	char	*name;
 	int		nb_cmd;
 	t_cmd	**cmds;
 }					t_env;

@@ -20,7 +20,7 @@
 
 #include "../includes/libft.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char *s1, char const *s2, int f)
 {
 	char	*tmp;
 	int		is;
@@ -39,5 +39,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	while (s2 && s2[id])
 		tmp[is++] = s2[id++];
 	tmp[is] = '\0';
+	if (f == 1)
+		free(s1);
 	return (tmp);
 }

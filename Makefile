@@ -21,9 +21,9 @@ CFLAGS = -Wall -Wextra -Werror -g
 RLFLAGS = -lreadline -lncurses
 
 # Includes
-LIBFT = includes/libft/libft.a
-LIBFT_PATH = includes/libft/
-READLINE = includes/readline/libreadline.a
+LIBFT = libs/libft/libft.a
+LIBFT_PATH = libs/libft/
+READLINE = libs/readline/libreadline.a
 
 # Sources files
 S = srcs/
