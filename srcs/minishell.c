@@ -107,10 +107,10 @@ bool	ft_is_only_space(char *buffer)
 char	*ft_get_prompt(void)
 {
 	char *prompt;
-
-	prompt = ft_strjoin("\033[0;32m", variable.user, 0); //username
+	//green + user + @ + host + : + green + pwd + > + white
+	prompt = ft_strjoin("\033[0;32m", variable.user, 0);
 	prompt = ft_strjoin(prompt, "@", 1);
-	prompt = ft_strjoin(prompt, variable.name, 1); //hostname
+	prompt = ft_strjoin(prompt, variable.name, 1);
 	prompt = ft_strjoin(prompt, ": ", 1);
 	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
 	prompt = ft_strjoin(prompt, variable.pwd, 1);
@@ -126,18 +126,18 @@ int	main(int ac, char **argv, char **env)
 	(void)ac;
 	(void)argv;
 	(void)env;
-	/*while (*env)
+	while (*env)
 	{
 		printf("%s\n", env[0]);
 		env++;
-	}*/
+	}
 	ft_init_environement();
 	while (1)
 	{
 		buffer = readline(ft_get_prompt());
 		if (ft_is_only_space(buffer))// if buffer is empty
 			continue ;
-		else if (ft_strncmp(buffer, "exit", 4) == 0)// exit program
+		else if (ft_strncmp(buffer, "exit ", 4) == 0)// exit program
 		{
 			free (buffer);// free buffer
 			exit (0);//	exit program
