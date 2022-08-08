@@ -6,28 +6,21 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/08 14:03:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/08 17:10:42 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
 extern char **environ;
 t_env	variable;
-
+/*
 bool	ft_init_environement(void)
 {
 	printf("%s\n", "Init environment");
 	variable.user = getenv("USER");
-	if (variable.user == NULL)
-		variable.user = ft_strdup("guest");
 	variable.path = getenv("PATH");
 	variable.pwd = getenv("PWD");
-	if (variable.pwd == NULL)
-		variable.pwd = ft_strdup("we do not know where we are");
 	variable.name = getenv("NAME");
-	if (variable.name == NULL)
-		variable.name = ft_strdup("minishell");
 	variable.nb_cmd = 0;
 	variable.cmds = NULL;
 	if (!variable.user || !variable.path)
@@ -38,7 +31,7 @@ bool	ft_init_environement(void)
 	printf("Name = %s\n", variable.name);
 	return (true);
 }
-
+*/
 void	ft_print_command_table(void)
 {
 	printf("here my command table\n");
@@ -109,7 +102,7 @@ bool	ft_is_only_space(char *buffer)
 	}
 	return (true);
 }
-
+/*
 char	*ft_get_prompt(void)
 {
 	char *prompt;
@@ -119,27 +112,26 @@ char	*ft_get_prompt(void)
 	prompt = ft_strjoin(prompt, variable.name, 1);
 	prompt = ft_strjoin(prompt, ": ", 1);
 	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
-	prompt = ft_strjoin(prompt, ft_get_pwd(), 1);
+	prompt = ft_strjoin(prompt, variable.pwd, 1);
 	prompt = ft_strjoin(prompt, "> ", 1);
 	prompt = ft_strjoin(prompt, "\033[0m", 1);
+
 	return (prompt);
 }
-
-int	main(int ac, char **argv, char **env)
+*/
+int	main()
 {
 	char	*buffer;
-	(void)ac;
-	(void)argv;
-	(void)env;
+
 	while (*environ)
 	{
 		printf("%s\n", environ[0]);
 		environ++;
 	}
-	ft_init_environement();
+	//ft_init_environement();
 	while (1)
 	{
-		buffer = readline(ft_get_prompt());
+		buffer = readline(PROMPT);
 		if (ft_is_only_space(buffer))// if buffer is empty
 			continue ;
 		else if (ft_strncmp(buffer, "exit ", 4) == 0)// exit program
