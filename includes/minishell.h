@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/06 18:44:38 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/08 14:06:04 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 typedef struct		s_cmd
 {
 	int		infile;
+	bool	if_infile;
 	int		outfile;
 	char	**options;
 	char	*path;
@@ -33,7 +34,6 @@ typedef struct		s_cmd
 
 typedef struct		s_env
 {
-	char	*user;
 	char	*path;
 	char	*pwd;
 	char	*name;

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 16:57:35 by dantremb          #+#    #+#             */
-/*   Updated: 2022/05/17 23:40:07 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/08 12:54:49 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ char	*ft_strjoin(char *s1, char const *s2, int f)
 
 	is = 0;
 	id = 0;
+	if (!s1 || !s2)
+		return (NULL);
 	tmp = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
 	if (tmp == NULL)
 		return (NULL);

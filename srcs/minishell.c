@@ -6,21 +6,28 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/06 18:52:54 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/08 14:03:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+extern char **environ;
 t_env	variable;
 
 bool	ft_init_environement(void)
 {
 	printf("%s\n", "Init environment");
 	variable.user = getenv("USER");
+	if (variable.user == NULL)
+		variable.user = ft_strdup("guest");
 	variable.path = getenv("PATH");
 	variable.pwd = getenv("PWD");
+	if (variable.pwd == NULL)
+		variable.pwd = ft_strdup("we do not know where we are");
 	variable.name = getenv("NAME");
+	if (variable.name == NULL)
+		variable.name = ft_strdup("minishell");
 	variable.nb_cmd = 0;
 	variable.cmds = NULL;
 	if (!variable.user || !variable.path)
@@ -29,7 +36,6 @@ bool	ft_init_environement(void)
 	printf("Pwd = %s\n", variable.pwd);
 	//printf("Path = %s\n", variable.path);
 	printf("Name = %s\n", variable.name);
-
 	return (true);
 }
 
@@ -69,7 +75,7 @@ int	ft_number_of_command(char *buffer)
 
 bool	ft_execute_command_table(void)
 {
-	if (!variable.nb_cmd == 0)
+	if (variable.nb_cmd == 0)
 	{
 		printf("Nothing to execute\n");
 		return (false);
@@ -81,7 +87,7 @@ bool	ft_execute_command_table(void)
 
 bool	ft_parse_command(void)
 {
-	if (!variable.nb_cmd == 0)
+	if (variable.nb_cmd == 0)
 	{
 		printf("Nothing to parse\n");
 		return (false);
@@ -113,10 +119,9 @@ char	*ft_get_prompt(void)
 	prompt = ft_strjoin(prompt, variable.name, 1);
 	prompt = ft_strjoin(prompt, ": ", 1);
 	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
-	prompt = ft_strjoin(prompt, variable.pwd, 1);
+	prompt = ft_strjoin(prompt, ft_get_pwd(), 1);
 	prompt = ft_strjoin(prompt, "> ", 1);
 	prompt = ft_strjoin(prompt, "\033[0m", 1);
-
 	return (prompt);
 }
 
@@ -126,10 +131,10 @@ int	main(int ac, char **argv, char **env)
 	(void)ac;
 	(void)argv;
 	(void)env;
-	while (*env)
+	while (*environ)
 	{
-		printf("%s\n", env[0]);
-		env++;
+		printf("%s\n", environ[0]);
+		environ++;
 	}
 	ft_init_environement();
 	while (1)
