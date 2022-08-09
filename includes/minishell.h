@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/08 14:06:04 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/09 11:35:17 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,9 @@ typedef struct		s_cmd
 	char	*cmd;
 }					t_cmd;
 
-typedef struct		s_env
+typedef struct		s_data
 {
-	char	*path;
-	char	*pwd;
-	char	*name;
 	int		nb_cmd;
 	t_cmd	**cmds;
-}					t_env;
+}					t_data;
 #endif

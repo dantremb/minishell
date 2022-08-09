@@ -6,48 +6,40 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/08 17:10:42 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/09 11:44:17 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
 extern char **environ;
-t_env	variable;
-/*
-bool	ft_init_environement(void)
+
+void	ft_exit_program(t_data *data, char *str)
 {
-	printf("%s\n", "Init environment");
-	variable.user = getenv("USER");
-	variable.path = getenv("PATH");
-	variable.pwd = getenv("PWD");
-	variable.name = getenv("NAME");
-	variable.nb_cmd = 0;
-	variable.cmds = NULL;
-	if (!variable.user || !variable.path)
-		return (false);
-	printf("User = %s\n", variable.user);
-	printf("Pwd = %s\n", variable.pwd);
-	//printf("Path = %s\n", variable.path);
-	printf("Name = %s\n", variable.name);
-	return (true);
+	ft_putstr_fd(str, 2);
+	
+	if (data->cmds)
+		free (data->cmds);
+	exit(0);
 }
-*/
+
+void	ft_init_environement(t_data *data)
+{
+	int i;
+	printf("%s\n", "Init environment");
+	i = 0;
+	while(environ[i])
+	{
+		environ[i] = ft_strdup(environ[i]);
+		i++;
+	}
+	data->nb_cmd = 0;
+	data->cmds = NULL;
+}
+
 void	ft_print_command_table(void)
 {
 	printf("here my command table\n");
-}
-
-void	ft_free_command_table(char	**t_cmd)
-{
-	int i;
-
-	i = 0;
-	while (t_cmd[i])
-	{
-		free(t_cmd[i]);
-		i++;
-	}
-	free(t_cmd);
 }
 
 int	ft_number_of_command(char *buffer)
@@ -66,27 +58,33 @@ int	ft_number_of_command(char *buffer)
 	return (count);
 }
 
-bool	ft_execute_command_table(void)
+void	ft_execute_command_table(t_data *data)
 {
-	if (variable.nb_cmd == 0)
+	if (data->nb_cmd == 0)
 	{
 		printf("Nothing to execute\n");
-		return (false);
 	}
-	printf("execute the table with = ");
-	ft_print_command_table();
-	return (true);
+	else
+	{
+		printf("execute the table with = ");
+		ft_print_command_table();
+	}
 }
 
-bool	ft_parse_command(void)
+void	ft_parse_command(t_data *data, int count)
 {
-	if (variable.nb_cmd == 0)
+	if (count == 0)
 	{
 		printf("Nothing to parse\n");
-		return (false);
 	}
-	printf("parsing\n");
-	return (true);
+	else
+	{
+		printf("parsing\n");
+		data->nb_cmd = count;
+		data->cmds = malloc(sizeof(char *) * (count + 1));
+		if (data->cmds == NULL)
+			ft_exit_program(data, "malloc error");
+	}
 }
 
 bool	ft_is_only_space(char *buffer)
@@ -102,38 +100,26 @@ bool	ft_is_only_space(char *buffer)
 	}
 	return (true);
 }
-/*
-char	*ft_get_prompt(void)
-{
-	char *prompt;
-	//green + user + @ + host + : + green + pwd + > + white
-	prompt = ft_strjoin("\033[0;32m", variable.user, 0);
-	prompt = ft_strjoin(prompt, "@", 1);
-	prompt = ft_strjoin(prompt, variable.name, 1);
-	prompt = ft_strjoin(prompt, ": ", 1);
-	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
-	prompt = ft_strjoin(prompt, variable.pwd, 1);
-	prompt = ft_strjoin(prompt, "> ", 1);
-	prompt = ft_strjoin(prompt, "\033[0m", 1);
 
-	return (prompt);
-}
-*/
-int	main()
+int	main(void)
 {
 	char	*buffer;
-
-	while (*environ)
-	{
-		printf("%s\n", environ[0]);
-		environ++;
-	}
-	//ft_init_environement();
+	t_data data;
+	
+	ft_init_environement(&data);
 	while (1)
 	{
 		buffer = readline(PROMPT);
 		if (ft_is_only_space(buffer))// if buffer is empty
 			continue ;
+		else if (ft_strncmp(buffer, "env", 3) == 0)
+		{
+			while (*environ)
+			{
+				printf("%s\n", *environ);
+				environ++;
+			}
+		}
 		else if (ft_strncmp(buffer, "exit ", 4) == 0)// exit program
 		{
 			free (buffer);// free buffer
@@ -141,8 +127,8 @@ int	main()
 		}
 		else
 		{
-			ft_parse_command();// parsing the buffer into the command table
-			ft_execute_command_table();// executing the command table
+			ft_parse_command(&data, ft_number_of_command(buffer));// parsing the buffer into the command table
+			ft_execute_command_table(&data);// executing the command table
 			//ft_free_command_table(buffer);// free the command table
 		}
 	}
