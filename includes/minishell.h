@@ -6,9 +6,11 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/09 11:35:17 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/09 14:37:56 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+//check if system is linux or mac
 
 #ifndef MINISHELL_H
 # define MINISHELL_H

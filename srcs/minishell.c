@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/09 11:44:17 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/09 16:47:02 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ extern char **environ;
 void	ft_exit_program(t_data *data, char *str)
 {
 	ft_putstr_fd(str, 2);
-	
+	ft_free_array(environ);
 	if (data->cmds)
 		free (data->cmds);
 	exit(0);
@@ -25,16 +25,17 @@ void	ft_exit_program(t_data *data, char *str)
 
 void	ft_init_environement(t_data *data)
 {
-	int i;
+	//int i;
 	printf("%s\n", "Init environment");
-	i = 0;
+	/*i = 0;
 	while(environ[i])
 	{
 		environ[i] = ft_strdup(environ[i]);
 		i++;
-	}
+	}*/
 	data->nb_cmd = 0;
 	data->cmds = NULL;
+	tgetent(NULL, getenv("TERM"));
 }
 
 void	ft_print_command_table(void)
