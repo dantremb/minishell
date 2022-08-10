@@ -30,9 +30,9 @@ void	ft_init_environement(t_data *data)
 	data->cmds = NULL;
 }
 
-void	ft_print_command_table(void)
+void	ft_print_command_table(t_data *data)
 {
-	printf("here my command table\n");
+	printf("Number of commands: %d\n", data->nb_cmd);
 }
 
 int	ft_number_of_command(char *buffer)
@@ -41,7 +41,7 @@ int	ft_number_of_command(char *buffer)
 	int count;
 
 	i = 0;
-	count = 0;
+	count = 1;
 	while (buffer[i] != '\0')
 	{
 		if (buffer[i] == '|')
@@ -53,31 +53,25 @@ int	ft_number_of_command(char *buffer)
 
 void	ft_execute_command_table(t_data *data)
 {
-	if (data->nb_cmd == 0)
-	{
-		printf("Nothing to execute\n");
-	}
-	else
-	{
-		printf("execute the table with = ");
-		ft_print_command_table();
-	}
+	printf("execute the table\n");
+	ft_print_command_table(data);
+}
+
+void	ft_fill_command_table(t_data *data)
+{
+	printf("fill the table\n");
+	if (ft_strncmp(data->buffer, "echo ", 5) == 0)
+		data->cmds[0]->builtin = 1;
 }
 
 void	ft_parse_command(t_data *data, int count)
 {
-	if (count == 0)
-	{
-		printf("Nothing to parse\n");
-	}
-	else
-	{
-		printf("parsing\n");
-		data->nb_cmd = count;
-		data->cmds = malloc(sizeof(char *) * (count + 1));
-		if (data->cmds == NULL)
-			ft_exit_program(data, "malloc error");
-	}
+	printf("parsing\n");
+	data->nb_cmd = count;
+	data->cmds = malloc(sizeof(char *) * count);
+	if (data->cmds == NULL)
+		ft_exit_program(data, "malloc error");
+	ft_fill_command_table(data);
 }
 
 bool	ft_is_only_space(char *buffer)
@@ -94,18 +88,32 @@ bool	ft_is_only_space(char *buffer)
 	return (true);
 }
 
+char	*ft_get_prompt(void)
+{
+	char	*prompt;
+
+	prompt = ft_strjoin("\033[0;32m", getenv("USER") , 0);
+	prompt = ft_strjoin(prompt, "@", 1);
+	prompt = ft_strjoin(prompt, getenv("NAME"), 1);
+	prompt = ft_strjoin(prompt, ": ", 1);
+	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
+	prompt = ft_strjoin(prompt, getenv("PWD"), 1);
+	prompt = ft_strjoin(prompt, "> ", 1);
+	prompt = ft_strjoin(prompt, "\033[0m", 1);
+	return (prompt);
+}
+
 int	main(void)
 {
-	char	*buffer;
 	t_data data;
 	
 	ft_init_environement(&data);
 	while (1)
 	{
-		buffer = readline(PROMPT);
-		if (ft_is_only_space(buffer))// if buffer is empty
+		data.buffer = readline(ft_get_prompt());
+		if (ft_is_only_space(data.buffer))// if buffer is empty
 			continue ;
-		else if (ft_strncmp(buffer, "env", 3) == 0)
+		else if (ft_strncmp(data.buffer, "env", 3) == 0)
 		{
 			while (*environ)
 			{
@@ -113,16 +121,16 @@ int	main(void)
 				environ++;
 			}
 		}
-		else if (ft_strncmp(buffer, "exit ", 4) == 0)// exit program
+		else if (ft_strncmp(data.buffer, "exit ", 4) == 0)// exit program
 		{
-			free (buffer);// free buffer
+			free (data.buffer);// free buffer
 			exit (0);//	exit program
 		}
 		else
 		{
-			ft_parse_command(&data, ft_number_of_command(buffer));// parsing the buffer into the command table
+			ft_parse_command(&data, ft_number_of_command(data.buffer));// parsing the buffer into the command table
 			ft_execute_command_table(&data);// executing the command table
-			//ft_free_command_table(buffer);// free the command table
+			//ft_free_command_table(data.buffer);// free the command table
 		}
 	}
 }

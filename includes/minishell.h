@@ -26,17 +26,26 @@
 
 typedef struct		s_cmd
 {
+	//for redirections
 	int		infile;
-	bool	if_infile;
 	int		outfile;
+	//for execve
 	char	**options;
 	char	*path;
 	char	*cmd;
+	//for builtins
+	//0=not use 1=echo 2=cd 3=pwd 4=export 
+	//5=unset 6=env 7=setenv 8=unsetenv 9=exit
+	int		builtin;
 }					t_cmd;
 
 typedef struct		s_data
 {
+	//nunmber of commands
 	int		nb_cmd;
+	//buffer for readline
+	char	*buffer;
+	//array of commands
 	t_cmd	**cmds;
 }					t_data;
 #endif
