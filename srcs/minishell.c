@@ -25,17 +25,9 @@ void	ft_exit_program(t_data *data, char *str)
 
 void	ft_init_environement(t_data *data)
 {
-	//int i;
 	printf("%s\n", "Init environment");
-	/*i = 0;
-	while(environ[i])
-	{
-		environ[i] = ft_strdup(environ[i]);
-		i++;
-	}*/
 	data->nb_cmd = 0;
 	data->cmds = NULL;
-	tgetent(NULL, getenv("TERM"));
 }
 
 void	ft_print_command_table(void)
