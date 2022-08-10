@@ -34,9 +34,10 @@ typedef struct		s_cmd
 	char	*path;
 	char	*cmd;
 	//for builtins
-	//0=not use 1=echo 2=cd 3=pwd 4=export 
-	//5=unset 6=env 7=setenv 8=unsetenv 9=exit
+	//0=not use 1=echo 2=cd 3=pwd 4=export 5=unset 6=env
 	int		builtin;
+	//buffer after split command
+	char	*cmd_buffer;
 }					t_cmd;
 
 typedef struct		s_data

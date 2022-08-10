@@ -57,11 +57,39 @@ void	ft_execute_command_table(t_data *data)
 	ft_print_command_table(data);
 }
 
+int	ft_is_builtin(t_cmd *cmds)
+{
+	if (ft_strncmp(cmds->cmd_buffer, "echo ", 5) == 0)
+		return (1);
+	else if (ft_strncmp(cmds->cmd_buffer, "cd", 2) == 0)
+		return (2);
+	else if (ft_strncmp(cmds->cmd_buffer, "pwd", 3) == 0)
+		return (3);
+	else if (ft_strncmp(cmds->cmd_buffer, "export ", 7) == 0)
+		return (4);
+	else if (ft_strncmp(cmds->cmd_buffer, "unset ", 9) == 0)
+		return (5);
+	else if (ft_strncmp(cmds->cmd_buffer, "env", 4) == 0)
+		return (6);
+	else if (ft_strncmp(cmds->cmd_buffer, "exit", 4) == 0)
+		return (7);
+	else
+		return (0);
+}
+
+void	ft_init_builtin(t_cmd *cmds)
+{
+	cmds->builtin = ft_is_builtin(cmds);
+	cmds->cmd_buffer = ft_substr()
+}
+
 void	ft_fill_command_table(t_data *data)
 {
 	printf("fill the table\n");
-	if (ft_strncmp(data->buffer, "echo ", 5) == 0)
-		data->cmds[0]->builtin = 1;
+	if (ft_is_builtin(data->cmds[0]))
+		ft_init_builtin(data->cmds[0]);
+	else
+		ft_init_execve(data->cmds[0]);
 }
 
 void	ft_parse_command(t_data *data, int count)
@@ -71,6 +99,7 @@ void	ft_parse_command(t_data *data, int count)
 	data->cmds = malloc(sizeof(char *) * count);
 	if (data->cmds == NULL)
 		ft_exit_program(data, "malloc error");
+	data->cmds[0]->cmd_buffer = ft_strdup(data->buffer);
 	ft_fill_command_table(data);
 }
 
