@@ -31,35 +31,18 @@
 /* pointer et aucune variable temporaire a besoin d'être free				  */
 
 #include "../includes/libft.h"
+#include <stdio.h>
 
-static int	ft_count_word(char const *src, char sep)
-{
-	int		words;
-	int		i;
-
-	i = -1;
-	words = 0;
-	while (src[++i])
-	{
-		while (src[i] == sep)
-			i++;
-		if (src[i] != sep && src[i])
-			words++;
-		while (src[i] != sep && src[i])
-			i++;
-	}
-	return (words);
-}
-
-char	**ft_split(char const *src, char sep)
+char	**ft_split(char *src, char sep)
 {
 	char	**tab;
 	int		words;
 	int		i;
 	int		len;
 
-	words = ft_count_word(src, sep);
-	tab = ft_calloc(sizeof(char *), (words + 1));
+	words = ft_split_size(src, sep);
+	tab = ft_calloc(sizeof(char *), (words));
+	printf("splits words = %d\n", words);
 	i = -1;
 	if (!tab)
 		return (NULL);

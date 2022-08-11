@@ -60,7 +60,7 @@ char			*ft_strcat(char *dest, char *src);
 char			*ft_itoa(int nbr);
 char			*ft_strdup(const char *src);
 char			*ft_strchr(const char *str, int nbr);
-char			**ft_split(char const *src, char sep);
+char			**ft_split(char *src, char sep);
 char			*ft_strrchr(const char *str, int nbr);
 char			*ft_strjoin(char *s1, char const *s2, int f);
 char			*ft_strtrim(char const *s1, char const *set);
@@ -87,5 +87,6 @@ void			ft_put_hex(unsigned long int nbr, unsigned int base,
 					char *hex, int *p);
 void			ft_free_array(char **array);
 int				ft_split_size(char *src, char sep);
+int				ft_array_size(char **array);
 
 #endif

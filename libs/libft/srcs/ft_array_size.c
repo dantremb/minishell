@@ -1,25 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_free_array.c                                    :+:      :+:    :+:   */
+/*   ft_array_size.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/30 14:10:37 by dantremb          #+#    #+#             */
-/*   Updated: 2022/06/30 14:11:04 by dantremb         ###   ########.fr       */
+/*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
+/*   Updated: 2022/08/09 16:47:02 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
+#include <stdio.h>
 
-void	ft_free_array(char **array)
+int	ft_array_size(char **array)
 {
-	int	i;
+	int i;
 
-	i = -1;
-	while (array[++i])
-		free(array[i]);
-	if (array)
-		free(array);
-	exit(1);
+	i = 0;
+	while (array[i])
+		i++;
+	return (i + 1);
 }

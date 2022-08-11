@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//check if system is linux or mac
-
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -47,6 +45,7 @@ typedef struct		s_data
 	//buffer for readline
 	char	*buffer;
 	//array of commands
-	t_cmd	**cmds;
+	t_cmd	*cmds;
 }					t_data;
+
 #endif

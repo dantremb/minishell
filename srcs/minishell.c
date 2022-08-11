@@ -14,20 +14,29 @@
 
 extern char **environ;
 
-void	ft_exit_program(t_data *data, char *str)
+/* *******************UTILS************************************************** */
+
+void	ft_exit_program(t_data *data, char *str, int status)
 {
 	ft_putstr_fd(str, 2);
-	ft_free_array(environ);
-	if (data->cmds)
-		free (data->cmds);
+	if (status == 0)
+		exit (0);
+	else if (status == 1)
+	{
+		ft_free_array(environ);
+	}
+	else if (status == 2)
+	{
+		ft_free_array(environ);
+		free(data->buffer);
+	}
+	else
+	{
+		ft_free_array(environ);
+		free(data->buffer);
+		free(data->cmds);
+	}
 	exit(0);
-}
-
-void	ft_init_environement(t_data *data)
-{
-	printf("%s\n", "Init environment");
-	data->nb_cmd = 0;
-	data->cmds = NULL;
 }
 
 void	ft_print_command_table(t_data *data)
@@ -35,27 +44,71 @@ void	ft_print_command_table(t_data *data)
 	printf("Number of commands: %d\n", data->nb_cmd);
 }
 
-int	ft_number_of_command(char *buffer)
+/* **********************INIT ENVIRONEMENT*********************************** */
+
+void	ft_copy_environement(t_data *data)
 {
 	int i;
-	int count;
+	char **tmp;
 
 	i = 0;
-	count = 1;
-	while (buffer[i] != '\0')
+	tmp = malloc(sizeof(char *) * (ft_array_size(environ)));
+	if (tmp == NULL)
+		ft_exit_program(data, "Malloc error\n", 0);
+	printf("copy environement\n");
+	while (environ[i])
 	{
-		if (buffer[i] == '|')
-			count++;
-		i++;
+		tmp[i] = ft_strdup(environ[i]);
+		if (!tmp[i++])
+		{
+			free(tmp);
+			ft_exit_program(data, "Malloc error\n", 0);
+		}
 	}
-	return (count);
+	environ = tmp;
 }
 
-void	ft_execute_command_table(t_data *data)
+void	ft_init_environement(t_data *data)
 {
-	printf("execute the table\n");
-	ft_print_command_table(data);
+	printf("%s\n", "Init environment");
+	data->nb_cmd = 0;
+	data->buffer = NULL;
+	data->cmds = NULL;
+	ft_copy_environement(data);
 }
+
+/* ************************READLINE UTILS************************************ */
+
+char	*ft_get_prompt(void)
+{
+	char	*prompt;
+	
+	prompt = ft_strjoin("\033[0;32m", getenv("USER") , 0);
+	prompt = ft_strjoin(prompt, "@", 1);
+	prompt = ft_strjoin(prompt, getenv("NAME"), 1);
+	prompt = ft_strjoin(prompt, ": ", 1);
+	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
+	prompt = ft_strjoin(prompt, getenv("PWD"), 1);
+	prompt = ft_strjoin(prompt, "> ", 1);
+	prompt = ft_strjoin(prompt, "\033[0m", 1);
+	return (prompt);
+}
+
+bool	ft_is_only_space(char *buffer)
+{
+	int i;
+
+	i = 0;
+	while (buffer[i] != '\0')
+	{
+		if (buffer[i] != ' ')
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
+/* **************************PARSING***************************************** */
 
 int	ft_is_builtin(t_cmd *cmds)
 {
@@ -77,60 +130,70 @@ int	ft_is_builtin(t_cmd *cmds)
 		return (0);
 }
 
-void	ft_init_builtin(t_cmd *cmds)
+int	ft_number_of_command(char *buffer)
 {
-	cmds->builtin = ft_is_builtin(cmds);
-	cmds->cmd_buffer = ft_substr()
+	int i;
+	int count;
+
+	i = 0;
+	count = 1;
+	while (buffer[i] != '\0')
+	{
+		if (buffer[i] == ';')
+			count++;
+		i++;
+	}
+	return (count);
 }
 
 void	ft_fill_command_table(t_data *data)
 {
 	printf("fill the table\n");
-	if (ft_is_builtin(data->cmds[0]))
-		ft_init_builtin(data->cmds[0]);
-	else
-		ft_init_execve(data->cmds[0]);
+	(void)data;
+	//	if (ft_is_builtin(data->cmds[0]))
+	//		ft_init_builtin(data->cmds[0]);
+	//	else
+	//		ft_init_execve(data->cmds[0]);
 }
 
 void	ft_parse_command(t_data *data, int count)
 {
-	printf("parsing\n");
+	char **split;
+
+	printf("parsing %d commands\n", count);
+	split = ft_split(data->buffer, ';');
+	if (split == NULL)
+		ft_exit_program(data, "Malloc error\n", 2);
 	data->nb_cmd = count;
-	data->cmds = malloc(sizeof(char *) * count);
+	printf("array size = %d and count = %d\n", ft_array_size(split) - 1, count);
+	data->cmds = malloc(sizeof(t_cmd) * count);
 	if (data->cmds == NULL)
-		ft_exit_program(data, "malloc error");
-	data->cmds[0]->cmd_buffer = ft_strdup(data->buffer);
-	ft_fill_command_table(data);
+		ft_exit_program(data, "malloc error", 2);
+	//ft_init_command_table(data);
+	//ft_fill_command_table(data);
 }
 
-bool	ft_is_only_space(char *buffer)
+/* *******************ENGINE************************************************* */
+
+void	ft_execute_command_table(t_data *data)
 {
-	int i;
-
-	i = 0;
-	while (buffer[i] != '\0')
-	{
-		if (buffer[i] != ' ')
-			return (false);
-		i++;
-	}
-	return (true);
+	printf("execute the table\n");
+	ft_print_command_table(data);
 }
 
-char	*ft_get_prompt(void)
+/* ******************BUILT-IN************************************************ */
+
+void	ft_print_env(void)
 {
-	char	*prompt;
+	int	i;
 
-	prompt = ft_strjoin("\033[0;32m", getenv("USER") , 0);
-	prompt = ft_strjoin(prompt, "@", 1);
-	prompt = ft_strjoin(prompt, getenv("NAME"), 1);
-	prompt = ft_strjoin(prompt, ": ", 1);
-	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
-	prompt = ft_strjoin(prompt, getenv("PWD"), 1);
-	prompt = ft_strjoin(prompt, "> ", 1);
-	prompt = ft_strjoin(prompt, "\033[0m", 1);
-	return (prompt);
+	i = -1;
+	while(environ[++i])
+		printf("%s\n", environ[i]);
+
 }
+
+/* ***********************MAIN*********************************************** */
 
 int	main(void)
 {
@@ -143,23 +206,16 @@ int	main(void)
 		if (ft_is_only_space(data.buffer))// if buffer is empty
 			continue ;
 		else if (ft_strncmp(data.buffer, "env", 3) == 0)
-		{
-			while (*environ)
-			{
-				printf("%s\n", *environ);
-				environ++;
-			}
-		}
+			ft_print_env();
 		else if (ft_strncmp(data.buffer, "exit ", 4) == 0)// exit program
-		{
-			free (data.buffer);// free buffer
-			exit (0);//	exit program
-		}
+			ft_exit_program(&data, "Good bye, have a nice day!\n", 2);
 		else
 		{
 			ft_parse_command(&data, ft_number_of_command(data.buffer));// parsing the buffer into the command table
-			ft_execute_command_table(&data);// executing the command table
-			//ft_free_command_table(data.buffer);// free the command table
+			//ft_execute_command_table(&data);// executing the command table
+			//free command table
+			free (data.cmds);
 		}
+		free (data.buffer);
 	}
 }
