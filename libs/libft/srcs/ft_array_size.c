@@ -20,5 +20,5 @@ int	ft_array_size(char **array)
 	i = 0;
 	while (array[i])
 		i++;
-	return (i + 1);
+	return (i + 2);
 }

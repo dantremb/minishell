@@ -20,10 +20,10 @@
 # include "../libs/libft/includes/libft.h"
 # include <stdbool.h>
 
-#define PROMPT "\033[0;32mMINISHELL->\033[0;37m"
-
 typedef struct		s_cmd
 {
+	//commmand number
+	int		id;
 	//for redirections
 	int		infile;
 	int		outfile;
@@ -34,16 +34,20 @@ typedef struct		s_cmd
 	//for builtins
 	//0=not use 1=echo 2=cd 3=pwd 4=export 5=unset 6=env
 	int		builtin;
-	//buffer after split command
+	//buffer after first split
 	char	*cmd_buffer;
 }					t_cmd;
 
 typedef struct		s_data
 {
-	//nunmber of commands
+	//copy of enviroment variable
+	char	**env;
+	//number of commands
 	int		nb_cmd;
 	//buffer for readline
 	char	*buffer;
+	//prompt message for readline
+	char	*prompt;
 	//array of commands
 	t_cmd	*cmds;
 }					t_data;

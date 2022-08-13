@@ -27,15 +27,18 @@ char	*ft_substr(char const *src, unsigned int start, size_t len)
 
 	if (!src)
 		return (NULL);
-	slen = ft_strlen((char *)src);
+	slen = ft_strlen(src);
 	if (start > slen)
-		return (ft_strdup(""));
+		return (NULL);
 	tmp = malloc((len + 1) * sizeof(char));
 	if (!tmp)
 		return (NULL);
-	i = -1;
-	while (++i < len)
+	i = 0;
+	while (i < len)
+	{
 		tmp[i] = src[start + i];
+		i++;
+	}
 	tmp[i] = '\0';
 	return (tmp);
 }
