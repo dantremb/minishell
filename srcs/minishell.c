@@ -12,7 +12,19 @@
 
 #include "../includes/minishell.h"
 
+extern char **environ;
+
 /* ********************EXIT************************************************** */
+
+void	ft_free_command_table(t_data *data)
+{
+	int i;
+
+	i = -1;
+	while (++i < data->nb_cmd)
+		free(data->cmds[i].cmd_buffer);
+	free(data->cmds);
+}
 
 void	ft_exit(t_data *data, char *str, int s)
 {
@@ -21,43 +33,38 @@ void	ft_exit(t_data *data, char *str, int s)
 		exit(0);
 	if (s < 2)
 		free(data->buffer);
-	if (s < 3)
-		ft_free_array(data->env);
-	if (s < 4)
-		free(data->buffer);
 	else if (s == 3)
 	{
 		free(data->buffer);
-		ft_free_array(data->env);
-		free(data->cmds);
-		ft_free_cmd_buffer(data);
+		ft_free_array(environ);
+		free(data->cmds); 
 		exit(0);
 	}
 }
 
-void	ft_free
-
 /* **********************INIT ENVIRONEMENT*********************************** */
 
-void	ft_copy_env(t_data *data, char **envp)
+void	ft_copy_env(t_data *data)
 {
 	printf("copy environement\n");
-	int i;
+	char	**tmp;
+	int		i;
 
 	i = 0;
-	data->env = ft_calloc(sizeof(char *), ft_array_size(envp));
-	if (data->env == NULL)
+	tmp = ft_calloc(sizeof(char *), ft_array_size(environ));
+	if (tmp == NULL)
 		ft_exit(data, "Malloc error\n", 0);
-	while (envp[i])
+	while (environ[i])
 	{
-		data->env[i] = ft_strdup(envp[i]);
-		if (!data->env[i])
+		tmp[i] = ft_strdup(environ[i]);
+		if (!tmp[i])
 			ft_exit(data, "Malloc error\n", 0);
 		i++;
 	}
+	environ = tmp;
 }
 
-void	ft_init_environement(t_data *data, char **envp)
+void	ft_init_environement(t_data *data)
 {
 	printf("Init environment\n");
 	data->nb_cmd = 0;
@@ -65,7 +72,7 @@ void	ft_init_environement(t_data *data, char **envp)
 	data->env = NULL;
 	data->prompt = NULL;
 	data->cmds = NULL;
-	ft_copy_env(data, envp);
+	ft_copy_env(data);
 }
 
 /* ************************READLINE UTILS************************************ */
@@ -137,16 +144,13 @@ void	ft_parse_command(t_data *data, int count)
 	int		i;
 	char	**split;
 
-	split = ft_split(data->buffer, ';');
-	if (split == NULL)
-		ft_exit(data, "Malloc error\n", 1);
 	data->nb_cmd = count;
 	data->cmds = ft_calloc(sizeof(t_cmd), count);
 	if (data->cmds == NULL)
-	{
-		ft_free_array(split);
 		ft_exit(data, "Malloc error\n", 1);
-	}
+	split = ft_split(data->buffer, ';');
+	if (split == NULL)
+		ft_exit(data, "Malloc error\n", 1);
 	i = -1;
 	while (++i < count)
 		ft_init_command_table(&data->cmds[i], i + 1, split[i]);
@@ -157,7 +161,7 @@ void	ft_parse_command(t_data *data, int count)
 
 void	ft_execute_command(t_cmd *cmd)
 {
-	printf("execute command no.%d\n", cmd->id);
+	printf("execute command no.%d = %s\n", cmd->id, cmd->cmd_buffer);
 }
 
 void	ft_execute_command_table(t_data *data)
@@ -184,13 +188,11 @@ void	ft_env(t_data *data)
 
 /* ***********************MAIN*********************************************** */
 
-int	main(int argc, char **argv, char **envp)
+int	main(void)
 {
 	t_data data;
-	(void)argc;
-	(void)argv;
 
-	ft_init_environement(&data, envp);
+	ft_init_environement(&data);
 	while (1)
 	{
 		data.prompt = ft_get_prompt();
@@ -201,14 +203,14 @@ int	main(int argc, char **argv, char **envp)
 		else if (ft_strncmp(data.buffer, "env", 3) == 0)// Environement
 			ft_env(&data);
 		else if (ft_strncmp(data.buffer, "exit", 4) == 0)// exit program
-			ft_exit(&data, "Good bye, have a nice day!\n", 2);
+			ft_exit(&data, "Good bye, have a nice day!\n", 3);
 		else
 		{
 			ft_parse_command(&data, ft_number_of_command(data.buffer));
-			free(data.cmds);
-			ft_free_cmd_buffer(&data);
-			printf("Execute Command\n");// Execute Command
+			ft_execute_command_table(&data);// Execute Command
+			ft_free_command_table(&data);
 		}
 		free (data.buffer);
 	}
+	ft_free_array(environ);
 }

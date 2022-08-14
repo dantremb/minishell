@@ -42,7 +42,6 @@ char	**ft_split(char *src, char sep)
 
 	words = ft_split_size(src, sep);
 	tab = ft_calloc(sizeof(char *), (words));
-	printf("splits words = %d\n", words);
 	i = -1;
 	if (!tab)
 		return (NULL);
