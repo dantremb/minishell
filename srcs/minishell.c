@@ -183,12 +183,12 @@ bool	ft_execute_builtin(t_data *data, t_cmd *cmd)
 	if (ft_strncmp(cmd->cmd_buffer, "echo ", 5) == 0)
 		ft_echo(cmd->cmd_buffer + 5);
 	else if (ft_strncmp(cmd->cmd_buffer, "cd ", 3) == 0)
-		printf("cd\n");
-	else if (ft_strncmp(cmd->cmd_buffer, "export ", 7) == 0)
 		ft_cd(cmd->cmd_buffer + 7);
+	else if (ft_strncmp(cmd->cmd_buffer, "export ", 7) == 0)
+		printf("export\n");
 	else if (ft_strncmp(cmd->cmd_buffer, "unset ", 6) == 0)
 		printf("unset\n");
-	else if (ft_strncmp(cmd->cmd_buffer, "pwd ", 4) == 0)
+	else if (ft_strncmp(cmd->cmd_buffer, "pwd", 3) == 0)
 		printf("pwd\n");
 	else if (ft_strncmp(cmd->cmd_buffer, "env", 3) == 0)
 		ft_env();
