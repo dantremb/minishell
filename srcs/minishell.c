@@ -6,14 +6,45 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/14 11:46:12 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/16 17:48:59 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char **environ;
-bool	ft_cd(char *buffer);
+
+/* ********************COLORS************************************************ */
+
+void green(void)
+{
+  printf("\033[1;32m");
+}
+
+void red(void)
+{
+  printf("\033[1;31m");
+}
+
+void yellow(void)
+{
+  printf("\033[1;33m");
+}
+
+void blue(void)
+{
+  printf("\033[1;34m");
+}
+
+void cyan(void)
+{
+  printf("\033[1;36m");
+}
+
+void reset(void)
+{
+  printf("\033[0m");
+}
 
 /* ******************BUILT-IN************************************************ */
 
@@ -41,6 +72,9 @@ void	ft_free_command_table(t_data *data)
 	i = -1;
 	while (++i < data->nb_cmd)
 		free(data->cmds[i].cmd_buffer);
+	i = -1;
+	while (++i < data->nb_cmd)
+		free(data->cmds[i].options);
 }
 
 void	ft_exit(t_data *data, char *str, int s)
@@ -53,6 +87,8 @@ void	ft_exit(t_data *data, char *str, int s)
 		ft_free_array(environ);
 	if (s <= 3)
 		free(data->cmds);
+	if (s <= 4)
+		ft_free_command_table(data);
 	exit(0);
 }
 
@@ -93,7 +129,7 @@ void	ft_init_environement(t_data *data)
 char	*ft_get_prompt(void)
 {
 	char	*prompt;
-	
+
 	prompt = ft_strjoin("\033[0;32m", getenv("USER") , 0);
 	prompt = ft_strjoin(prompt, "@", 1);
 	prompt = ft_strjoin(prompt, "Minishell", 1);
@@ -137,22 +173,71 @@ int	ft_number_of_command(char *buffer)
 	return (count);
 }
 
+char	**ft_split_command(char *buffer)
+{
+	char	**tmp;
+
+	tmp = ft_split(buffer, ' ');
+	return (tmp);
+}
+
+char *ft_get_command_path(char *cmd)
+{
+	char	*program_name;
+	char	**prog_path;
+	char	*env_path;
+	char	*test_path;
+	int		i;
+	
+	if (!cmd || access(cmd, F_OK | X_OK) == 0)
+		return (cmd);
+	program_name = ft_strjoin("/", cmd, 0);
+	env_path = getenv("PATH");
+	prog_path = ft_split(env_path, ':');
+	if (prog_path == NULL)
+		return (NULL);
+	i = 0;
+	while (prog_path[i])
+	{
+		test_path = ft_strjoin(prog_path[i], program_name, 0);
+		if (access(test_path, F_OK | X_OK) == 0)
+			break ;
+		free (test_path);
+		i++;
+	}
+	//ft_free_array(prog_path);
+	//free (program_name);
+	return (test_path);
+}
+
 void	ft_init_command_table(t_cmd *cmd, int id, char *buffer)
 {
+	red();
 	printf("Init command #%d\n", id);
 	cmd->cmd_buffer = buffer;
+	yellow();
+	printf("[  BUFFER] : %s\n", cmd->cmd_buffer);
 	cmd->id = id;
+	printf("[      ID] : %d\n", cmd->id);
 	cmd->infile = 0;
 	cmd->outfile = 0;
-	cmd->options = NULL;
-	cmd->path = NULL;
 	cmd->cmd = NULL;
-	printf("my buffer is %s\n", cmd->cmd_buffer);
+	cmd->options = ft_split(buffer, ' ');
+	int i = -1;
+	printf("[ OPTIONS] : ");
+	while (cmd->options[++i])
+		printf("[%s]", cmd->options[i]);
+	printf("\n");
+	cmd->path = ft_get_command_path(cmd->options[0]);
+	printf("[    PATH] : %s\n", cmd->path);
+	reset();
 }
 
 void	ft_parse_command(t_data *data, int count)
 {
-	printf("parsing %d commands\n", count);
+	blue();
+	printf("[--- PARSING %d COMMANDS ---]\n", count);
+	reset();
 	int		i;
 	char	**split;
 
@@ -173,7 +258,18 @@ void	ft_parse_command(t_data *data, int count)
 
 void	ft_execute_command(t_data *data, t_cmd *cmd)
 {
+	printf("BOMBOMBOMBOMBOMBOM");
+	int ret;
+	green();
 	printf("execute command no.%d = %s\n", cmd->id, cmd->cmd_buffer);
+	reset();
+	ret = execve(cmd->path, cmd->options, environ);
+	if (ret == -1)
+	{
+		red();
+		printf("Execve error : %s\n", cmd->options[0]);
+		reset();
+	}
 	(void)data;
 }
 
@@ -183,15 +279,17 @@ bool	ft_execute_builtin(t_data *data, t_cmd *cmd)
 	if (ft_strncmp(cmd->cmd_buffer, "echo ", 5) == 0)
 		ft_echo(cmd->cmd_buffer + 5);
 	else if (ft_strncmp(cmd->cmd_buffer, "cd ", 3) == 0)
-		ft_cd(cmd->cmd_buffer + 7);
+		printf("cd\n");
 	else if (ft_strncmp(cmd->cmd_buffer, "export ", 7) == 0)
 		printf("export\n");
 	else if (ft_strncmp(cmd->cmd_buffer, "unset ", 6) == 0)
-		printf("unset\n");
+		printf("unset\n"); 
 	else if (ft_strncmp(cmd->cmd_buffer, "pwd", 3) == 0)
 		printf("pwd\n");
 	else if (ft_strncmp(cmd->cmd_buffer, "env", 3) == 0)
 		ft_env();
+	else if (ft_strncmp(cmd->cmd_buffer, "exit", 4) == 0)
+		ft_exit(data, "Good bye!\n", 4);
 	else
 		return (false);
 	printf("bypass command no.%d = %s\n", cmd->id, cmd->cmd_buffer);
@@ -206,6 +304,7 @@ void	ft_execve_or_builtin(t_data *data, t_cmd *cmd)
 
 void	ft_execute_command_table(t_data *data)
 {
+	cyan();
 	printf("execute the table\n");
 	int	i;
 
@@ -229,10 +328,6 @@ int	main(void)
 		free(data.prompt);
 		if (ft_is_only_space(data.buffer))// Newline on empty buffer
 			continue ;
-		/* else if (ft_strncmp(data.buffer, "env", 3) == 0)// Environement
-			ft_env(); */
-		else if (ft_strncmp(data.buffer, "exit", 4) == 0)// exit program
-			ft_exit(&data, "Good bye, have a nice day!\n", 2);
 		else
 		{
 			ft_parse_command(&data, ft_number_of_command(data.buffer));

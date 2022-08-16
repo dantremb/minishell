@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 16:57:30 by dantremb          #+#    #+#             */
-/*   Updated: 2022/06/30 14:01:00 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/16 17:23:28 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	**ft_split(char *src, char sep)
 	int		len;
 
 	words = ft_split_size(src, sep);
-	tab = ft_calloc(sizeof(char *), (words));
+	tab = ft_calloc(sizeof(char *), (words + 1));
 	i = -1;
 	if (!tab)
 		return (NULL);
