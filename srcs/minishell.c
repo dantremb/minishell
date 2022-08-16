@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/16 17:48:59 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/16 17:56:13 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,18 +65,6 @@ void	ft_env(void)
 
 /* ********************EXIT************************************************** */
 
-void	ft_free_command_table(t_data *data)
-{
-	int i;
-
-	i = -1;
-	while (++i < data->nb_cmd)
-		free(data->cmds[i].cmd_buffer);
-	i = -1;
-	while (++i < data->nb_cmd)
-		free(data->cmds[i].options);
-}
-
 void	ft_exit(t_data *data, char *str, int s)
 {
 	if (s <= 0)
@@ -87,8 +75,6 @@ void	ft_exit(t_data *data, char *str, int s)
 		ft_free_array(environ);
 	if (s <= 3)
 		free(data->cmds);
-	if (s <= 4)
-		ft_free_command_table(data);
 	exit(0);
 }
 
@@ -258,7 +244,6 @@ void	ft_parse_command(t_data *data, int count)
 
 void	ft_execute_command(t_data *data, t_cmd *cmd)
 {
-	printf("BOMBOMBOMBOMBOMBOM");
 	int ret;
 	green();
 	printf("execute command no.%d = %s\n", cmd->id, cmd->cmd_buffer);
@@ -332,7 +317,7 @@ int	main(void)
 		{
 			ft_parse_command(&data, ft_number_of_command(data.buffer));
 			ft_execute_command_table(&data);// Execute Command
-			ft_free_command_table(&data);
+			//ft_free_command_table(&data);
 		}
 		free (data.buffer);
 	}
