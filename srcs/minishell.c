@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/16 17:56:13 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/16 17:57:35 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,7 +246,7 @@ void	ft_execute_command(t_data *data, t_cmd *cmd)
 {
 	int ret;
 	green();
-	printf("execute command no.%d = %s\n", cmd->id, cmd->cmd_buffer);
+	printf("execute command no.%d\n", cmd->id);
 	reset();
 	ret = execve(cmd->path, cmd->options, environ);
 	if (ret == -1)
@@ -295,7 +295,10 @@ void	ft_execute_command_table(t_data *data)
 
 	i = -1;
 	while (++i < data->nb_cmd)
+	{
 		ft_execve_or_builtin(data, &data->cmds[i]);
+		sleep(1);
+	}
 }
 
 
