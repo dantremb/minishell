@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/22 22:40:58 by root              #+#    #+#             */
-/*   Updated: 2022/06/30 14:17:40 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 00:35:02 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,14 @@
 # define DEC "0123456789"
 # define HEXU "0123456789ABCDEF"
 # define HEXL "0123456789abcdef"
-# define BUFFER_SIZE 500
+# define BUFFER_SIZE 1
+# define RED 1
+# define GREEN 2
+# define YELLOW 3
+# define BLUE 4
+# define PURPLE 5
+# define CYAN 6
+# define WHITE 7
 
 typedef struct s_list
 {
@@ -88,5 +95,5 @@ void			ft_put_hex(unsigned long int nbr, unsigned int base,
 void			ft_free_array(char **array);
 int				ft_split_size(char *src, char sep);
 int				ft_array_size(char **array);
-
+void			ft_color(int color);
 #endif

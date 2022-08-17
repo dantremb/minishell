@@ -6,45 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 00:02:04 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 00:41:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char **environ;
-
-/* ********************COLORS************************************************ */
-
-void green(void)
-{
-  printf("\033[1;32m");
-}
-
-void red(void)
-{
-  printf("\033[1;31m");
-}
-
-void yellow(void)
-{
-  printf("\033[1;33m");
-}
-
-void blue(void)
-{
-  printf("\033[1;34m");
-}
-
-void cyan(void)
-{
-  printf("\033[1;36m");
-}
-
-void white(void)
-{
-  printf("\033[1;37m");
-}
 
 /* ******************BUILT-IN************************************************ */
 
@@ -64,6 +32,16 @@ void	ft_env(void)
 }
 
 /* ********************EXIT************************************************** */
+
+void	ft_free_command_table(t_data *data)
+{
+	int	i;
+	
+	free (data->cmds[i]->cmd);
+	free (data->cmds[i]->path);
+	free (data->cmds[i]->cmd_buffer);
+	ft_free_array(data->cmds[i]->options);
+}
 
 void	ft_exit(t_data *data, char *str, int s)
 {
@@ -198,10 +176,10 @@ char *ft_get_command_path(char *cmd)
 
 void	ft_init_command_table(t_cmd *cmd, int id, char *buffer)
 {
-	red();
+	ft_color(RED);
 	printf("Init command #%d\n", id);
 	cmd->cmd_buffer = buffer;
-	yellow();
+	ft_color(YELLOW);
 	printf("[  BUFFER] : %s\n", cmd->cmd_buffer);
 	cmd->id = id;
 	printf("[      ID] : %d\n", cmd->id);
@@ -216,14 +194,14 @@ void	ft_init_command_table(t_cmd *cmd, int id, char *buffer)
 	printf("\n");
 	cmd->path = ft_get_command_path(cmd->options[0]);
 	printf("[    PATH] : %s\n", cmd->path);
-	white();
+	ft_color(WHITE);
 }
 
 void	ft_parse_command(t_data *data, int count)
 {
-	blue();
+	ft_color(BLUE);
 	printf("[--- PARSING %d COMMANDS ---]\n", count);
-	white();
+	ft_color(WHITE);
 	int		i;
 	char	**split;
 
@@ -253,10 +231,9 @@ void	ft_execute_command(t_data *data, t_cmd *cmd)
 	//int ret;
 	pid_t pid;
 	
-	green();
+	ft_color(GREEN);
 	printf("execute command no.%d\n", cmd->id);
-	white();
-	printf("test2\n");
+	ft_color(WHITE);
 	pid = fork();
 	if (pid == 0)
 		ft_child_process(data, cmd);
@@ -296,7 +273,7 @@ void	ft_execve_or_builtin(t_data *data, t_cmd *cmd)
 
 void	ft_execute_command_table(t_data *data)
 {
-	cyan();
+	ft_color(CYAN);
 	printf("execute the table\n");
 	int	i;
 
