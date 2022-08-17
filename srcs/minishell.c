@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 00:54:03 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 13:15:14 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,15 @@ void	ft_free_command_table(t_data *data)
 	i = -1;
 	while (data->cmds[++i].id)
 	{
-		free (data->cmds[i].cmd);
+		if (data->cmds[i].cmd)
+			free (data->cmds[i].cmd);
+		data->cmds[i].cmd = NULL;
 		free (data->cmds[i].path);
+		data->cmds[i].path = NULL;
 		free (data->cmds[i].cmd_buffer);
+		data->cmds[i].cmd_buffer = NULL;
 		ft_free_array(data->cmds[i].options);
+		data->cmds[i].options = NULL;
 	}
 }
 
@@ -109,7 +114,8 @@ char	*ft_get_prompt(void)
 	return (prompt);
 }
 
-bool	ft_is_only_space(char *buffer)
+bool	ft_is_only_space(char *buffer)ls -al
+
 {
 	int i;
 
