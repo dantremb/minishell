@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/16 17:57:35 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 00:02:04 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ void cyan(void)
   printf("\033[1;36m");
 }
 
-void reset(void)
+void white(void)
 {
-  printf("\033[0m");
+  printf("\033[1;37m");
 }
 
 /* ******************BUILT-IN************************************************ */
@@ -216,14 +216,14 @@ void	ft_init_command_table(t_cmd *cmd, int id, char *buffer)
 	printf("\n");
 	cmd->path = ft_get_command_path(cmd->options[0]);
 	printf("[    PATH] : %s\n", cmd->path);
-	reset();
+	white();
 }
 
 void	ft_parse_command(t_data *data, int count)
 {
 	blue();
 	printf("[--- PARSING %d COMMANDS ---]\n", count);
-	reset();
+	white();
 	int		i;
 	char	**split;
 
@@ -242,19 +242,26 @@ void	ft_parse_command(t_data *data, int count)
 
 /* *******************ENGINE************************************************* */
 
+void	ft_child_process(t_data *data, t_cmd *cmd)
+{
+	execve(cmd->path, cmd->options, environ);
+	(void)data;
+}
+
 void	ft_execute_command(t_data *data, t_cmd *cmd)
 {
-	int ret;
+	//int ret;
+	pid_t pid;
+	
 	green();
 	printf("execute command no.%d\n", cmd->id);
-	reset();
-	ret = execve(cmd->path, cmd->options, environ);
-	if (ret == -1)
-	{
-		red();
-		printf("Execve error : %s\n", cmd->options[0]);
-		reset();
-	}
+	white();
+	printf("test2\n");
+	pid = fork();
+	if (pid == 0)
+		ft_child_process(data, cmd);
+	else
+		waitpid(pid, NULL, 0);
 	(void)data;
 }
 
@@ -295,10 +302,7 @@ void	ft_execute_command_table(t_data *data)
 
 	i = -1;
 	while (++i < data->nb_cmd)
-	{
 		ft_execve_or_builtin(data, &data->cmds[i]);
-		sleep(1);
-	}
 }
 
 
