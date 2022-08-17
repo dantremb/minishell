@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 00:41:44 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 00:54:03 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,14 @@ void	ft_free_command_table(t_data *data)
 {
 	int	i;
 	
-	free (data->cmds[i]->cmd);
-	free (data->cmds[i]->path);
-	free (data->cmds[i]->cmd_buffer);
-	ft_free_array(data->cmds[i]->options);
+	i = -1;
+	while (data->cmds[++i].id)
+	{
+		free (data->cmds[i].cmd);
+		free (data->cmds[i].path);
+		free (data->cmds[i].cmd_buffer);
+		ft_free_array(data->cmds[i].options);
+	}
 }
 
 void	ft_exit(t_data *data, char *str, int s)
@@ -222,6 +226,7 @@ void	ft_parse_command(t_data *data, int count)
 
 void	ft_child_process(t_data *data, t_cmd *cmd)
 {
+	printf("White \033[0;37m");
 	execve(cmd->path, cmd->options, environ);
 	(void)data;
 }
@@ -231,9 +236,8 @@ void	ft_execute_command(t_data *data, t_cmd *cmd)
 	//int ret;
 	pid_t pid;
 	
-	ft_color(GREEN);
+	ft_color(1);
 	printf("execute command no.%d\n", cmd->id);
-	ft_color(WHITE);
 	pid = fork();
 	if (pid == 0)
 		ft_child_process(data, cmd);

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 14:10:37 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 00:42:29 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 00:45:08 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void	ft_free_array(char **array)
 {
 	int	i;
 
+	if (!array)
+		return ;
 	i = -1;
 	while (array[++i])
 		free(array[i]);
