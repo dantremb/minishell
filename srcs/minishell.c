@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 13:15:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 23:09:45 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,16 @@ void	ft_free_command_table(t_data *data)
 	int	i;
 	
 	i = -1;
-	while (data->cmds[++i].id)
+	while (++i < data->nb_cmd)
 	{
 		if (data->cmds[i].cmd)
 			free (data->cmds[i].cmd);
 		data->cmds[i].cmd = NULL;
-		free (data->cmds[i].path);
+		if (data->cmds[i].path)
+			free (data->cmds[i].path);
 		data->cmds[i].path = NULL;
-		free (data->cmds[i].cmd_buffer);
+		if (data->cmds[i].cmd_buffer)
+			free (data->cmds[i].cmd_buffer);
 		data->cmds[i].cmd_buffer = NULL;
 		ft_free_array(data->cmds[i].options);
 		data->cmds[i].options = NULL;
@@ -62,6 +64,8 @@ void	ft_exit(t_data *data, char *str, int s)
 		ft_free_array(environ);
 	if (s <= 3)
 		free(data->cmds);
+	if (s <= 4)
+		ft_free_command_table(data);
 	exit(0);
 }
 
@@ -114,8 +118,7 @@ char	*ft_get_prompt(void)
 	return (prompt);
 }
 
-bool	ft_is_only_space(char *buffer)ls -al
-
+bool	ft_is_only_space(char *buffer)
 {
 	int i;
 
@@ -179,8 +182,8 @@ char *ft_get_command_path(char *cmd)
 		free (test_path);
 		i++;
 	}
-	//ft_free_array(prog_path);
-	//free (program_name);
+	ft_free_array(prog_path);
+	free (program_name);
 	return (test_path);
 }
 
@@ -188,21 +191,21 @@ void	ft_init_command_table(t_cmd *cmd, int id, char *buffer)
 {
 	ft_color(RED);
 	printf("Init command #%d\n", id);
-	cmd->cmd_buffer = buffer;
+	cmd->cmd_buffer = buffer;// receive individual command buffer
 	ft_color(YELLOW);
 	printf("[  BUFFER] : %s\n", cmd->cmd_buffer);
-	cmd->id = id;
+	cmd->id = id;// set command number (useless maybe)
 	printf("[      ID] : %d\n", cmd->id);
-	cmd->infile = 0;
-	cmd->outfile = 0;
-	cmd->cmd = NULL;
-	cmd->options = ft_split(buffer, ' ');
+	cmd->infile = 0;// set input file if any
+	cmd->outfile = 0;// set output file if any
+	cmd->cmd = NULL; // set buffer for builtin
+	cmd->options = ft_split(buffer, ' ');//set options array for execve
 	int i = -1;
 	printf("[ OPTIONS] : ");
 	while (cmd->options[++i])
 		printf("[%s]", cmd->options[i]);
 	printf("\n");
-	cmd->path = ft_get_command_path(cmd->options[0]);
+	cmd->path = ft_get_command_path(cmd->options[0]);// get path of command
 	printf("[    PATH] : %s\n", cmd->path);
 	ft_color(WHITE);
 }
@@ -215,17 +218,17 @@ void	ft_parse_command(t_data *data, int count)
 	int		i;
 	char	**split;
 
-	data->nb_cmd = count;
-	data->cmds = ft_calloc(sizeof(t_cmd), count);
+	data->nb_cmd = count; //receive number of command from function
+	data->cmds = ft_calloc(sizeof(t_cmd), count); //malloc cmds array
 	if (data->cmds == NULL)
 		ft_exit(data, "Malloc error\n", 2);
-	split = ft_split(data->buffer, ';');
+	split = ft_split(data->buffer, ';');//split buffer with ;
 	if (split == NULL)
 		ft_exit(data, "Malloc error\n", 3);
 	i = -1;
 	while (++i < count)
-		ft_init_command_table(&data->cmds[i], i + 1, split[i]);
-	free(split);
+		ft_init_command_table(&data->cmds[i], i + 1, split[i]);//init each command
+	free(split); //free split pointer
 }
 
 /* *******************ENGINE************************************************* */
@@ -299,21 +302,20 @@ int	main(void)
 {
 	t_data data;
 
-	ft_init_environement(&data);
+	ft_init_environement(&data);// Copy global environ variable to heap
 	while (1)
 	{
-		data.prompt = ft_get_prompt();
-		data.buffer = readline(data.prompt);
-		free(data.prompt);
+		data.prompt = ft_get_prompt();// Get user and path for prompt
+		data.buffer = readline(data.prompt);// Fill the buffer with user input
+		free(data.prompt);// Free the prompt for next iteration
 		if (ft_is_only_space(data.buffer))// Newline on empty buffer
 			continue ;
 		else
 		{
-			ft_parse_command(&data, ft_number_of_command(data.buffer));
-			ft_execute_command_table(&data);// Execute Command
-			//ft_free_command_table(&data);
+			ft_parse_command(&data, ft_number_of_command(data.buffer));//Fill command table
+			ft_execute_command_table(&data);// Execute Command Table
+			ft_free_command_table(&data);// Free Command Table
 		}
-		free (data.buffer);
+		free (data.buffer);// Free buffer for next iteration
 	}
-	ft_free_array(environ);
 }
