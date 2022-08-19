@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 23:09:45 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/18 20:41:41 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,21 +210,45 @@ void	ft_init_command_table(t_cmd *cmd, int id, char *buffer)
 	ft_color(WHITE);
 }
 
-void	ft_parse_command(t_data *data, int count)
+void	ft_reset_command_table(t_data *data, int count)
 {
-	ft_color(BLUE);
-	printf("[--- PARSING %d COMMANDS ---]\n", count);
-	ft_color(WHITE);
-	int		i;
-	char	**split;
+	int i;
 
 	data->nb_cmd = count; //receive number of command from function
 	data->cmds = ft_calloc(sizeof(t_cmd), count); //malloc cmds array
 	if (data->cmds == NULL)
 		ft_exit(data, "Malloc error\n", 2);
-	split = ft_split(data->buffer, ';');//split buffer with ;
+	i = -1;
+	while (++i < count)
+	{
+		data->cmds[i].id = i + 1;
+		data->cmds[i]->infile = -1;
+		data->cmds[i]->outfile = -1;
+		data->cmds[i]->cmd = NULL;
+		data->cmds[i]->options = NULL;
+		data->cmds[i]->path = NULL;
+		data->cmd_buffer = NULL;
+	}
+}
+
+char	**ft_split_pipe(data->buffer)
+{
+	char	**split;
+	
+	split = ft_split(data->buffer, ';');
 	if (split == NULL)
 		ft_exit(data, "Malloc error\n", 3);
+	return(split);
+}
+
+void	ft_parse_command(t_data *data, int count)
+{
+	ft_color(BLUE);printf("[--- PARSING %d COMMANDS ---]\n", count);ft_color(WHITE);
+	int		i;
+	char	**split;
+	
+	ft_reset_command_table(data, count);// all int to -1 and pointer to NULL
+	split = ft_split_pipe(data->buffer);//first split with pipe and check for quotes
 	i = -1;
 	while (++i < count)
 		ft_init_command_table(&data->cmds[i], i + 1, split[i]);//init each command
