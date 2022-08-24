@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 13:15:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/24 14:41:49 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ char	*ft_get_prompt(void)
 	return (prompt);
 }
 
-bool	ft_is_only_space(char *buffer)ls -al
+bool	ft_is_only_space(char *buffer)
 
 {
 	int i;
@@ -295,6 +295,35 @@ void	ft_execute_command_table(t_data *data)
 
 /* ***********************MAIN*********************************************** */
 
+char	*ft_strtok(char *buffer)
+{
+	static int i = 0;
+	char *tmp;
+	
+	tmp = &buffer[i];
+	while (buffer[i] && buffer[i] != 32)
+	{
+		if (buffer[i] == 39 || buffer[i] == 34)
+		{
+			i++;
+			while (buffer[i] && buffer[i] != 39 && buffer[i] != 34)
+				i++;
+			i++;
+		}
+		else
+			i++;
+	}
+	buffer[i] = 0;
+	i++;
+	return (tmp);
+}
+
+void 	ft_parse(char *buffer)
+{
+	for (int i = 0; i < 5; i++)
+		printf("%s\n", ft_strtok(buffer));
+}
+
 int	main(void)
 {
 	t_data data;
@@ -309,9 +338,11 @@ int	main(void)
 			continue ;
 		else
 		{
-			ft_parse_command(&data, ft_number_of_command(data.buffer));
+			/*ft_parse_command(&data, ft_number_of_command(data.buffer));
 			ft_execute_command_table(&data);// Execute Command
-			//ft_free_command_table(&data);
+			//ft_free_command_table(&data);*/
+			printf("i will parse [%s]\n", data.buffer);
+			ft_parse(data.buffer);
 		}
 		free (data.buffer);
 	}
