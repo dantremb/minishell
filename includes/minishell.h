@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/16 17:24:58 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/17 23:00:39 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,29 +22,22 @@
 
 typedef struct		s_cmd
 {
-	//commmand number
-	int		id;
-	//for redirections
-	int		infile;
-	int		outfile;
-	//for execve and builtins
-	char	*cmd;
-	char	**options;
-	char	*path;
-	//buffer after first split
-	char	*cmd_buffer;
+	int		id;				//commmand number
+	int		infile;			//redirections input
+	int		outfile;		//redirections output
+	char	*cmd;			//builtin buffer
+	char	**options; 		//for execve options
+	char	*path;			//for execve path
+	char	*cmd_buffer;	//individual command buffer
 }					t_cmd;
 
 typedef struct		s_data
 {
-	//number of commands
-	int		nb_cmd;
-	//buffer for readline
-	char	*buffer;
-	//prompt message for readline
-	char	*prompt;
-	//array of commands
-	t_cmd	*cmds;
+	int		nb_cmd;			//number of commands
+	char	*buffer;		//buffer for readline
+	char	*prompt;		//prompt message for readline
+	t_cmd	*cmds;			//array of commands
+
 }					t_data;
 
 #endif
