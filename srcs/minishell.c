@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/25 01:28:47 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/25 01:39:32 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ char	*ft_strtok(char *buffer)
 	if (!save)
 		save = buffer;
 	ret = save;
-	while (save && *save != 32)
+	while (save && *save != 32) 
 	{
 		if (*save == '\0')
 		{
