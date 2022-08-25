@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 13:06:04 by dantremb          #+#    #+#             */
-/*   Updated: 2022/05/17 23:40:16 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/25 01:00:26 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ size_t	ft_strlen(const char *str)
 	{
 	size_t	i;
 
+	if (!str)
+		return (0);
 	i = 0;
 	while (str[i] != '\0')
 		i++;

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/24 14:43:30 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/25 01:28:47 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,6 @@ void	ft_exit(t_data *data, char *str, int s)
 		free(data->buffer);
 	if (s <= 2)
 		ft_free_array(environ);
-	if (s <= 3)
-		free(data->cmds);
-	if (s <= 4)
-		ft_free_command_table(data);
 	exit(0);
 }
 
@@ -134,221 +130,52 @@ bool	ft_is_only_space(char *buffer)
 
 /* **************************PARSING***************************************** */
 
-int	ft_number_of_command(char *buffer)
-{
-	int i;
-	int count;
-
-	i = 0;
-	count = 1;
-	while (buffer[i] != '\0')
-	{
-		if (buffer[i] == ';')
-			count++;
-		i++;
-	}
-	return (count);
-}
-
-char	**ft_split_command(char *buffer)
-{
-	char	**tmp;
-
-	tmp = ft_split(buffer, ' ');
-	return (tmp);
-}
-
-char *ft_get_command_path(char *cmd)
-{
-	char	*program_name;
-	char	**prog_path;
-	char	*env_path;
-	char	*test_path;
-	int		i;
-	
-	if (!cmd || access(cmd, F_OK | X_OK) == 0)
-		return (cmd);
-	program_name = ft_strjoin("/", cmd, 0);
-	env_path = getenv("PATH");
-	prog_path = ft_split(env_path, ':');
-	if (prog_path == NULL)
-		return (NULL);
-	i = 0;
-	while (prog_path[i])
-	{
-		test_path = ft_strjoin(prog_path[i], program_name, 0);
-		if (access(test_path, F_OK | X_OK) == 0)
-			break ;
-		free (test_path);
-		i++;
-	}
-	ft_free_array(prog_path);
-	free (program_name);
-	return (test_path);
-}
-
-void	ft_init_command_table(t_cmd *cmd, int id, char *buffer)
-{
-	ft_color(RED);
-	printf("Init command #%d\n", id);
-	cmd->cmd_buffer = buffer;// receive individual command buffer
-	ft_color(YELLOW);
-	printf("[  BUFFER] : %s\n", cmd->cmd_buffer);
-	cmd->id = id;// set command number (useless maybe)
-	printf("[      ID] : %d\n", cmd->id);
-	cmd->infile = 0;// set input file if any
-	cmd->outfile = 0;// set output file if any
-	cmd->cmd = NULL; // set buffer for builtin
-	cmd->options = ft_split(buffer, ' ');//set options array for execve
-	int i = -1;
-	printf("[ OPTIONS] : ");
-	while (cmd->options[++i])
-		printf("[%s]", cmd->options[i]);
-	printf("\n");
-	cmd->path = ft_get_command_path(cmd->options[0]);// get path of command
-	printf("[    PATH] : %s\n", cmd->path);
-	ft_color(WHITE);
-}
-
-void	ft_reset_command_table(t_data *data, int count)
-{
-	int i;
-
-	data->nb_cmd = count; //receive number of command from function
-	data->cmds = ft_calloc(sizeof(t_cmd), count); //malloc cmds array
-	if (data->cmds == NULL)
-		ft_exit(data, "Malloc error\n", 2);
-	i = -1;
-	while (++i < count)
-	{
-		data->cmds[i].id = i + 1;
-		data->cmds[i]->infile = -1;
-		data->cmds[i]->outfile = -1;
-		data->cmds[i]->cmd = NULL;
-		data->cmds[i]->options = NULL;
-		data->cmds[i]->path = NULL;
-		data->cmd_buffer = NULL;
-	}
-}
-
-char	**ft_split_pipe(data->buffer)
-{
-	char	**split;
-	
-	split = ft_split(data->buffer, ';');
-	if (split == NULL)
-		ft_exit(data, "Malloc error\n", 3);
-	return(split);
-}
-
-void	ft_parse_command(t_data *data, int count)
-{
-	ft_color(BLUE);printf("[--- PARSING %d COMMANDS ---]\n", count);ft_color(WHITE);
-	int		i;
-	char	**split;
-	
-	ft_reset_command_table(data, count);// all int to -1 and pointer to NULL
-	split = ft_split_pipe(data->buffer);//first split with pipe and check for quotes
-	i = -1;
-	while (++i < count)
-		ft_init_command_table(&data->cmds[i], i + 1, split[i]);//init each command
-	free(split); //free split pointer
-}
 
 /* *******************ENGINE************************************************* */
-
-void	ft_child_process(t_data *data, t_cmd *cmd)
-{
-	printf("White \033[0;37m");
-	execve(cmd->path, cmd->options, environ);
-	(void)data;
-}
-
-void	ft_execute_command(t_data *data, t_cmd *cmd)
-{
-	//int ret;
-	pid_t pid;
-	
-	ft_color(1);
-	printf("execute command no.%d\n", cmd->id);
-	pid = fork();
-	if (pid == 0)
-		ft_child_process(data, cmd);
-	else
-		waitpid(pid, NULL, 0);
-	(void)data;
-}
-
-bool	ft_execute_builtin(t_data *data, t_cmd *cmd)
-{
-	(void)data;
-	if (ft_strncmp(cmd->cmd_buffer, "echo ", 5) == 0)
-		ft_echo(cmd->cmd_buffer + 5);
-	else if (ft_strncmp(cmd->cmd_buffer, "cd ", 3) == 0)
-		printf("cd\n");
-	else if (ft_strncmp(cmd->cmd_buffer, "export ", 7) == 0)
-		printf("export\n");
-	else if (ft_strncmp(cmd->cmd_buffer, "unset ", 6) == 0)
-		printf("unset\n"); 
-	else if (ft_strncmp(cmd->cmd_buffer, "pwd", 3) == 0)
-		printf("pwd\n");
-	else if (ft_strncmp(cmd->cmd_buffer, "env", 3) == 0)
-		ft_env();
-	else if (ft_strncmp(cmd->cmd_buffer, "exit", 4) == 0)
-		ft_exit(data, "Good bye!\n", 4);
-	else
-		return (false);
-	printf("bypass command no.%d = %s\n", cmd->id, cmd->cmd_buffer);
-	return (true);
-}
-
-void	ft_execve_or_builtin(t_data *data, t_cmd *cmd)
-{
-	if (!ft_execute_builtin(data, cmd))
-		ft_execute_command(data, cmd);
-}
-
-void	ft_execute_command_table(t_data *data)
-{
-	ft_color(CYAN);
-	printf("execute the table\n");
-	int	i;
-
-	i = -1;
-	while (++i < data->nb_cmd)
-		ft_execve_or_builtin(data, &data->cmds[i]);
-}
 
 
 /* ***********************MAIN*********************************************** */
 
 char	*ft_strtok(char *buffer)
 {
-	static int i = 0;
-	char *tmp;
+	static char	*save;
+	char *ret;
 	
-	tmp = &buffer[i];
-	while (buffer[i] && buffer[i] != 32)
+	if (!save)
+		save = buffer;
+	ret = save;
+	while (save && *save != 32)
 	{
-		if (buffer[i] == 39 || buffer[i] == 34)
+		if (*save == '\0')
 		{
-			i++;
-			while (buffer[i] && buffer[i] != 39 && buffer[i] != 34)
-				i++;
-			i++;
+			save = NULL;
+			return (ret);
+		}
+		else if (*save == 39 || *save == 34)
+		{
+			save = strchr(save + 1, *save);
+			if (!save)
+				return (ret);
+			save++;
 		}
 		else
-			i++;
+			save++;	
 	}
-	buffer[i] = 0;
-	i++;
-	return (tmp);
+	if (save)
+		*save++ = 0;
+	return (ret);
 }
 
 void 	ft_parse(char *buffer)
 {
-	for (int i = 0; i < 5; i++)
-		printf("%s\n", ft_strtok(buffer));
+	char *token;
+
+	token = ft_strtok(buffer);
+	while (token)
+	{
+		printf("TOK = %s\n", token);
+		token = ft_strtok(NULL);
+	}
 }
 
 int	main(void)
