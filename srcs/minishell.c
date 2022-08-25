@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/25 01:39:32 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/25 01:47:02 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,27 +32,6 @@ void	ft_env(void)
 }
 
 /* ********************EXIT************************************************** */
-
-void	ft_free_command_table(t_data *data)
-{
-	int	i;
-	
-	i = -1;
-	while (++i < data->nb_cmd)
-	{
-		if (data->cmds[i].cmd)
-			free (data->cmds[i].cmd);
-		data->cmds[i].cmd = NULL;
-		if (data->cmds[i].path)
-			free (data->cmds[i].path);
-		data->cmds[i].path = NULL;
-		if (data->cmds[i].cmd_buffer)
-			free (data->cmds[i].cmd_buffer);
-		data->cmds[i].cmd_buffer = NULL;
-		ft_free_array(data->cmds[i].options);
-		data->cmds[i].options = NULL;
-	}
-}
 
 void	ft_exit(t_data *data, char *str, int s)
 {
@@ -192,9 +171,6 @@ int	main(void)
 			continue ;
 		else
 		{
-			/*ft_parse_command(&data, ft_number_of_command(data.buffer));
-			ft_execute_command_table(&data);// Execute Command
-			//ft_free_command_table(&data);*/
 			printf("i will parse [%s]\n", data.buffer);
 			ft_parse(data.buffer);
 		}
