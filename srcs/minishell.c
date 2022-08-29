@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/29 12:29:51 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/29 14:56:30 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,6 @@ void	ft_init_environement(t_data *data)
 	data->nb_cmd = 0;
 	data->buffer = NULL;
 	data->prompt = NULL;
-	data->cmds = NULL;
 	ft_copy_env(data);
 }
 
@@ -113,6 +112,7 @@ bool	ft_is_only_space(char *buffer)
 
 /* **************************PARSING***************************************** */
 
+/*
 int		*ft_open_file(char *buffer)
 {
 	int		*fd;
@@ -158,7 +158,7 @@ char	*ft_get_path(char *buffer)
 	free(program);
 	return (test_path);
 }
-
+*/
 char	*ft_strtok(char *buffer)
 {
 	static char	*save;
@@ -191,25 +191,45 @@ char	*ft_strtok(char *buffer)
 
 int	ft_token_count(t_data *data)
 {
-	char *token_count;
+	char *tmp;
+	char *token;
+	int i;
 	
-	token_count = ft_strtok(data->buffer);
-	while(token_count)
+	i = 0;
+	tmp = ft_strdup(data->buffer);
+	token = ft_strtok(tmp);
+	while(token)
 	{
-		data->nb_cmd++;
-		token_count = ft_strtok(NULL);
+		i++;
+		token = ft_strtok(NULL);
 	}
+	free(tmp);
+	return (i);
+}
+
+void	ft_parse_token(t_data *data)
+{
+	int i;
 	
+	i = 0;
+	data->token[i].name = ft_strtok(data->buffer);
+	while(data->token[i].name)
+	{
+		i++;
+		data->token[i].name = ft_strtok(NULL);
+	}
 }
 
 void 	ft_parse(t_data *data)
 {
-	token = ft_strtok(buffer);
-	while (token)
-	{
-		printf("TOK = %s\n", token);
-		token = ft_strtok(NULL);
-	}
+	int i = -1;
+	
+	data->token = ft_calloc(sizeof(t_token), ft_token_count(data));
+	ft_parse_token(data);
+	
+
+	while(data->token[++i].name)
+		printf("%s\n", data->token[i].name);
 }
 
 /* *******************ENGINE************************************************* */
@@ -234,7 +254,7 @@ int	main(void)
 			ft_color(1);
 			printf("i will parse [%s]\n", data.buffer);
 			ft_color(7);
-			ft_parse(&data);
+			ft_parse(&data);//tokenize the buffer
 		}
 		free (data.buffer);// Free buffer for next iteration
 	}

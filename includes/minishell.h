@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/29 12:34:44 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/29 14:19:22 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@
 
 typedef struct		s_token
 {
-	char	*token;			//indivividual token
+	char	*name;			//indivividual token
 	char	*path;			//for execve path
-	int		infile = -1;
+	int		infile;
 	int		outfile;
 	
 }					t_token;
