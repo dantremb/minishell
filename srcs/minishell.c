@@ -6,11 +6,15 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/25 13:11:23 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/29 11:54:21 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+#define DBQUOTE 34
+#define SQUOTE 39
+#define SPACE 32
 
 extern char **environ;
 
@@ -115,34 +119,62 @@ bool	ft_is_only_space(char *buffer)
 
 /* ***********************MAIN*********************************************** */
 
+char	*ft_get_path(char *cmd)
+{
+	char	*env_path;
+	char	**fcnt_path;
+	int		i;
+
+	i = 0;
+	if (access(cmd, F_OK | X_OK) == 0)
+		return (cmd);
+	env_path = getenv("PATH");
+	if (env_path == NULL)
+		return (NULL);
+	fcnt_path = ft_strsplit(env_path, ':');
+	if (fcnt_path == NULL)
+		return (NULL);
+	while (fcnt_path[i])
+	{
+		test_path = ft_strjoin(fcnt_path[i], cmd);
+		if (access(test_path, F_OK | X_OK) == 0)
+			break ;
+		free (test_path);
+		test_path = NULL;
+		i++;
+	}
+	ft_free_array(fcnt_path);
+	return (test_path);
+}
+
 char	*ft_strtok(char *buffer)
 {
-	static char	*save; //pointer to insert NULL after token and keep the rest of the buffer
-	char *ret; //start of the token
+	static char	*save;
+	char *ret;
 	
-	if (!save) //if save is NULL, we are at the beginning of the buffer
-		save = buffer; //so we make a copy of the pointer to the buffer
-	ret = save; //we make a copy of the pointer to the save pointer to keep the start of the token
-	while (save && *save != 32) //while we are not on a space character
+	if (!save)
+		save = buffer;
+	ret = save;
+	while (save && *save != SPACE)
 	{
-		if (*save == '\0') // if we are at the end of the buffer
+		if (*save == '\0')
 		{
-			save = NULL; //set save to NULL for the next call to return NULL directly
-			return (ret); //return the pointer to the start of the token that will send all the remaining buffer
+			save = NULL;
+			return (ret);
 		}
-		else if (*save == 39 || *save == 34) // if we are on a double or single quotes
+		else if (*save == DBQUOTE || *save == SQUOTE)
 		{
-			save = strchr(save + 1, *save); // we change our pointer to the next quote with strchr
-			if (!save) // if he return Null then its a syntax error
-				return (ret); // so we return all the remaining buffer
-			save++; // we move the pointer to the next character after the quote to continue the parsing
+			save = strchr(save + 1, *save);
+			if (!save)
+				return (ret);
+			save++;
 		}
 		else
-			save++;	//we go to the next character if it is not a space or a quote
+			save++;
 	}
-	if (save) // if save is not NULL, we are at the end of the token
-		*save++ = 0; //we insert a NULL character to the end of the token and increment the save pointer for the next token
-	return (ret); //we return the pointer we copied at the start of the token
+	if (save)
+		*save++ = 0;
+	return (ret);
 }
 
 void 	ft_parse(char *buffer)
@@ -177,3 +209,35 @@ int	main(void)
 		free (data.buffer);// Free buffer for next iteration
 	}
 }
+
+/*
+char	*ft_strtok(char *buffer)
+{
+	static char	*save; //pointer to insert NULL after token and keep the rest of the buffer
+	char *ret; //start of the token
+	
+	if (!save) //if save is NULL, we are at the beginning of the buffer
+		save = buffer; //so we make a copy of the pointer to the buffer
+	ret = save; //we make a copy of the pointer to the save pointer to keep the start of the token
+	while (save && *save != 32) //while we are not on a space character
+	{
+		if (*save == '\0') // if we are at the end of the buffer
+		{
+			save = NULL; //set save to NULL for the next call to return NULL directly
+			return (ret); //return the pointer to the start of the token that will send all the remaining buffer
+		}
+		else if (*save == 39 || *save == 34) // if we are on a double or single quotes
+		{
+			save = strchr(save + 1, *save); // we change our pointer to the next quote with strchr
+			if (!save) // if he return Null then its a syntax error
+				return (ret); // so we return all the remaining buffer
+			save++; // we move the pointer to the next character after the quote to continue the parsing
+		}
+		else
+			save++;	//we go to the next character if it is not a space or a quote
+	}
+	if (save) // if save is not NULL, we are at the end of the token
+		*save++ = 0; //we insert a NULL character to the end of the token and increment the save pointer for the next token
+	return (ret); //we return the pointer we copied at the start of the token
+}
+*/
