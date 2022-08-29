@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/29 11:54:21 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/29 12:13:45 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,30 +113,40 @@ bool	ft_is_only_space(char *buffer)
 
 /* **************************PARSING***************************************** */
 
-
-/* *******************ENGINE************************************************* */
-
-
-/* ***********************MAIN*********************************************** */
-
-char	*ft_get_path(char *cmd)
+int		*ft_open_file(char *buffer)
 {
+	int		*fd;
+
+	fd = open(buffer, O_RDONLY);
+	if (fd == -1)
+	{
+		ft_putstr_fd("Error: ", 2);
+		ft_putstr_fd(buffer, 2);
+		ft_putstr_fd(" not found\n", 2);
+		return (NULL);
+	}
+}
+
+char	*ft_get_path(char *buffer)
+{
+	char	*program;
 	char	*env_path;
 	char	**fcnt_path;
 	int		i;
 
 	i = 0;
-	if (access(cmd, F_OK | X_OK) == 0)
-		return (cmd);
+	if (access(buffer, F_OK | X_OK) == 0)
+		return (buffer);
+	program = ft_strjoin("/", buffer, 0);
 	env_path = getenv("PATH");
-	if (env_path == NULL)
+	if (env_path == NULL || )
 		return (NULL);
 	fcnt_path = ft_strsplit(env_path, ':');
 	if (fcnt_path == NULL)
 		return (NULL);
 	while (fcnt_path[i])
 	{
-		test_path = ft_strjoin(fcnt_path[i], cmd);
+		test_path = ft_strjoin(fcnt_path[i], buffer);
 		if (access(test_path, F_OK | X_OK) == 0)
 			break ;
 		free (test_path);
@@ -177,7 +187,7 @@ char	*ft_strtok(char *buffer)
 	return (ret);
 }
 
-void 	ft_parse(char *buffer)
+void 	ft_parse(t_data *data)
 {
 	char *token;
 
@@ -188,6 +198,11 @@ void 	ft_parse(char *buffer)
 		token = ft_strtok(NULL);
 	}
 }
+
+/* *******************ENGINE************************************************* */
+
+
+/* ***********************MAIN*********************************************** */
 
 int	main(void)
 {
@@ -203,8 +218,10 @@ int	main(void)
 			continue ;
 		else
 		{
+			ft_color(1);
 			printf("i will parse [%s]\n", data.buffer);
-			ft_parse(data.buffer);
+			ft_color(7);
+			ft_parse(&data);
 		}
 		free (data.buffer);// Free buffer for next iteration
 	}
