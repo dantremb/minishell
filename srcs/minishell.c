@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/29 12:13:45 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/29 12:29:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ int		*ft_open_file(char *buffer)
 		ft_putstr_fd(" not found\n", 2);
 		return (NULL);
 	}
+	return (fd);
 }
 
 char	*ft_get_path(char *buffer)
@@ -146,7 +147,7 @@ char	*ft_get_path(char *buffer)
 		return (NULL);
 	while (fcnt_path[i])
 	{
-		test_path = ft_strjoin(fcnt_path[i], buffer);
+		test_path = ft_strjoin([ifcnt_path], program);
 		if (access(test_path, F_OK | X_OK) == 0)
 			break ;
 		free (test_path);
@@ -154,6 +155,7 @@ char	*ft_get_path(char *buffer)
 		i++;
 	}
 	ft_free_array(fcnt_path);
+	free(program);
 	return (test_path);
 }
 
@@ -187,10 +189,21 @@ char	*ft_strtok(char *buffer)
 	return (ret);
 }
 
+int	ft_token_count(t_data *data)
+{
+	char *token_count;
+	
+	token_count = ft_strtok(data->buffer);
+	while(token_count)
+	{
+		data->nb_cmd++;
+		token_count = ft_strtok(NULL);
+	}
+	
+}
+
 void 	ft_parse(t_data *data)
 {
-	char *token;
-
 	token = ft_strtok(buffer);
 	while (token)
 	{

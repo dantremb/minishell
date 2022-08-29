@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/17 23:00:39 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/29 12:34:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,21 @@
 # include "../libs/libft/includes/libft.h"
 # include <stdbool.h>
 
-typedef struct		s_cmd
+typedef struct		s_token
 {
-	int		id;				//commmand number
-	int		infile;			//redirections input
-	int		outfile;		//redirections output
-	char	*cmd;			//builtin buffer
-	char	**options; 		//for execve options
+	char	*token;			//indivividual token
 	char	*path;			//for execve path
-	char	*cmd_buffer;	//individual command buffer
-}					t_cmd;
+	int		infile = -1;
+	int		outfile;
+	
+}					t_token;
 
 typedef struct		s_data
 {
 	int		nb_cmd;			//number of commands
 	char	*buffer;		//buffer for readline
 	char	*prompt;		//prompt message for readline
-	t_cmd	*cmds;			//array of commands
+	t_token	*token;			//array of token
 
 }					t_data;
 
