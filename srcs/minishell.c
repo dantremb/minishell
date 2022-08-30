@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 12:28:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 12:47:28 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ int	ft_token_count(char *buffer, char sep)
 	int i;
 	
 	i = 0;
-	tmp = ft_strdup(data->buffer);
+	tmp = ft_strdup(buffer);
 	token = ft_strtok(tmp, sep);
 	while(token)
 	{
@@ -223,11 +223,11 @@ void	ft_make_cmd_table(t_data *data)
 {
 	int i;
 
-	i = -1;
-	data->cmd_count = ft_token_count(data, '|');
+	i = 0;
+	data->cmd_count = ft_token_count(data->buffer, '|');
 	data->cmd = ft_calloc(sizeof(char *), data->cmd_count);
 	data->cmd[0].buffer = ft_strtok(data->buffer, '|');
-	while (data->cmd[++i].buffer)
+	while (++i <= data->cmd_count)
 		data->cmd[i].buffer = ft_strtok(NULL, '|');
 }
 
