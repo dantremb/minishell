@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 12:47:28 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 12:52:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,6 +236,7 @@ void 	ft_parse(t_data *data)
 	int i = -1;
 	
 	ft_make_cmd_table(data);
+	ft_
 	while(data->cmd[++i].buffer)
 		printf("%s\n", data->cmd[i].buffer);
 }
