@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 12:52:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 13:26:49 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,12 +231,24 @@ void	ft_make_cmd_table(t_data *data)
 		data->cmd[i].buffer = ft_strtok(NULL, '|');
 }
 
+/*void	ft_make_token(t_data *data)
+{
+	while (i < data->cmd_count)
+	{
+		data->cmd[i].token_count = ft_token_count(data->cmd[i].buffer, ' ');
+		data->cmd[i].token = ft_calloc(sizeof(char *), data->cmd[i].token_count);
+		data->cmd[i].token[0].buffer = ft_strtok(data->cmd[i].buffer, ' ');
+		while (++i <= data->cmd_count)
+			data->cmd[i].token[i].buffer = ft_strtok(NULL, ' ');
+	}
+}*/
+
 void 	ft_parse(t_data *data)
 {
 	int i = -1;
 	
 	ft_make_cmd_table(data);
-	ft_
+	//ft_make_token(data);
 	while(data->cmd[++i].buffer)
 		printf("%s\n", data->cmd[i].buffer);
 }
@@ -266,6 +278,7 @@ int	main(void)
 			ft_parse(&data);//tokenize the buffer
 		}
 		free (data.buffer);// Free buffer for next iteration
+		free (data->cmd);// Free cmd for next iteration
 	}
 }
 
