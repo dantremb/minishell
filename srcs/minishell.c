@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 12:11:54 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 12:28:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,7 +202,7 @@ char	*ft_strtok(char *buffer, char sep)
 	return (ret);
 }
 
-int	ft_token_count(t_data *data, char sep)
+int	ft_token_count(char *buffer, char sep)
 {
 	char *tmp;
 	char *token;
@@ -216,24 +216,28 @@ int	ft_token_count(t_data *data, char sep)
 		i++;
 		token = ft_strtok(NULL, sep);
 	}
-	fcat );
 	return (i);
+}
+
+void	ft_make_cmd_table(t_data *data)
+{
+	int i;
+
+	i = -1;
+	data->cmd_count = ft_token_count(data, '|');
+	data->cmd = ft_calloc(sizeof(char *), data->cmd_count);
+	data->cmd[0].buffer = ft_strtok(data->buffer, '|');
+	while (data->cmd[++i].buffer)
+		data->cmd[i].buffer = ft_strtok(NULL, '|');
 }
 
 void 	ft_parse(t_data *data)
 {
-	int i;
-
-	i = 0;
-	data->cmd_count = ft_token_count(data, '|');
-	data->cmd = ft_calloc(sizeof(char *), data->cmd_count);
-	data->cmd[0] = ft_strtok(data->buffer, '|');
-	while (data->cmd[i])
-	{
-		i++;
-		data->cmd[i] = ft_strtok(NULL, '|');
-	}
+	int i = -1;
 	
+	ft_make_cmd_table(data);
+	while(data->cmd[++i].buffer)
+		printf("%s\n", data->cmd[i].buffer);
 }
 
 /* *******************ENGINE************************************************* */
