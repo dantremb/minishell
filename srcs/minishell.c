@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 17:12:28 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 19:13:27 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,23 @@ bool	ft_is_only_space(char *buffer)
 
 /* **************************PARSING***************************************** */
 
+char	*ft_trim_space(char *buffer)
+{
+	int		i;
+	
+	if (!buffer)
+		return (buffer);
+	i = ft_strlen(buffer) - 1;
+	while (buffer[i] == ' ')
+	{
+		buffer[i] = '\0';
+		i--;
+	}
+	while (*buffer == ' ')
+		buffer++;
+	return (buffer);
+}
+
 char	*ft_strtok(char *buffer, char sep)
 {
 	static char	*save;
@@ -106,11 +123,15 @@ char	*ft_strtok(char *buffer, char sep)
 	if (!save)
 		save = buffer;
 	ret = save;
+	while (save && *save == ' ')
+		save++;
 	while (save && *save != sep)
 	{
 		if (*save == '\0')
 		{
 			save = NULL;
+			if (ft_is_only_space(ret))
+				return (NULL);
 			return (ret);
 		}
 		else if (*save == DBQUOTE || *save == SQUOTE)
@@ -124,7 +145,7 @@ char	*ft_strtok(char *buffer, char sep)
 			save++;
 	}
 	if (save)
-		*save++ = 0;
+		*save++ = '\0';
 	return (ret);
 }
 
@@ -136,11 +157,13 @@ int	ft_token_count(char *buffer, char sep)
 	
 	i = 0;
 	tmp = ft_strdup(buffer);
-	token = ft_strtok(tmp, sep);
+	token = ft_trim_space(ft_strtok(tmp, sep));
+	printf("tokencount[%i]: [%s]\n", i, token);
 	while(token)
 	{
 		i++;
-		token = ft_strtok(NULL, sep);
+		token = ft_trim_space(ft_strtok(NULL, sep));
+		printf("tokencount[%i]: [%s]\n", i, token);
 	}
 	free(tmp);
 	return (i);
@@ -156,9 +179,24 @@ void	ft_make_cmd_table(t_data *data)
 	data->cmd = ft_calloc(sizeof(t_cmd), data->cmd_count);
 	if (data->cmd == NULL)
 		ft_exit(data, "Malloc error\n", 2);
-	data->cmd[0].buffer = ft_strtok(data->buffer, '|');
+	//data->cmd[0].buffer = ft_strtok(data->buffer, '|');
+	data->cmd[0].buffer = ft_trim_space(ft_strtok(data->buffer, '|'));
 	while (++i < data->cmd_count)
-		data->cmd[i].buffer = ft_strtok(NULL, '|');
+	{
+		//data->cmd[i].buffer = ft_strtok(NULL, '|');
+		data->cmd[i].buffer = ft_trim_space(ft_strtok(NULL, '|'));
+	}
+}
+
+void	ft_make_token(t_data *data)
+{
+	int i;
+
+	i = -1;
+	while (++i < data->cmd_count)
+	{
+		printf("number of token = [%d]\n", ft_token_count(data->cmd[i].buffer, 32));
+	}
 }
 
 void 	ft_parse(t_data *data)
@@ -166,9 +204,9 @@ void 	ft_parse(t_data *data)
 	int i = -1;
 	
 	ft_make_cmd_table(data);
-	//ft_make_token(data);
 	while (++i < data->cmd_count)
-		printf("%s\n", data->cmd[i].buffer);
+		printf("[%s]\n", data->cmd[i].buffer);
+	ft_make_token(data);
 
 }
 
