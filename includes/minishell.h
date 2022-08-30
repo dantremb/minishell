@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 12:52:11 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 16:54:43 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ typedef struct		s_cmd
 
 typedef struct		s_data
 {
+	char	**env;
 	char	*buffer;		//buffer for readline
 	char	*prompt;		//prompt message for readline
 	int 	cmd_count;		//count of commands
