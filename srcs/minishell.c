@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/29 14:56:30 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 12:11:54 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,20 @@
 extern char **environ;
 
 /* ******************BUILT-IN************************************************ */
+
+char	*ft_get_var(char *var)
+{
+	char	*tmp;
+
+	tmp = getenv(var);
+	printf("%s\n", tmp);
+	if (ft_strncmp(var, "|", 1) == 0)
+		return ("'|'");
+	else if (ft_strncmp(var, "", 1) == 0)
+		return (NULL);
+	else
+		return (tmp);
+}
 
 void	ft_echo(char *buffer)
 {
@@ -73,7 +87,6 @@ void	ft_copy_env(t_data *data)
 void	ft_init_environement(t_data *data)
 {
 	printf("Init environment\n");
-	data->nb_cmd = 0;
 	data->buffer = NULL;
 	data->prompt = NULL;
 	ft_copy_env(data);
@@ -159,7 +172,7 @@ char	*ft_get_path(char *buffer)
 	return (test_path);
 }
 */
-char	*ft_strtok(char *buffer)
+char	*ft_strtok(char *buffer, char sep)
 {
 	static char	*save;
 	char *ret;
@@ -167,7 +180,7 @@ char	*ft_strtok(char *buffer)
 	if (!save)
 		save = buffer;
 	ret = save;
-	while (save && *save != SPACE)
+	while (save && *save != sep)
 	{
 		if (*save == '\0')
 		{
@@ -189,7 +202,7 @@ char	*ft_strtok(char *buffer)
 	return (ret);
 }
 
-int	ft_token_count(t_data *data)
+int	ft_token_count(t_data *data, char sep)
 {
 	char *tmp;
 	char *token;
@@ -197,39 +210,30 @@ int	ft_token_count(t_data *data)
 	
 	i = 0;
 	tmp = ft_strdup(data->buffer);
-	token = ft_strtok(tmp);
+	token = ft_strtok(tmp, sep);
 	while(token)
 	{
 		i++;
-		token = ft_strtok(NULL);
+		token = ft_strtok(NULL, sep);
 	}
-	free(tmp);
+	fcat );
 	return (i);
-}
-
-void	ft_parse_token(t_data *data)
-{
-	int i;
-	
-	i = 0;
-	data->token[i].name = ft_strtok(data->buffer);
-	while(data->token[i].name)
-	{
-		i++;
-		data->token[i].name = ft_strtok(NULL);
-	}
 }
 
 void 	ft_parse(t_data *data)
 {
-	int i = -1;
-	
-	data->token = ft_calloc(sizeof(t_token), ft_token_count(data));
-	ft_parse_token(data);
-	
+	int i;
 
-	while(data->token[++i].name)
-		printf("%s\n", data->token[i].name);
+	i = 0;
+	data->cmd_count = ft_token_count(data, '|');
+	data->cmd = ft_calloc(sizeof(char *), data->cmd_count);
+	data->cmd[0] = ft_strtok(data->buffer, '|');
+	while (data->cmd[i])
+	{
+		i++;
+		data->cmd[i] = ft_strtok(NULL, '|');
+	}
+	
 }
 
 /* *******************ENGINE************************************************* */
