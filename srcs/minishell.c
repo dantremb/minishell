@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 19:13:27 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 19:50:03 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,12 +158,10 @@ int	ft_token_count(char *buffer, char sep)
 	i = 0;
 	tmp = ft_strdup(buffer);
 	token = ft_trim_space(ft_strtok(tmp, sep));
-	printf("tokencount[%i]: [%s]\n", i, token);
 	while(token)
 	{
 		i++;
 		token = ft_trim_space(ft_strtok(NULL, sep));
-		printf("tokencount[%i]: [%s]\n", i, token);
 	}
 	free(tmp);
 	return (i);
@@ -179,23 +177,24 @@ void	ft_make_cmd_table(t_data *data)
 	data->cmd = ft_calloc(sizeof(t_cmd), data->cmd_count);
 	if (data->cmd == NULL)
 		ft_exit(data, "Malloc error\n", 2);
-	//data->cmd[0].buffer = ft_strtok(data->buffer, '|');
 	data->cmd[0].buffer = ft_trim_space(ft_strtok(data->buffer, '|'));
 	while (++i < data->cmd_count)
-	{
-		//data->cmd[i].buffer = ft_strtok(NULL, '|');
 		data->cmd[i].buffer = ft_trim_space(ft_strtok(NULL, '|'));
-	}
 }
 
 void	ft_make_token(t_data *data)
 {
-	int i;
+	int c;
+	int t;
 
-	i = -1;
-	while (++i < data->cmd_count)
+	c = -1;
+	while (++c < data->cmd_count)
 	{
-		printf("number of token = [%d]\n", ft_token_count(data->cmd[i].buffer, 32));
+		data->cmd[c].token = ft_calloc(sizeof(char *), ft_token_count(data->cmd[c].buffer, ' '));
+		t = 0;
+		data->cmd[t].buffer = ft_trim_space(ft_strtok(data->buffer, ' '));
+		while (++t < data->cmd_count)
+			data->cmd[t].buffer = ft_trim_space(ft_strtok(NULL, ' '));
 	}
 }
 
@@ -207,11 +206,12 @@ void 	ft_parse(t_data *data)
 	while (++i < data->cmd_count)
 		printf("[%s]\n", data->cmd[i].buffer);
 	ft_make_token(data);
-
+	for (int c = 0; c < data->cmd_count; c++)
+	{
+		for (int t = 0; t < ft_token_count(data->cmd[c].buffer, ' '); t++)
+			printf("[%s]\n", data->cmd[c].token[t]);
+	}
 }
-
-/* *******************ENGINE************************************************* */
-
 
 /* ***********************MAIN*********************************************** */
 
@@ -242,39 +242,6 @@ int	main(int ac, char **argv, char **env)
 		free(data.cmd);// Free cmd for next iteration
 	}
 }
-
-/*
-char	*ft_strtok(char *buffer)
-{
-	static char	*save; //pointer to insert NULL after token and keep the rest of the buffer
-	char *ret; //start of the token
-	
-	if (!save) //if save is NULL, we are at the beginning of the buffer
-		save = buffer; //so we make a copy of the pointer to the buffer
-	ret = save; //we make a copy of the pointer to the save pointer to keep the start of the token
-	while (save && *save != 32) //while we are not on a space character
-	{
-		if (*save == '\0') // if we are at the end of the buffer
-		{
-			save = NULL; //set save to NULL for the next call to return NULL directly
-			return (ret); //return the pointer to the start of the token that will send all the remaining buffer
-		}
-		else if (*save == 39 || *save == 34) // if we are on a double or single quotes
-		{
-			save = strchr(save + 1, *save); // we change our pointer to the next quote with strchr
-			if (!save) // if he return Null then its a syntax error
-				return (ret); // so we return all the remaining buffer
-			save++; // we move the pointer to the next character after the quote to continue the parsing
-		}
-		else
-			save++;	//we go to the next character if it is not a space or a quote
-	}
-	if (save) // if save is not NULL, we are at the end of the token
-		*save++ = 0; //we insert a NULL character to the end of the token and increment the save pointer for the next token
-	return (ret); //we return the pointer we copied at the start of the token
-}
-*/
-
 
 /*
 int		*ft_open_file(char *buffer)
