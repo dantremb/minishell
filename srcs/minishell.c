@@ -6,21 +6,26 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 21:00:44 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/31 00:23:20 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-#define DBQUOTE 34
-#define SQUOTE 39
-#define SPACE 32
-
-extern char **environ;
-
 /* ******************BUILT-IN************************************************ */
 
-/* ********************EXIT************************************************** */
+/* ******************EXIT AND FREE******************************************* */
+
+void ft_free_table(t_data *data)
+{
+	int i;
+
+	i = -1;
+	while (++i < data->cmd_count)
+		free(data->cmd[i].token);
+	free(data->cmd);
+	free(data->buffer);
+}
 
 void	ft_exit(t_data *data, char *str, int s)
 {
@@ -30,37 +35,30 @@ void	ft_exit(t_data *data, char *str, int s)
 		free(data->buffer);
 	if (s <= 2)
 		ft_free_array(data->env);
-	if (s <= 3)
-		free(data->cmd);
 	exit(0);
 }
 
 /* **********************INIT ENVIRONEMENT*********************************** */
 
-void	ft_copy_env(t_data *data, char **env)
+void	ft_init_environement(t_data *data, char **env)
 {
 	int		i;
 
-	i = 0;
-	data->env = ft_calloc(sizeof(char *), ft_array_size(env));
-	if (data->env == NULL)
-		ft_exit(data, "Malloc error\n", 0);
-	while (environ[i])
-	{
-		data->env[i] = ft_strdup(env[i]);
-		if (!data->env[i])
-			ft_exit(data, "Malloc error\n", 0);
-		i++;
-	}
-}
-
-void	ft_init_environement(t_data *data, char **env)
-{
 	data->buffer = NULL;
 	data->prompt = NULL;
 	data->cmd_count = 0;
 	data->cmd = NULL;
-	ft_copy_env(data, env);
+	i = 0;
+	data->env = ft_calloc(sizeof(char *), ft_array_size(env));
+	if (data->env == NULL)
+		ft_exit(data, "Malloc Error\n", 0);
+	while (env[i])
+	{
+		data->env[i] = ft_strdup(env[i]);
+		if (!data->env[i])
+			ft_exit(data, "Malloc Error\n", 0);
+		i++;
+	}
 }
 
 /* ************************READLINE UTILS************************************ */
@@ -94,6 +92,24 @@ bool	ft_is_only_space(char *buffer)
 	return (true);
 }
 
+void	ft_print_table(t_data *data)
+{
+	int i;
+	int j;
+	
+	i = 0;
+	while (i < data->cmd_count)
+	{
+		j = 0;
+		while (data->cmd[i].token[j])
+		{
+			printf("%s\n", data->cmd[i].token[j]);
+			j++;
+		}
+		i++;
+	}
+}
+
 /* **************************PARSING***************************************** */
 
 char	*ft_trim_space(char *buffer)
@@ -113,6 +129,14 @@ char	*ft_trim_space(char *buffer)
 	return (buffer);
 }
 
+char	*ft_end_buffer(char *ret, char **save)
+{
+	*save = NULL;
+	if (ft_is_only_space(ret))
+		return (NULL);
+	return (ret);
+}
+
 char	*ft_strtok(char *buffer, char sep)
 {
 	static char	*save;
@@ -126,12 +150,7 @@ char	*ft_strtok(char *buffer, char sep)
 	while (save && *save != sep)
 	{
 		if (*save == '\0')
-		{
-			save = NULL;
-			if (ft_is_only_space(ret))
-				return (NULL);
-			return (ret);
-		}
+			return (ft_end_buffer(ret, &save));
 		else if (*save == DBQUOTE || *save == SQUOTE)
 		{
 			save = strchr(save + 1, *save);
@@ -197,24 +216,6 @@ void	ft_make_token(t_data *data)
 	}
 }
 
-void	ft_print_table(t_data *data)
-{
-	int i;
-	int j;
-	
-	i = 0;
-	while (i < data->cmd_count)
-	{
-		j = 0;
-		while (data->cmd[i].token[j])
-		{
-			printf("%s\n", data->cmd[i].token[j]);
-			j++;
-		}
-		i++;
-	}
-}
-
 void 	ft_parse(t_data *data)
 {
 	ft_make_cmd_table(data);
@@ -237,15 +238,15 @@ int	main(int ac, char **argv, char **env)
 		data.buffer = readline(data.prompt);// Fill the buffer with user input
 		free(data.prompt);// Free the prompt for next iteration
 		if (ft_is_only_space(data.buffer))// Newline on empty buffer
-			continue ;
+			free(data.buffer);
 		else if (ft_strncmp(data.buffer, "exit", 5) == 0)// Exit on exit command
 			ft_exit(&data, "Goodbye\n", 2);
 		else
 		{
 			ft_parse(&data);//tokenize the buffer
+			//ft_execute(&data);//execute the command
+			ft_free_table(&data);// Free the table for next iteration
 		}
-		free (data.buffer);// Free buffer for next iteration
-		free(data.cmd);// Free cmd for next iteration
 	}
 }
 

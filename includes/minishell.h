@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 20:54:58 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/31 00:10:12 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 # include <readline/readline.h>
 # include "../libs/libft/includes/libft.h"
 # include <stdbool.h>
+
+# define DBQUOTE 34
+# define SQUOTE 39
 
 typedef struct		s_cmd
 {
