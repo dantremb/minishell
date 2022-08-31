@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 19:50:03 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 20:57:09 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,8 +173,7 @@ void	ft_make_cmd_table(t_data *data)
 
 	i = 0;
 	data->cmd_count = ft_token_count(data->buffer, '|');
-	printf("number of command = %d\n", data->cmd_count);
-	data->cmd = ft_calloc(sizeof(t_cmd), data->cmd_count);
+	data->cmd = ft_calloc(sizeof(t_cmd), data->cmd_count + 1);
 	if (data->cmd == NULL)
 		ft_exit(data, "Malloc error\n", 2);
 	data->cmd[0].buffer = ft_trim_space(ft_strtok(data->buffer, '|'));
@@ -186,31 +185,43 @@ void	ft_make_token(t_data *data)
 {
 	int c;
 	int t;
+	int count;
 
 	c = -1;
 	while (++c < data->cmd_count)
 	{
-		data->cmd[c].token = ft_calloc(sizeof(char *), ft_token_count(data->cmd[c].buffer, ' '));
+		count = ft_token_count(data->cmd[c].buffer, ' ');
+		data->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
 		t = 0;
-		data->cmd[t].buffer = ft_trim_space(ft_strtok(data->buffer, ' '));
-		while (++t < data->cmd_count)
-			data->cmd[t].buffer = ft_trim_space(ft_strtok(NULL, ' '));
+		data->cmd[c].token[t] = ft_trim_space(ft_strtok(data->cmd[c].buffer, ' '));
+		while (++t < count)
+			data->cmd[c].token[t] = ft_trim_space(ft_strtok(NULL, ' '));
+	}
+}
+
+void	ft_print_table(t_data *data)
+{
+	int i;
+	int j;
+	
+	i = 0;
+	while (i < data->cmd_count)
+	{
+		j = 0;
+		while (data->cmd[i].token[j])
+		{
+			printf("%s\n", data->cmd[i].token[j]);
+			j++;
+		}
+		i++;
 	}
 }
 
 void 	ft_parse(t_data *data)
 {
-	int i = -1;
-	
 	ft_make_cmd_table(data);
-	while (++i < data->cmd_count)
-		printf("[%s]\n", data->cmd[i].buffer);
 	ft_make_token(data);
-	for (int c = 0; c < data->cmd_count; c++)
-	{
-		for (int t = 0; t < ft_token_count(data->cmd[c].buffer, ' '); t++)
-			printf("[%s]\n", data->cmd[c].token[t]);
-	}
+	ft_print_table(data);
 }
 
 /* ***********************MAIN*********************************************** */
