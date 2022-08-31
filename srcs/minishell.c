@@ -6,13 +6,72 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/31 00:23:20 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/31 15:49:01 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 /* ******************BUILT-IN************************************************ */
+
+void	ft_print_table(t_data *data)
+{
+	int i;
+	int j;
+	
+	i = 0;
+	while (i < data->cmd_count)
+	{
+		j = 0;
+		while (data->cmd[i].token[j])
+		{
+			printf("%s\n", data->cmd[i].token[j]);
+			j++;
+		}
+		i++;
+	}
+}
+
+char	*ft_get_variable(t_data *data, char *buffer)
+{
+	int		i;
+
+	i = -1;
+	while (data->env[++i])
+	{
+		if (ft_strncmp(data->env[i], buffer, ft_strlen(buffer) == 0))
+		{
+			if (data->env[i][ft_strlen(buffer)] == '=')
+				return (data->env[i] + (ft_strlen(buffer) + 1));
+		}
+	}
+	ft_color(RED);
+	printf("<%s> variable not exist\n", buffer);
+	ft_color(WHITE);
+	return (NULL);
+}
+
+void	ft_echo(t_data *data, char *buffer)
+{
+	if (buffer[0] == '"')
+	{
+		buffer[ft_strlen(buffer) - 1] = '\0';
+		buffer++;
+	}
+	else if (buffer[0] == '$')
+		buffer = ft_get_variable(data, buffer + 1);
+	if (buffer)
+		printf("%s\n", buffer);
+}
+
+void	ft_env(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while(data->env[++i])
+		printf("%s\n", data->env[i]);
+}
 
 /* ******************EXIT AND FREE******************************************* */
 
@@ -92,39 +151,22 @@ bool	ft_is_only_space(char *buffer)
 	return (true);
 }
 
-void	ft_print_table(t_data *data)
-{
-	int i;
-	int j;
-	
-	i = 0;
-	while (i < data->cmd_count)
-	{
-		j = 0;
-		while (data->cmd[i].token[j])
-		{
-			printf("%s\n", data->cmd[i].token[j]);
-			j++;
-		}
-		i++;
-	}
-}
 
 /* **************************PARSING***************************************** */
 
-char	*ft_trim_space(char *buffer)
+char	*ft_trim_token(char *buffer, char sep)
 {
 	int		i;
 	
 	if (!buffer)
 		return (buffer);
 	i = ft_strlen(buffer) - 1;
-	while (buffer[i] == ' ')
+	while (buffer[i] == sep)
 	{
 		buffer[i] = '\0';
 		i--;
 	}
-	while (*buffer == ' ')
+	while (*buffer == sep)
 		buffer++;
 	return (buffer);
 }
@@ -146,7 +188,7 @@ char	*ft_strtok(char *buffer, char sep)
 		save = buffer;
 	ret = save;
 	while (save && *save == ' ')
-		save++;
+		save++; 
 	while (save && *save != sep)
 	{
 		if (*save == '\0')
@@ -174,11 +216,11 @@ int	ft_token_count(char *buffer, char sep)
 	
 	i = 0;
 	tmp = ft_strdup(buffer);
-	token = ft_trim_space(ft_strtok(tmp, sep));
+	token = ft_trim_token(ft_strtok(tmp, sep), ' ');
 	while(token)
 	{
 		i++;
-		token = ft_trim_space(ft_strtok(NULL, sep));
+		token = ft_trim_token(ft_strtok(NULL, sep), ' ');
 	}
 	free(tmp);
 	return (i);
@@ -193,9 +235,9 @@ void	ft_make_cmd_table(t_data *data)
 	data->cmd = ft_calloc(sizeof(t_cmd), data->cmd_count + 1);
 	if (data->cmd == NULL)
 		ft_exit(data, "Malloc error\n", 2);
-	data->cmd[0].buffer = ft_trim_space(ft_strtok(data->buffer, '|'));
+	data->cmd[0].buffer = ft_trim_token(ft_strtok(data->buffer, '|'), ' ');
 	while (++i < data->cmd_count)
-		data->cmd[i].buffer = ft_trim_space(ft_strtok(NULL, '|'));
+		data->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
 }
 
 void	ft_make_token(t_data *data)
@@ -216,11 +258,72 @@ void	ft_make_token(t_data *data)
 	}
 }
 
+void ft_make_arguments(t_data *data)
+{
+	int i;
+	int j;
+	
+	i = 0;
+	while (i < data->cmd_count)
+	{
+		j = 0;
+		while (data->cmd[i].token[j])
+		{
+			printf("%s\n", data->cmd[i].token[j]);
+			j++;
+		}
+		i++;
+	}
+}
+
 void 	ft_parse(t_data *data)
 {
 	ft_make_cmd_table(data);
 	ft_make_token(data);
-	ft_print_table(data);
+	ft_make_arguments(data);
+	//ft_check_var(data);
+	//ft_redirect(data);
+}
+
+/* **********************ENGINE********************************************** */
+
+void	ft_execute_builtin(t_data *data, t_cmd *cmd)
+{
+	printf("\n");
+	if (ft_strncmp(cmd->buffer, "echo", 4) == 0)
+		ft_echo(data, cmd->token[1]);
+	else if (ft_strncmp(cmd->buffer, "env", 3) == 0)
+		ft_env(data);
+	else if (ft_strncmp(cmd->buffer, "pwd", 3) == 0)
+		ft_pwd(data);
+	else if (ft_strncmp(cmd->buffer, "cd", 2) == 0)
+		ft_cd(data, cmd->token[1]);
+	else if (ft_strncmp(cmd->buffer, "cat", 3) == 0)
+		ft_cat(cmd);
+	else if (ft_strncmp(cmd->buffer, "export", 6) == 0)
+		ft_export(data, cmd->token[1]);
+	else if (ft_strncmp(cmd->buffer, "unset", 5) == 0)
+		ft_unset(data, cmd->token[1]); 
+	else if (ft_strncmp(cmd->buffer, "wc", 2) == 0)
+		ft_wc(cmd);
+	else if (ft_strncmp(cmd->buffer, "exit", 4) == 0)
+		ft_exit(data, "Good bye!\n", 4);
+	else
+	{
+		ft_color(RED);
+		printf("<%s> is not a builtin command\n", cmd->buffer);
+		ft_color(WHITE);
+	}
+	return (true);
+}
+
+void	ft_execute(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while (++i < data->cmd_count)
+		ft_execute_builtin(data, &data->cmd[i]);
 }
 
 /* ***********************MAIN*********************************************** */
@@ -239,12 +342,13 @@ int	main(int ac, char **argv, char **env)
 		free(data.prompt);// Free the prompt for next iteration
 		if (ft_is_only_space(data.buffer))// Newline on empty buffer
 			free(data.buffer);
-		else if (ft_strncmp(data.buffer, "exit", 5) == 0)// Exit on exit command
+		else if (ft_strncmp(data.buffer, "exit", 5) == 0)// Exit the program
 			ft_exit(&data, "Goodbye\n", 2);
 		else
 		{
 			ft_parse(&data);//tokenize the buffer
-			//ft_execute(&data);//execute the command
+			ft_print_table(&data);//print the table with all the tokens
+			ft_execute(&data);//execute the command
 			ft_free_table(&data);// Free the table for next iteration
 		}
 	}
