@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/30 20:57:09 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/08/30 21:00:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	ft_exit(t_data *data, char *str, int s)
 
 void	ft_copy_env(t_data *data, char **env)
 {
-	printf("copy environement\n");
 	int		i;
 
 	i = 0;
@@ -57,7 +56,6 @@ void	ft_copy_env(t_data *data, char **env)
 
 void	ft_init_environement(t_data *data, char **env)
 {
-	printf("Init environment\n");
 	data->buffer = NULL;
 	data->prompt = NULL;
 	data->cmd_count = 0;
@@ -244,9 +242,6 @@ int	main(int ac, char **argv, char **env)
 			ft_exit(&data, "Goodbye\n", 2);
 		else
 		{
-			ft_color(1);
-			printf("i will parse [%s]\n", data.buffer);
-			ft_color(7);
 			ft_parse(&data);//tokenize the buffer
 		}
 		free (data.buffer);// Free buffer for next iteration
