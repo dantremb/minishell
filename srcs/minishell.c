@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/02 13:26:30 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/02 13:56:55 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,24 @@ void	ft_print_table(t_data *data)
 	int j;
 	
 	i = 0;
+	ft_color(RED);
+	printf("---------- COMAND TABLE ----------\n");
 	while (i < data->cmd_count)
 	{
 		j = 0;
+		printf("[cmd %d]", i);
 		while (data->cmd[i].token[j])
 		{
-			printf("%s\n", data->cmd[i].token[j]);
+			ft_color(YELLOW);
+			printf("[%s]", data->cmd[i].token[j]);
 			j++;
 		}
+		printf("\n");
 		i++;
 	}
+	ft_color(RED);
+	printf("---------------END----------------\n");
+	ft_color(WHITE);
 }
 
 char	*ft_get_variable(t_data *data, char *buffer)
@@ -53,13 +61,21 @@ char	*ft_get_variable(t_data *data, char *buffer)
 
 void	ft_echo(char **arg)
 {
+	int flag;
 	int i;
 
 	i = 0;
-	if (*arg)
-	while (cmd->token[++i])
-		printf("%s", cmd->token[i]);
-	printf("\n");
+	flag = 0;
+	while (ft_strncmp(arg[++i], "-n\0", 3) == 0)
+		flag = 1;
+	while (arg[i])
+	{
+		printf("%s", arg[i++]);
+		if (arg[i])
+			printf(" ");
+	}
+	if (flag == 0)
+		printf("\n");
 }
 
 void	ft_env(t_data *data)
@@ -267,7 +283,7 @@ void ft_make_arguments(t_data *data)
 		j = 0;
 		while (data->cmd[i].token[j])
 		{
-			printf("%s\n", data->cmd[i].token[j]);
+			//printf("%s\n", data->cmd[i].token[j]);
 			j++;
 		}
 		i++;
@@ -287,9 +303,8 @@ void 	ft_parse(t_data *data)
 
 void	ft_execute_builtin(t_data *data, t_cmd *cmd)
 {
-	printf("\n");
 	if (ft_strncmp(cmd->buffer, "echo", 4) == 0)
-		ft_echo(cmd);
+		ft_echo(cmd->token);
 	else if (ft_strncmp(cmd->buffer, "env", 3) == 0)
 		ft_env(data);
 	/*else if (ft_strncmp(cmd->buffer, "pwd", 3) == 0)
