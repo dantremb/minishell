@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/22 22:40:58 by root              #+#    #+#             */
-/*   Updated: 2022/08/17 00:35:02 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/02 16:27:35 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdarg.h>
+# include <stdbool.h>
 
 # define DEC "0123456789"
 # define HEXU "0123456789ABCDEF"
@@ -96,4 +97,7 @@ void			ft_free_array(char **array);
 int				ft_split_size(char *src, char sep);
 int				ft_array_size(char **array);
 void			ft_color(int color);
+bool			ft_is_only(char *buffer, char c);
+char			*ft_strtok(char *buffer, char sep);
+
 #endif

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/02 15:29:46 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/02 16:27:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,21 +146,6 @@ char	*ft_get_prompt(void)
 	return (prompt);
 }
 
-bool	ft_is_only_space(char *buffer)
-{
-	int i;
-
-	i = 0;
-	while (buffer[i] != '\0')
-	{
-		if (buffer[i] != ' ')
-			return (false);
-		i++;
-	}
-	return (true);
-}
-
-
 /* **************************PARSING***************************************** */
 
 char	*ft_trim_token(char *buffer, char sep)
@@ -178,43 +163,6 @@ char	*ft_trim_token(char *buffer, char sep)
 	while (*buffer == sep)
 		buffer++;
 	return (buffer);
-}
-
-char	*ft_end_buffer(char *ret, char **save)
-{
-	*save = NULL;
-	if (ft_is_only_space(ret))
-		return (NULL);
-	return (ret);
-}
-
-char	*ft_strtok(char *buffer, char sep)
-{
-	static char	*save;
-	char *ret;
-	
-	if (!save)
-		save = buffer;
-	ret = save;
-	while (save && *save == ' ')
-		save++; 
-	while (save && *save != sep)
-	{
-		if (*save == '\0')
-			return (ft_end_buffer(ret, &save));
-		else if (*save == DBQUOTE || *save == SQUOTE)
-		{
-			save = strchr(save + 1, *save);
-			if (!save)
-				return (ret);
-			save++;
-		}
-		else
-			save++;
-	}
-	if (save)
-		*save++ = '\0';
-	return (ret);
 }
 
 int	ft_token_count(char *buffer, char sep)
@@ -327,7 +275,7 @@ int	main(int ac, char **argv, char **env)
 		data.prompt = ft_get_prompt();// Get user and path for prompt
 		data.buffer = readline(data.prompt);// Fill the buffer with user input
 		free(data.prompt);// Free the prompt for next iteration
-		if (ft_is_only_space(data.buffer))// Newline on empty buffer
+		if (ft_is_only(data.buffer, SPACE))// Newline on empty buffer
 			free(data.buffer);
 		else if (ft_strncmp(data.buffer, "exit", 5) == 0)// Exit the program
 			ft_exit(&data, "Goodbye\n", 2);
