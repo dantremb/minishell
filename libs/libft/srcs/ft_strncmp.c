@@ -6,11 +6,12 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/28 22:15:16 by root              #+#    #+#             */
-/*   Updated: 2022/05/17 23:40:22 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/02 15:20:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
+#include <stdio.h>
 
 /* On doit comparer "s1" et "s2" juqu'a "n" nombre de caractère. On compare   */
 /* chaque caractere jusqua NULL ou "n" puis dès que l'on trouve une case 	  */
@@ -22,7 +23,6 @@
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	size_t	i;
-
 	i = 0;
 	if (n == 0)
 		return (0);

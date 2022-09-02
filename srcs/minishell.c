@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/02 13:56:55 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/02 15:29:46 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void	ft_print_table(t_data *data)
 	while (i < data->cmd_count)
 	{
 		j = 0;
+		ft_color(CYAN);
 		printf("[cmd %d]", i);
 		while (data->cmd[i].token[j])
 		{
@@ -43,11 +44,10 @@ void	ft_print_table(t_data *data)
 char	*ft_get_variable(t_data *data, char *buffer)
 {
 	int		i;
-
 	i = -1;
 	while (data->env[++i])
 	{
-		if (ft_strncmp(data->env[i], buffer, ft_strlen(buffer) == 0))
+		if (ft_strncmp(data->env[i], buffer, ft_strlen(buffer)) == 0)
 		{
 			if (data->env[i][ft_strlen(buffer)] == '=')
 				return (data->env[i] + (ft_strlen(buffer) + 1));
@@ -61,21 +61,16 @@ char	*ft_get_variable(t_data *data, char *buffer)
 
 void	ft_echo(char **arg)
 {
-	int flag;
 	int i;
 
-	i = 0;
-	flag = 0;
-	while (ft_strncmp(arg[++i], "-n\0", 3) == 0)
-		flag = 1;
+	i = 1;
 	while (arg[i])
 	{
 		printf("%s", arg[i++]);
 		if (arg[i])
 			printf(" ");
 	}
-	if (flag == 0)
-		printf("\n");
+	printf("\n");
 }
 
 void	ft_env(t_data *data)
@@ -240,20 +235,6 @@ int	ft_token_count(char *buffer, char sep)
 	return (i);
 }
 
-void	ft_make_cmd_table(t_data *data)
-{
-	int i;
-
-	i = 0;
-	data->cmd_count = ft_token_count(data->buffer, '|');
-	data->cmd = ft_calloc(sizeof(t_cmd), data->cmd_count + 1);
-	if (data->cmd == NULL)
-		ft_exit(data, "Malloc error\n", 2);
-	data->cmd[0].buffer = ft_trim_token(ft_strtok(data->buffer, '|'), ' ');
-	while (++i < data->cmd_count)
-		data->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
-}
-
 void	ft_make_token(t_data *data)
 {
 	int c;
@@ -269,34 +250,30 @@ void	ft_make_token(t_data *data)
 		data->cmd[c].token[t] = ft_trim_token(ft_strtok(data->cmd[c].buffer, ' '), ' ');
 		while (++t < count)
 			data->cmd[c].token[t] = ft_trim_token(ft_strtok(NULL, ' '), ' ');
-	}
-}
-
-void ft_make_arguments(t_data *data)
-{
-	int i;
-	int j;
-	
-	i = 0;
-	while (i < data->cmd_count)
-	{
-		j = 0;
-		while (data->cmd[i].token[j])
+		t = 0;
+		while (++t < count)
 		{
-			//printf("%s\n", data->cmd[i].token[j]);
-			j++;
+			if (data->cmd[c].token[t][0] == SQUOTE)
+				data->cmd[c].token[t] = ft_trim_token(data->cmd[c].token[t], SQUOTE);
+			else if (data->cmd[c].token[t][0] == '$')
+				data->cmd[c].token[t] = ft_get_variable(data, data->cmd[c].token[t] + 1);
 		}
-		i++;
 	}
 }
 
 void 	ft_parse(t_data *data)
 {
-	ft_make_cmd_table(data);
+	int i;
+
+	i = 0;
+	data->cmd_count = ft_token_count(data->buffer, '|');
+	data->cmd = ft_calloc(sizeof(t_cmd), data->cmd_count + 1);
+	if (data->cmd == NULL)
+		ft_exit(data, "Malloc error\n", 2);
+	data->cmd[0].buffer = ft_trim_token(ft_strtok(data->buffer, '|'), ' ');
+	while (++i < data->cmd_count)
+		data->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
 	ft_make_token(data);
-	ft_make_arguments(data);
-	//ft_check_var(data);
-	//ft_redirect(data);
 }
 
 /* **********************ENGINE********************************************** */
