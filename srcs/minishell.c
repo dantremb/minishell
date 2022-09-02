@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/08/31 15:49:01 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/02 13:26:30 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,17 +51,15 @@ char	*ft_get_variable(t_data *data, char *buffer)
 	return (NULL);
 }
 
-void	ft_echo(t_data *data, char *buffer)
+void	ft_echo(char **arg)
 {
-	if (buffer[0] == '"')
-	{
-		buffer[ft_strlen(buffer) - 1] = '\0';
-		buffer++;
-	}
-	else if (buffer[0] == '$')
-		buffer = ft_get_variable(data, buffer + 1);
-	if (buffer)
-		printf("%s\n", buffer);
+	int i;
+
+	i = 0;
+	if (*arg)
+	while (cmd->token[++i])
+		printf("%s", cmd->token[i]);
+	printf("\n");
 }
 
 void	ft_env(t_data *data)
@@ -252,9 +250,9 @@ void	ft_make_token(t_data *data)
 		count = ft_token_count(data->cmd[c].buffer, ' ');
 		data->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
 		t = 0;
-		data->cmd[c].token[t] = ft_trim_space(ft_strtok(data->cmd[c].buffer, ' '));
+		data->cmd[c].token[t] = ft_trim_token(ft_strtok(data->cmd[c].buffer, ' '), ' ');
 		while (++t < count)
-			data->cmd[c].token[t] = ft_trim_space(ft_strtok(NULL, ' '));
+			data->cmd[c].token[t] = ft_trim_token(ft_strtok(NULL, ' '), ' ');
 	}
 }
 
@@ -291,10 +289,10 @@ void	ft_execute_builtin(t_data *data, t_cmd *cmd)
 {
 	printf("\n");
 	if (ft_strncmp(cmd->buffer, "echo", 4) == 0)
-		ft_echo(data, cmd->token[1]);
+		ft_echo(cmd);
 	else if (ft_strncmp(cmd->buffer, "env", 3) == 0)
 		ft_env(data);
-	else if (ft_strncmp(cmd->buffer, "pwd", 3) == 0)
+	/*else if (ft_strncmp(cmd->buffer, "pwd", 3) == 0)
 		ft_pwd(data);
 	else if (ft_strncmp(cmd->buffer, "cd", 2) == 0)
 		ft_cd(data, cmd->token[1]);
@@ -305,16 +303,13 @@ void	ft_execute_builtin(t_data *data, t_cmd *cmd)
 	else if (ft_strncmp(cmd->buffer, "unset", 5) == 0)
 		ft_unset(data, cmd->token[1]); 
 	else if (ft_strncmp(cmd->buffer, "wc", 2) == 0)
-		ft_wc(cmd);
-	else if (ft_strncmp(cmd->buffer, "exit", 4) == 0)
-		ft_exit(data, "Good bye!\n", 4);
+		ft_wc(cmd);*/
 	else
 	{
 		ft_color(RED);
 		printf("<%s> is not a builtin command\n", cmd->buffer);
 		ft_color(WHITE);
 	}
-	return (true);
 }
 
 void	ft_execute(t_data *data)
