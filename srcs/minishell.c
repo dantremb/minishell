@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/03 00:25:33 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/03 01:08:13 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ void	ft_exit(t_data *data, char *str, int s)
 		free(data->buffer);
 	if (s <= 2)
 		ft_free_array(data->env);
+	if (s <= 3)
+		ft_free_table(data);
 	exit(0);
 }
 
@@ -152,10 +154,21 @@ void	ft_env(t_data *data)
 		printf("%s\n", data->env[i]);
 }
 
-/* ******************EXIT AND FREE******************************************* */
+void ft_export(t_data *data, char *arg)
+{
+	char **temp;
+	int i;
 
-
-
+	temp = ft_calloc(sizeof(char *), ft_array_size(data->env) + 2);
+	if (temp == NULL)
+		ft_exit(data, "Malloc Error\n", 3);
+	i = -1;
+	while (data->env[++i])
+		temp[i] = data->env[i];
+	temp[i] = ft_strdup(arg);
+	free(data->env);
+	data->env = temp;
+}
 
 /* **************************PARSING***************************************** */
 
@@ -239,18 +252,18 @@ void 	ft_parse(t_data *data)
 
 void	ft_execute_builtin(t_data *data, t_cmd *cmd)
 {
-	if (ft_strncmp(cmd->buffer, "echo", 4) == 0)
+	if (ft_strncmp(cmd->token[0], "echo", 4) == 0)
 		ft_echo(cmd->token);
-	else if (ft_strncmp(cmd->buffer, "env", 3) == 0)
+	else if (ft_strncmp(cmd->token[0], "env", 3) == 0)
 		ft_env(data);
+	else if (ft_strncmp(cmd->token[0], "export", 6) == 0)
+		ft_export(data, cmd->token[1]);
 	/*else if (ft_strncmp(cmd->buffer, "pwd", 3) == 0)
 		ft_pwd(data);
 	else if (ft_strncmp(cmd->buffer, "cd", 2) == 0)
 		ft_cd(data, cmd->token[1]);
 	else if (ft_strncmp(cmd->buffer, "cat", 3) == 0)
 		ft_cat(cmd);
-	else if (ft_strncmp(cmd->buffer, "export", 6) == 0)
-		ft_export(data, cmd->token[1]);
 	else if (ft_strncmp(cmd->buffer, "unset", 5) == 0)
 		ft_unset(data, cmd->token[1]); 
 	else if (ft_strncmp(cmd->buffer, "wc", 2) == 0)
@@ -280,7 +293,7 @@ int	main(int ac, char **argv, char **env)
 	(void)argv;
 	t_data data;
 
-	ft_init_environement(&data, env);// Copy global environ variable to heap
+	ft_init_environement(&data, env);// Copy environement variable in main struct
 	while (1)
 	{
 		data.prompt = ft_get_prompt();// Get user and path for prompt
@@ -299,51 +312,3 @@ int	main(int ac, char **argv, char **env)
 		}
 	}
 }
-
-/*
-int		*ft_open_file(char *buffer)
-{
-	int		*fd;
-
-	fd = open(buffer, O_RDONLY);
-	if (fd == -1)
-	{
-		ft_putstr_fd("Error: ", 2);
-		ft_putstr_fd(buffer, 2);
-		ft_putstr_fd(" not found\n", 2);
-		return (NULL);
-	}
-	return (fd);
-}
-
-char	*ft_get_path(char *buffer)
-{
-	char	*program;
-	char	*env_path;
-	char	**fcnt_path;
-	int		i;
-
-	i = 0;
-	if (access(buffer, F_OK | X_OK) == 0)
-		return (buffer);
-	program = ft_strjoin("/", buffer, 0);
-	env_path = getenv("PATH");
-	if (env_path == NULL || )
-		return (NULL);
-	fcnt_path = ft_strsplit(env_path, ':');
-	if (fcnt_path == NULL)
-		return (NULL);
-	while (fcnt_path[i])
-	{
-		test_path = ft_strjoin([ifcnt_path], program);
-		if (access(test_path, F_OK | X_OK) == 0)
-			break ;
-		free (test_path);
-		test_path = NULL;
-		i++;
-	}
-	ft_free_array(fcnt_path);
-	free(program);
-	return (test_path);
-}
-*/
