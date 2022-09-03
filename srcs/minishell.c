@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/03 01:08:13 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/03 10:13:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,26 @@ char	*ft_get_variable(t_data *data, char *buffer)
 
 /* ******************BUILT-IN************************************************ */
 
+void	ft_unset(t_data *data, char *buffer)
+{
+	int	i;
+
+	i = -1;
+	while (data->env[++i])
+	{
+		if (ft_strncmp(data->env[i], buffer, ft_strlen(buffer)) == 0
+			&& data->env[i][ft_strlen(buffer)] == '=')
+		{
+			while (data->env[i])
+			{
+				data->env[i] = data->env[i + 1];
+				i++;
+			}
+			free(data->env[i]);
+		}
+	}
+}
+
 void	ft_echo(char **arg)
 {
 	int i;
@@ -158,7 +178,7 @@ void ft_export(t_data *data, char *arg)
 {
 	char **temp;
 	int i;
-
+	if (ft_get_variable())
 	temp = ft_calloc(sizeof(char *), ft_array_size(data->env) + 2);
 	if (temp == NULL)
 		ft_exit(data, "Malloc Error\n", 3);
@@ -258,14 +278,14 @@ void	ft_execute_builtin(t_data *data, t_cmd *cmd)
 		ft_env(data);
 	else if (ft_strncmp(cmd->token[0], "export", 6) == 0)
 		ft_export(data, cmd->token[1]);
+	else if (ft_strncmp(cmd->buffer, "unset", 5) == 0)
+		ft_unset(data, cmd->token[1]); 
 	/*else if (ft_strncmp(cmd->buffer, "pwd", 3) == 0)
 		ft_pwd(data);
 	else if (ft_strncmp(cmd->buffer, "cd", 2) == 0)
 		ft_cd(data, cmd->token[1]);
 	else if (ft_strncmp(cmd->buffer, "cat", 3) == 0)
 		ft_cat(cmd);
-	else if (ft_strncmp(cmd->buffer, "unset", 5) == 0)
-		ft_unset(data, cmd->token[1]); 
 	else if (ft_strncmp(cmd->buffer, "wc", 2) == 0)
 		ft_wc(cmd);*/
 	else
