@@ -6,13 +6,71 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/02 16:27:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/03 00:25:33 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-/* ******************BUILT-IN************************************************ */
+/* ************************MINISHELL UTILS************************************ */
+
+void ft_free_table(t_data *data)
+{
+	int i;
+
+	i = -1;
+	while (++i < data->cmd_count)
+		free(data->cmd[i].token);
+	free(data->cmd);
+	free(data->buffer);
+}
+
+void	ft_exit(t_data *data, char *str, int s)
+{
+	if (s <= 0)
+		ft_putstr_fd(str, 2);
+	if (s <= 1)
+		free(data->buffer);
+	if (s <= 2)
+		ft_free_array(data->env);
+	exit(0);
+}
+
+void	ft_init_environement(t_data *data, char **env)
+{
+	int		i;
+
+	data->buffer = NULL;
+	data->prompt = NULL;
+	data->cmd_count = 0;
+	data->cmd = NULL;
+	i = 0;
+	data->env = ft_calloc(sizeof(char *), ft_array_size(env));
+	if (data->env == NULL)
+		ft_exit(data, "Malloc Error\n", 0);
+	while (env[i])
+	{
+		data->env[i] = ft_strdup(env[i]);
+		if (!data->env[i])
+			ft_exit(data, "Malloc Error\n", 0);
+		i++;
+	}
+}
+
+char	*ft_get_prompt(void)
+{
+	char	*prompt;
+
+	prompt = ft_strjoin("\033[0;32m", getenv("USER") , 0);
+	prompt = ft_strjoin(prompt, "@", 1);
+	prompt = ft_strjoin(prompt, "Minishell", 1);
+	prompt = ft_strjoin(prompt, ": ", 1);
+	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
+	prompt = ft_strjoin(prompt, getenv("PWD"), 1);
+	prompt = ft_strjoin(prompt, "> ", 1);
+	prompt = ft_strjoin(prompt, "\033[0m", 1);
+	return (prompt);
+}
 
 void	ft_print_table(t_data *data)
 {
@@ -59,18 +117,30 @@ char	*ft_get_variable(t_data *data, char *buffer)
 	return (NULL);
 }
 
+
+
+/* ******************BUILT-IN************************************************ */
+
 void	ft_echo(char **arg)
 {
 	int i;
+	int flag;
 
+	flag = 0;
 	i = 1;
+	if (arg[1][0] == '-' && arg[1][1] == 'n')
+	{
+		flag = 1;
+		i++;
+	}
 	while (arg[i])
 	{
 		printf("%s", arg[i++]);
 		if (arg[i])
 			printf(" ");
 	}
-	printf("\n");
+	if (flag == 0)
+		printf("\n");
 }
 
 void	ft_env(t_data *data)
@@ -84,67 +154,8 @@ void	ft_env(t_data *data)
 
 /* ******************EXIT AND FREE******************************************* */
 
-void ft_free_table(t_data *data)
-{
-	int i;
 
-	i = -1;
-	while (++i < data->cmd_count)
-		free(data->cmd[i].token);
-	free(data->cmd);
-	free(data->buffer);
-}
 
-void	ft_exit(t_data *data, char *str, int s)
-{
-	if (s <= 0)
-		ft_putstr_fd(str, 2);
-	if (s <= 1)
-		free(data->buffer);
-	if (s <= 2)
-		ft_free_array(data->env);
-	exit(0);
-}
-
-/* **********************INIT ENVIRONEMENT*********************************** */
-
-void	ft_init_environement(t_data *data, char **env)
-{
-	int		i;
-
-	data->buffer = NULL;
-	data->prompt = NULL;
-	data->cmd_count = 0;
-	data->cmd = NULL;
-	i = 0;
-	data->env = ft_calloc(sizeof(char *), ft_array_size(env));
-	if (data->env == NULL)
-		ft_exit(data, "Malloc Error\n", 0);
-	while (env[i])
-	{
-		data->env[i] = ft_strdup(env[i]);
-		if (!data->env[i])
-			ft_exit(data, "Malloc Error\n", 0);
-		i++;
-	}
-}
-
-/* ************************READLINE UTILS************************************ */
-
-char	*ft_get_prompt(void)
-{
-	char	*prompt;
-
-	prompt = ft_strjoin("\033[0;32m", getenv("USER") , 0);
-	prompt = ft_strjoin(prompt, "@", 1);
-	prompt = ft_strjoin(prompt, "Minishell", 1);
-	prompt = ft_strjoin(prompt, ": ", 1);
-	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
-	prompt = ft_strjoin(prompt, getenv("PWD"), 1);
-	prompt = ft_strjoin(prompt, "> ", 1);
-	prompt = ft_strjoin(prompt, "\033[0m", 1);
-	return (prompt);
-}
 
 /* **************************PARSING***************************************** */
 
