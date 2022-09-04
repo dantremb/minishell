@@ -165,20 +165,10 @@ void	ft_echo(char **arg)
 		printf("\n");
 }
 
-void	ft_env(t_data *data)
-{
-	int	i;
-
-	i = -1;
-	while(data->env[++i])
-		printf("%s\n", data->env[i]);
-}
-
 void ft_export(t_data *data, char *arg)
 {
 	char **temp;
 	int i;
-	if (ft_get_variable())
 	temp = ft_calloc(sizeof(char *), ft_array_size(data->env) + 2);
 	if (temp == NULL)
 		ft_exit(data, "Malloc Error\n", 3);
@@ -239,14 +229,15 @@ void	ft_make_token(t_data *data)
 		count = ft_token_count(data->cmd[c].buffer, ' ');
 		data->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
 		t = 0;
-		data->cmd[c].token[t] = ft_trim_token(ft_strtok(data->cmd[c].buffer, ' '), ' ');
+		data->cmd[c].token[t] = ft_strtok(data->cmd[c].buffer, ' ');
 		while (++t < count)
-			data->cmd[c].token[t] = ft_trim_token(ft_strtok(NULL, ' '), ' ');
+			data->cmd[c].token[t] = ft_strtok(NULL, ' ');
 		t = 0;
 		while (++t < count)
 		{
-			if (data->cmd[c].token[t][0] == SQUOTE)
-				data->cmd[c].token[t] = ft_trim_token(data->cmd[c].token[t], SQUOTE);
+			data->cmd[c].token[t] = ft_trim_token(data->cmd[c].token[t], '\"');
+			if (data->cmd[c].token[t][0] == '\'')
+				data->cmd[c].token[t] = ft_trim_token(data->cmd[c].token[t], '\'');
 			else if (data->cmd[c].token[t][0] == '$')
 				data->cmd[c].token[t] = ft_get_variable(data, data->cmd[c].token[t] + 1);
 		}
@@ -270,39 +261,40 @@ void 	ft_parse(t_data *data)
 
 /* **********************ENGINE********************************************** */
 
-void	ft_execute_builtin(t_data *data, t_cmd *cmd)
+void	ft_execute_builtin(t_data *data, int nb)
 {
-	if (ft_strncmp(cmd->token[0], "echo", 4) == 0)
-		ft_echo(cmd->token);
-	else if (ft_strncmp(cmd->token[0], "env", 3) == 0)
-		ft_env(data);
-	else if (ft_strncmp(cmd->token[0], "export", 6) == 0)
-		ft_export(data, cmd->token[1]);
-	else if (ft_strncmp(cmd->buffer, "unset", 5) == 0)
-		ft_unset(data, cmd->token[1]); 
-	/*else if (ft_strncmp(cmd->buffer, "pwd", 3) == 0)
-		ft_pwd(data);
-	else if (ft_strncmp(cmd->buffer, "cd", 2) == 0)
-		ft_cd(data, cmd->token[1]);
-	else if (ft_strncmp(cmd->buffer, "cat", 3) == 0)
-		ft_cat(cmd);
-	else if (ft_strncmp(cmd->buffer, "wc", 2) == 0)
-		ft_wc(cmd);*/
+	int	i;
+
+	if (ft_strncmp(data->cmd[nb].token[0], "echo", 4) == 0)
+		ft_echo(data->cmd[nb].token);
+	else if (ft_strncmp(data->cmd[nb].token[0], "env", 3) == 0)
+	{
+		i = -1;
+		while(data->env[++i])
+			printf("%s\n", data->env[i]);
+	}
+	else if (ft_strncmp(data->cmd[nb].token[0], "export", 6) == 0)
+		ft_export(data, data->cmd[nb].token[1]);
+	else if (ft_strncmp(data->cmd[nb].token[0], "unset", 5) == 0)
+		ft_unset(data, data->cmd[nb].token[1]); 
+	else if (ft_strncmp(data->cmd[nb].token[0], "pwd", 3) == 0)
+		printf("%s\n", ft_get_variable(data, "PWD"));
+	else if (ft_strncmp(data->cmd[nb].token[0], "exit", 5) == 0)
+		ft_exit(data, "Goodbye\n", 3);
+	/*else if (ft_strncmp(data->cmd[nb].buffer, "cd", 2) == 0)
+		ft_cd(data, data->cmd[nb].token[1]);*/
 	else
 	{
 		ft_color(RED);
-		printf("<%s> is not a builtin command\n", cmd->buffer);
+		printf("<%s> is not a builtin command\n", data->cmd[nb].buffer);
 		ft_color(WHITE);
 	}
 }
 
-void	ft_execute(t_data *data)
+void	ft_make_child_process(t_data *data, int nb)
 {
-	int	i;
 
-	i = -1;
-	while (++i < data->cmd_count)
-		ft_execute_builtin(data, &data->cmd[i]);
+	ft_execute_builtin(data, nb);
 }
 
 /* ***********************MAIN*********************************************** */
@@ -312,22 +304,23 @@ int	main(int ac, char **argv, char **env)
 	(void)ac;
 	(void)argv;
 	t_data data;
+	int i;
 
 	ft_init_environement(&data, env);// Copy environement variable in main struct
 	while (1)
 	{
+		i = -1;
 		data.prompt = ft_get_prompt();// Get user and path for prompt
 		data.buffer = readline(data.prompt);// Fill the buffer with user input
 		free(data.prompt);// Free the prompt for next iteration
 		if (ft_is_only(data.buffer, SPACE))// Newline on empty buffer
 			free(data.buffer);
-		else if (ft_strncmp(data.buffer, "exit", 5) == 0)// Exit the program
-			ft_exit(&data, "Goodbye\n", 2);
 		else
 		{
 			ft_parse(&data);//tokenize the buffer
 			ft_print_table(&data);//print the table with all the tokens
-			ft_execute(&data);//execute the command
+			while (++i < data.cmd_count)
+				ft_make_child_process(&data, i);
 			ft_free_table(&data);// Free the table for next iteration
 		}
 	}
