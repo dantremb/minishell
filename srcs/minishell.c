@@ -150,7 +150,7 @@ void	ft_echo(char **arg)
 
 	flag = 0;
 	i = 1;
-	if (arg[1][0] == '-' && arg[1][1] == 'n')
+	if (arg[1] && ft_strncmp(arg[1], "-n\0", 3) == 0)
 	{
 		flag = 1;
 		i++;
@@ -217,6 +217,66 @@ int	ft_token_count(char *buffer, char sep)
 	return (i);
 }
 
+void	ft_remove_char(char *token, char sep)
+{
+	int i;
+	int j;
+	
+	i = 0;
+	j = 0;
+	while (token[i])
+	{
+		if (token[i] == sep)
+		{
+			j = i;
+			while (token[j])
+			{
+				token[j] = token[j + 1];
+				j++;
+			}
+		}
+		i++;
+	}
+}
+
+void	ft_clean_token(t_data *data, char **token)
+{
+	int t;
+
+	t = 0;
+	while (token[t])
+	{
+		if (token[t][0] == '\'')
+			token[t] = ft_trim_token(token[t], '\'');
+		else if (token[t][0] == '\"')
+		{
+			token[t] = ft_trim_token(token[t], '\"');
+			if (token[t][0] == '$')
+				token[t] = ft_get_variable(data, &token[t][1]);
+			t++;
+			while (token[t] && token[t][ft_strlen(token[t]) - 1] != '\"')
+			{
+				ft_remove_char(token[t++], '\"');
+				if (token[t][0] == '$')
+					token[t] = ft_get_variable(data, &token[t][1]);
+			}
+			if (token[t])
+			{
+				token[t] = ft_trim_token(token[t], '\"');
+				if (token[t][0] == '$')
+					token[t] = ft_get_variable(data, &token[t][1]);
+			}
+		}
+		else
+		{
+			token[t] = ft_trim_token(token[t], ' ');
+			if (token[t][0] == '$')
+				token[t] = ft_get_variable(data, &token[t][1]);
+		}
+		t++;
+	}
+}
+
 void	ft_make_token(t_data *data)
 {
 	int c;
@@ -227,21 +287,18 @@ void	ft_make_token(t_data *data)
 	while (++c < data->cmd_count)
 	{
 		count = ft_token_count(data->cmd[c].buffer, ' ');
-		data->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
+		data->cmd[c].token = ft_calloc(sizeof(char *), count + 2);
 		t = 0;
 		data->cmd[c].token[t] = ft_strtok(data->cmd[c].buffer, ' ');
-		while (++t < count)
-			data->cmd[c].token[t] = ft_strtok(NULL, ' ');
-		t = 0;
-		while (++t < count)
+		while (data->cmd[c].token[t])
 		{
-			data->cmd[c].token[t] = ft_trim_token(data->cmd[c].token[t], '\"');
-			if (data->cmd[c].token[t][0] == '\'')
-				data->cmd[c].token[t] = ft_trim_token(data->cmd[c].token[t], '\'');
-			else if (data->cmd[c].token[t][0] == '$')
-				data->cmd[c].token[t] = ft_get_variable(data, data->cmd[c].token[t] + 1);
+			t++;
+			data->cmd[c].token[t] = ft_strtok(NULL, ' ');
 		}
 	}
+	c = -1;
+	while (++c < data->cmd_count)
+		ft_clean_token(data, data->cmd[c].token);
 }
 
 void 	ft_parse(t_data *data)
@@ -258,6 +315,7 @@ void 	ft_parse(t_data *data)
 		data->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
 	ft_make_token(data);
 }
+
 
 /* **********************ENGINE********************************************** */
 
@@ -280,6 +338,7 @@ void	ft_execute_builtin(t_data *data, int nb)
 	else if (ft_strncmp(data->cmd[nb].token[0], "pwd", 3) == 0)
 		printf("%s\n", ft_get_variable(data, "PWD"));
 	else if (ft_strncmp(data->cmd[nb].token[0], "exit", 5) == 0)
+
 		ft_exit(data, "Goodbye\n", 3);
 	/*else if (ft_strncmp(data->cmd[nb].buffer, "cd", 2) == 0)
 		ft_cd(data, data->cmd[nb].token[1]);*/
@@ -293,7 +352,6 @@ void	ft_execute_builtin(t_data *data, int nb)
 
 void	ft_make_child_process(t_data *data, int nb)
 {
-
 	ft_execute_builtin(data, nb);
 }
 
