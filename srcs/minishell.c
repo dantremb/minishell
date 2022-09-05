@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/03 10:13:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/05 11:13:34 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,30 +121,30 @@ char	*ft_get_prompt(t_data *data)
 
 void	ft_cd(t_data *data, char *buffer)
 {
-	int	old;
-	int	new;
-	
+	int new;
+	int old;
+	int ret;
+
+	ret = chdir(buffer);
+	printf("ret = %d\n", ret);
 	old = -1;
 	while (data->env[++old])
 	{
-		if (ft_strncmp(data->env[old], "OLDPWD", 6) == 0)
+		if (ft_strncmp(data->env[old], "OLDPWD=", 7) == 0)
 			break ;
 	}
 	new = -1;
 	while (data->env[++new])
 	{
-		if (ft_strncmp(data->env[new], "PWD", 3) == 0)
+		if (ft_strncmp(data->env[new], "PWD=", 4) == 0)
 			break ;
 	}
-	if (access(buffer, F_OK | X_OK) == 0)
+	if (ret == 0)
 	{
-		if (chdir(buffer) == 0)
-		{
-			free(data->env[old]);
-			data->env[old] = ft_strjoin("OLDPWD=", ft_get_variable(data, "PWD"), 0);
-			free(data->env[new]);
-			data->env[new] = ft_strjoin("PWD=", buffer, 0);
-		}
+		free (data->env[old]);
+		data->env[old] = data->env[new];
+		data->env[new] = ft_strjoin("PWD=", getcwd(NULL, 0), 0);
+		printf("PWD = %s\n", data->env[new]);
 	}
 }
 
@@ -399,6 +399,7 @@ void	ft_execute_builtin(t_data *data, int nb)
 
 void	ft_make_child_process(t_data *data, int nb)
 {
+	//ft_find_redirect(data, nb);
 	ft_execute_builtin(data, nb);
 }
 
@@ -418,8 +419,13 @@ int	main(int ac, char **argv, char **env)
 		data.prompt = ft_get_prompt(&data);// Get user and path for prompt
 		data.buffer = readline(data.prompt);// Fill the buffer with user input
 		free(data.prompt);// Free the prompt for next iteration
-		if (ft_is_only(data.buffer, SPACE))// Newline on empty buffer
+		if (ft_is_only(data.buffer, ' '))// Newline on empty buffer
 			free(data.buffer);
+		else if (ft_strncmp(data.buffer, "test", 4) == 0)// test
+		{
+			while (env[++i])
+				printf("%s\n", env[i]);
+		}
 		else
 		{
 			ft_parse(&data);//tokenize the buffer
