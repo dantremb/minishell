@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/05 11:17:52 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/05 15:10:01 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,7 +239,6 @@ void ft_export(t_data *data, char *arg)
 char	*ft_trim_token(char *buffer, char sep)
 {
 	int		i;
-	
 	if (!buffer)
 		return (buffer);
 	i = ft_strlen(buffer) - 1;
@@ -294,13 +293,58 @@ void	ft_remove_char(char *token, char sep)
 	}
 }
 
+char	*ft_expand(t_data *data, char *'token')
+{
+	(void)	data;
+	(void)	token;
+	
+	int		i;
+	char	**tmp;
+	int		count;
+	int		start;
+	int		end;
+	
+	i = 0;
+	count = ft_token_count(token, '$') + 2;
+	printf("expand count = %d\n", count);
+	tmp = ft_calloc(sizeof(char *), count);
+	start = 0;
+	while (token[start])
+	{
+		end = start;
+		while (token[end])
+		{
+			printf("start = %d, end = %d\n", start, end);
+			if (token[end] == '$')
+			{
+				break ;
+			}
+			else
+				end++;
+		}
+		printf("start char = %c, end char = %c\n", token[start], token[end]);
+		tmp[i] = ft_substr(token, start, end - start);
+		printf("tmp[%d] = [%s]\n", i, tmp[i]);
+		i++;
+		start = ++end;
+		while (token[end] != '$' || token[end] != '\0' || token[end] != ' ')
+			end++;
+		tmp[i] = ft_substr(token, start, end - start);
+		printf("tmp[%d] = [%s]\n", i, tmp[i]);
+		i++;
+	}
+	return (NULL);
+}
+
 char	*ft_expand_variable(t_data *data, char *token)
 {
 	ft_color(YELLOW);
 	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
 		token = ft_get_variable(data, &token[1]);
 	else
-		printf("expander !!!!\n");
+	{
+		token = ft_expand(data, token);
+	}
 	ft_color(WHITE);
 	return (token);
 }
@@ -316,10 +360,9 @@ void	ft_clean_token(t_data *data, char **token)
 			ft_remove_char(token[t], '\'');
 		else if (token[t][0] == '\"' && token[t][ft_strlen(token[t]) - 1] == '\"')
 		{
+			ft_remove_char(token[t], '\"');
 			if (ft_strchr(token[t], '$'))
 				token[t] = ft_expand_variable(data, token[t]);
-			else
-				ft_remove_char(token[t], '\"');
 		}
 		else
 		{
@@ -400,13 +443,15 @@ void	ft_execute_builtin(t_data *data, int nb)
 void	ft_make_child_process(t_data *data, int nb)
 {
 	//pid
+	//dup2
 	//fork
-	//enter child process
-	//ft_find_redirect(data, nb);
-	//if builtin
-	ft_execute_builtin(data, nb);
-	//else
-	//ft_execute(data, nb);
+		//enter child process
+		//ft_find_redirect(data, nb);
+		//if builtin
+		ft_execute_builtin(data, nb);
+		//else
+		//ft_execute(data, nb);
+	//wait pid child
 }
 
 /* ***********************MAIN*********************************************** */
