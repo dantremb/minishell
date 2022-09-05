@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/05 11:13:34 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/05 11:17:52 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -399,8 +399,14 @@ void	ft_execute_builtin(t_data *data, int nb)
 
 void	ft_make_child_process(t_data *data, int nb)
 {
+	//pid
+	//fork
+	//enter child process
 	//ft_find_redirect(data, nb);
+	//if builtin
 	ft_execute_builtin(data, nb);
+	//else
+	//ft_execute(data, nb);
 }
 
 /* ***********************MAIN*********************************************** */
@@ -421,11 +427,6 @@ int	main(int ac, char **argv, char **env)
 		free(data.prompt);// Free the prompt for next iteration
 		if (ft_is_only(data.buffer, ' '))// Newline on empty buffer
 			free(data.buffer);
-		else if (ft_strncmp(data.buffer, "test", 4) == 0)// test
-		{
-			while (env[++i])
-				printf("%s\n", env[i]);
-		}
 		else
 		{
 			ft_parse(&data);//tokenize the buffer
