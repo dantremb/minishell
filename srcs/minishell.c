@@ -59,21 +59,6 @@ void	ft_init_environement(t_data *data, char **env)
 	}
 }
 
-char	*ft_get_prompt(void)
-{
-	char	*prompt;
-
-	prompt = ft_strjoin("\033[0;32m", getenv("USER") , 0);
-	prompt = ft_strjoin(prompt, "@", 1);
-	prompt = ft_strjoin(prompt, "Minishell", 1);
-	prompt = ft_strjoin(prompt, ": ", 1);
-	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
-	prompt = ft_strjoin(prompt, getenv("PWD"), 1);
-	prompt = ft_strjoin(prompt, "> ", 1);
-	prompt = ft_strjoin(prompt, "\033[0m", 1);
-	return (prompt);
-}
-
 void	ft_print_table(t_data *data)
 {
 	int i;
@@ -113,16 +98,64 @@ char	*ft_get_variable(t_data *data, char *buffer)
 				return (data->env[i] + (ft_strlen(buffer) + 1));
 		}
 	}
-	ft_color(RED);
-	printf("<%s> variable not exist\n", buffer);
-	ft_color(WHITE);
 	buffer[0] = '\0';
 	return (buffer);
 }
 
+char	*ft_get_prompt(t_data *data)
+{
+	char	*prompt;
 
+	prompt = ft_strjoin("\033[0;32m", ft_get_variable(data, "USER") , 0);
+	prompt = ft_strjoin(prompt, "@", 1);
+	prompt = ft_strjoin(prompt, "Minishell", 1);
+	prompt = ft_strjoin(prompt, ": ", 1);
+	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
+	prompt = ft_strjoin(prompt, ft_get_variable(data, "PWD"), 1);
+	prompt = ft_strjoin(prompt, "> ", 1);
+	prompt = ft_strjoin(prompt, "\033[0m", 1);
+	return (prompt);
+}
 
 /* ******************BUILT-IN************************************************ */
+
+void	ft_cd(t_data *data, char *buffer)
+{
+	int	old;
+	int	new;
+	
+	old = -1;
+	while (data->env[++old])
+	{
+		if (ft_strncmp(data->env[old], "OLDPWD", 6) == 0)
+			break ;
+	}
+	new = -1;
+	while (data->env[++new])
+	{
+		if (ft_strncmp(data->env[new], "PWD", 3) == 0)
+			break ;
+	}
+	if (access(buffer, F_OK | X_OK) == 0)
+	{
+		if (chdir(buffer) == 0)
+		{
+			free(data->env[old]);
+			data->env[old] = ft_strjoin("OLDPWD=", ft_get_variable(data, "PWD"), 0);
+			free(data->env[new]);
+			data->env[new] = ft_strjoin("PWD=", buffer, 0);
+		}
+	}
+}
+
+void	ft_env(t_data *data)
+{
+	int i;
+
+	i = -1;
+	while(data->env[++i])
+		printf("%s\n", data->env[i]);
+}
 
 void	ft_unset(t_data *data, char *buffer)
 {
@@ -134,12 +167,13 @@ void	ft_unset(t_data *data, char *buffer)
 		if (ft_strncmp(data->env[i], buffer, ft_strlen(buffer)) == 0
 			&& data->env[i][ft_strlen(buffer)] == '=')
 		{
-			while (data->env[i])
+			free(data->env[i]);
+			while (data->env[i + 1])
 			{
 				data->env[i] = data->env[i + 1];
 				i++;
 			}
-			free(data->env[i]);
+			data->env[i] = NULL;
 		}
 	}
 }
@@ -173,17 +207,31 @@ void	ft_echo(char **arg)
 
 void ft_export(t_data *data, char *arg)
 {
-	char **temp;
-	int i;
-	temp = ft_calloc(sizeof(char *), ft_array_size(data->env) + 2);
-	if (temp == NULL)
-		ft_exit(data, "Malloc Error\n", 3);
-	i = -1;
-	while (data->env[++i])
-		temp[i] = data->env[i];
-	temp[i] = ft_strdup(arg);
-	free(data->env);
-	data->env = temp;
+	char	**temp;
+	char	*duplicate;
+	char	*var;
+	int		i;
+
+	if (ft_strchr(arg, '=') && arg[0] != '=')
+	{
+		duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
+		var = ft_get_variable(data, duplicate);
+		if (var)
+			ft_unset(data, duplicate);
+		free (duplicate);
+		temp = ft_calloc(sizeof(char *), ft_array_size(data->env) + 2);
+		if (temp == NULL)
+			ft_exit(data, "Malloc Error\n", 3);
+		i = -1;
+		while (data->env[++i])
+			temp[i] = data->env[i];
+		temp[i] = ft_strdup(arg);
+		free(data->env);
+		data->env = temp;
+	}
+	else if (arg == NULL)
+		ft_env(data);
+
 }
 
 /* **************************PARSING***************************************** */
@@ -327,16 +375,10 @@ void 	ft_parse(t_data *data)
 
 void	ft_execute_builtin(t_data *data, int nb)
 {
-	int	i;
-
 	if (ft_strncmp(data->cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(data->cmd[nb].token);
 	else if (ft_strncmp(data->cmd[nb].token[0], "env", 3) == 0)
-	{
-		i = -1;
-		while(data->env[++i])
-			printf("%s\n", data->env[i]);
-	}
+		ft_env(data);
 	else if (ft_strncmp(data->cmd[nb].token[0], "export", 6) == 0)
 		ft_export(data, data->cmd[nb].token[1]);
 	else if (ft_strncmp(data->cmd[nb].token[0], "unset", 5) == 0)
@@ -344,10 +386,9 @@ void	ft_execute_builtin(t_data *data, int nb)
 	else if (ft_strncmp(data->cmd[nb].token[0], "pwd", 3) == 0)
 		printf("%s\n", ft_get_variable(data, "PWD"));
 	else if (ft_strncmp(data->cmd[nb].token[0], "exit", 5) == 0)
-
 		ft_exit(data, "Goodbye\n", 3);
-	/*else if (ft_strncmp(data->cmd[nb].buffer, "cd", 2) == 0)
-		ft_cd(data, data->cmd[nb].token[1]);*/
+	else if (ft_strncmp(data->cmd[nb].buffer, "cd", 2) == 0)
+		ft_cd(data, data->cmd[nb].token[1]);
 	else
 	{
 		ft_color(RED);
@@ -374,7 +415,7 @@ int	main(int ac, char **argv, char **env)
 	while (1)
 	{
 		i = -1;
-		data.prompt = ft_get_prompt();// Get user and path for prompt
+		data.prompt = ft_get_prompt(&data);// Get user and path for prompt
 		data.buffer = readline(data.prompt);// Fill the buffer with user input
 		free(data.prompt);// Free the prompt for next iteration
 		if (ft_is_only(data.buffer, SPACE))// Newline on empty buffer
