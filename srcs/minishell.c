@@ -116,7 +116,8 @@ char	*ft_get_variable(t_data *data, char *buffer)
 	ft_color(RED);
 	printf("<%s> variable not exist\n", buffer);
 	ft_color(WHITE);
-	return (NULL);
+	buffer[0] = '\0';
+	return (buffer);
 }
 
 
@@ -157,9 +158,14 @@ void	ft_echo(char **arg)
 	}
 	while (arg[i])
 	{
+		if (ft_is_only(arg[i], ' '))
+			i++;
+		else
+		{
 		printf("%s", arg[i++]);
 		if (arg[i])
 			printf(" ");
+		}
 	}
 	if (flag == 0)
 		printf("\n");
@@ -235,8 +241,20 @@ void	ft_remove_char(char *token, char sep)
 				j++;
 			}
 		}
-		i++;
+		else
+			i++;
 	}
+}
+
+char	*ft_expand_variable(t_data *data, char *token)
+{
+	ft_color(YELLOW);
+	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
+		token = ft_get_variable(data, &token[1]);
+	else
+		printf("expander !!!!\n");
+	ft_color(WHITE);
+	return (token);
 }
 
 void	ft_clean_token(t_data *data, char **token)
@@ -246,32 +264,20 @@ void	ft_clean_token(t_data *data, char **token)
 	t = 0;
 	while (token[t])
 	{
-		if (token[t][0] == '\'')
-			token[t] = ft_trim_token(token[t], '\'');
-		else if (token[t][0] == '\"')
+		if (token[t][0] == '\'' && token[t][ft_strlen(token[t]) - 1] == '\'')
+			ft_remove_char(token[t], '\'');
+		else if (token[t][0] == '\"' && token[t][ft_strlen(token[t]) - 1] == '\"')
 		{
-			token[t] = ft_trim_token(token[t], '\"');
-			if (token[t][0] == '$')
-				token[t] = ft_get_variable(data, &token[t][1]);
-			t++;
-			while (token[t] && token[t][ft_strlen(token[t]) - 1] != '\"')
-			{
-				ft_remove_char(token[t++], '\"');
-				if (token[t][0] == '$')
-					token[t] = ft_get_variable(data, &token[t][1]);
-			}
-			if (token[t])
-			{
-				token[t] = ft_trim_token(token[t], '\"');
-				if (token[t][0] == '$')
-					token[t] = ft_get_variable(data, &token[t][1]);
-			}
+			if (ft_strchr(token[t], '$'))
+				token[t] = ft_expand_variable(data, token[t]);
+			else
+				ft_remove_char(token[t], '\"');
 		}
 		else
 		{
 			token[t] = ft_trim_token(token[t], ' ');
-			if (token[t][0] == '$')
-				token[t] = ft_get_variable(data, &token[t][1]);
+			if (ft_strchr(token[t], '$'))
+				token[t] = ft_expand_variable(data, token[t]);
 		}
 		t++;
 	}

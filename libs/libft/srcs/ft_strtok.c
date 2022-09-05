@@ -34,9 +34,9 @@ char	*ft_strtok(char *buffer, char sep)
 	{
 		if (*save == '\0')
 			return (ft_end_buffer(ret, &save));
-		else if (*save == '\'')
+		else if (*save == '\'' || *save == '\"')
 		{
-			save = strchr(save + 1, '\'');
+			save = strchr(save + 1, *save);
 			if (!save)
 				return (ret);
 			save++;
