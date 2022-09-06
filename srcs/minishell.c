@@ -301,27 +301,20 @@ char	*ft_expand(t_data *data, char *token)
 	char	*middle;
 	char	*var;
 
-	index = token;
-	while (*index)
-	{
-		if (*index == '$')
-			break ;
-		index++;
-	}
+	index = ft_strchr(token, '$');
 	start = ft_substr(token, 0, index - token);
-	middle = index + 1;
-	while (++index)
-	{
-		if (*index == '\0' || *index == ' ' || *index == '$' || *index == '"' || *index == '\'')
-			break ;
-	}
-	middle = ft_substr(middle, 0, index - middle);
+	printf("start = [%s]\n", start);
+	var = index + 1;
+	while (ft_strchr("$ \'\"", *var))
+		var++;
+	middle = ft_substr(index + 1, 0, var - index);
 	var = ft_get_variable(data, middle);
+	printf("var = [%s]\n", var);
+	free(middle);
+	middle = ft_strjoin(start, var, 0);
+	printf("first chunk = [%s]\n", middle);
 	index++;
 	index = ft_substr(index, 0, ft_strlen(index));
-	printf("EXPANDER2022 = [%s]", start);
-	printf("[%s]", var);
-	printf("[%s]\n", ft_trim_token(index, '\"'));
 	return (token);
 }
 
