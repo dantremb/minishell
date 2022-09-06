@@ -293,59 +293,46 @@ void	ft_remove_char(char *token, char sep)
 	}
 }
 
-char	*ft_expand(t_data *data, char *'token')
+char	*ft_expand(t_data *data, char *token)
 {
-	(void)	data;
-	(void)	token;
-	
-	int		i;
-	char	**tmp;
-	int		count;
-	int		start;
-	int		end;
-	
-	i = 0;
-	count = ft_token_count(token, '$') + 2;
-	printf("expand count = %d\n", count);
-	tmp = ft_calloc(sizeof(char *), count);
-	start = 0;
-	while (token[start])
+	(void) data;
+	char	*index;
+	char	*start;
+	char	*middle;
+	char	*var;
+
+	index = token;
+	while (*index)
 	{
-		end = start;
-		while (token[end])
-		{
-			printf("start = %d, end = %d\n", start, end);
-			if (token[end] == '$')
-			{
-				break ;
-			}
-			else
-				end++;
-		}
-		printf("start char = %c, end char = %c\n", token[start], token[end]);
-		tmp[i] = ft_substr(token, start, end - start);
-		printf("tmp[%d] = [%s]\n", i, tmp[i]);
-		i++;
-		start = ++end;
-		while (token[end] != '$' || token[end] != '\0' || token[end] != ' ')
-			end++;
-		tmp[i] = ft_substr(token, start, end - start);
-		printf("tmp[%d] = [%s]\n", i, tmp[i]);
-		i++;
+		if (*index == '$')
+			break ;
+		index++;
 	}
-	return (NULL);
+	start = ft_substr(token, 0, index - token);
+	middle = index + 1;
+	while (++index)
+	{
+		if (*index == '\0' || *index == ' ' || *index == '$' || *index == '"' || *index == '\'')
+			break ;
+	}
+	middle = ft_substr(middle, 0, index - middle);
+	var = ft_get_variable(data, middle);
+	index++;
+	index = ft_substr(index, 0, ft_strlen(index));
+	printf("EXPANDER2022 = [%s]", start);
+	printf("[%s]", var);
+	printf("[%s]\n", ft_trim_token(index, '\"'));
+	return (token);
 }
 
 char	*ft_expand_variable(t_data *data, char *token)
 {
-	ft_color(YELLOW);
 	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
 		token = ft_get_variable(data, &token[1]);
 	else
 	{
-		token = ft_expand(data, token);
+		token = ft_expand(data, token + 1);
 	}
-	ft_color(WHITE);
 	return (token);
 }
 
@@ -360,9 +347,10 @@ void	ft_clean_token(t_data *data, char **token)
 			ft_remove_char(token[t], '\'');
 		else if (token[t][0] == '\"' && token[t][ft_strlen(token[t]) - 1] == '\"')
 		{
-			ft_remove_char(token[t], '\"');
 			if (ft_strchr(token[t], '$'))
 				token[t] = ft_expand_variable(data, token[t]);
+			else
+				ft_remove_char(token[t], '\"');
 		}
 		else
 		{
