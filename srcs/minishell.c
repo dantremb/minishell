@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/06 11:43:56 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/06 15:27:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ void	ft_init_environement(t_data *data, char **env)
 
 	data->expand[0] = 'a';
 	data->expand[1] = '\0';
+	data->heredoc[0] = 'a';
+	data->heredoc[1] = '\0';
 	data->buffer = NULL;
 	data->prompt = NULL;
 	data->cmd_count = 0;
