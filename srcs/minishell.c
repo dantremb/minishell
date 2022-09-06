@@ -270,7 +270,7 @@ int	ft_token_count(char *buffer, char sep)
 	return (i);
 }
 
-void	ft_remove_char(char *token, char sep)
+char	*ft_remove_char(char *token, char sep)
 {
 	int i;
 	int j;
@@ -291,38 +291,31 @@ void	ft_remove_char(char *token, char sep)
 		else
 			i++;
 	}
+	return (token);
 }
 
-char	*ft_expand(t_data *data, char *token)
+char	*ft_expand(t_data *data, char *token, int flag)
 {
-	(void) data;
-	char	*index;
-	char	*start;
-	char	*middle;
-	char	*var;
+	char	*temp[4];
 
-	index = ft_strchr(token, '$');
-	start = ft_substr(token, 0, index - token);
-	ft_remove_char(start, '\"');
-	middle = index + 1;
-	while (++index)
-	{
-		if (*index == '\0' || *index == ' ' || *index == '$' || *index == '"' || *index == '\'')
+	temp[0] = ft_strchr(token, '$');
+	temp[1] = ft_remove_char(ft_substr(token, 0, temp[0] - token), '\"');
+	temp[2] = temp[0] + 1;
+	while (++temp[0])
+		if (*temp[0] == '\0' || *temp[0] == ' ' || *temp[0] == '$' || *temp[0] == '"' || *temp[0] == '\'')
 			break ;
-	}
-	middle = ft_substr(middle, 0, index - middle);
-	var = ft_get_variable(data, middle);
-	free (middle);
-	middle = ft_strjoin(start, var, 0);
-	free (start);
-	index++;
-	start = ft_substr(index, 0, ft_strlen(index));
-	ft_remove_char(start, '\"');
-	index = ft_strjoin(middle, start, 0);
-	free (middle);
-	free (start);
-	printf("index = %s\n", index);
-	return (index);
+	temp[2] = ft_substr(temp[2] , 0, temp[0] - temp[2] );
+	temp[3] = ft_get_variable(data, temp[2] );
+	free(temp[2]);
+	temp[2]  = ft_strjoin(temp[1], temp[3], 1);
+	temp[1] = ft_remove_char(ft_substr(temp[0], 0, ft_strlen(temp[0])), '\"');
+	temp[0] = ft_strjoin(temp[2] , temp[1], 1);
+	free(temp[1]);
+	if (flag == 1)
+		free (token);
+	if (ft_strchr(temp[0], '$'))
+		temp[0] = ft_expand(data, temp[0], 1);
+	return (temp[0]);
 }
 
 char	*ft_expand_variable(t_data *data, char *token)
@@ -331,7 +324,7 @@ char	*ft_expand_variable(t_data *data, char *token)
 		token = ft_get_variable(data, &token[1]);
 	else
 	{
-		token = ft_expand(data, token + 1);
+		token = ft_expand(data, token + 1, 0);
 	}
 	return (token);
 }
