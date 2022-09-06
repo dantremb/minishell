@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/06 09:49:11 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/06 11:43:56 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ void	ft_init_environement(t_data *data, char **env)
 {
 	int		i;
 
+	data->expand[0] = 'a';
+	data->expand[1] = '\0';
 	data->buffer = NULL;
 	data->prompt = NULL;
 	data->cmd_count = 0;
@@ -126,25 +128,20 @@ void	ft_cd(t_data *data, char *buffer)
 	int ret;
 
 	ret = chdir(buffer);
-	printf("ret = %d\n", ret);
 	old = -1;
 	while (data->env[++old])
-	{
 		if (ft_strncmp(data->env[old], "OLDPWD=", 7) == 0)
 			break ;
-	}
 	new = -1;
 	while (data->env[++new])
-	{
 		if (ft_strncmp(data->env[new], "PWD=", 4) == 0)
 			break ;
-	}
 	if (ret == 0)
 	{
 		free (data->env[old]);
-		data->env[old] = data->env[new];
+		data->env[old] = ft_strjoin("OLDPWD=", data->env[new] + 4, 0);
+		free (data->env[new]);
 		data->env[new] = ft_strjoin("PWD=", getcwd(NULL, 0), 0);
-		printf("PWD = %s\n", data->env[new]);
 	}
 }
 
@@ -306,10 +303,10 @@ char	*ft_expand(t_data *data, char *token, int flag)
 			break ;
 	temp[2] = ft_substr(temp[2] , 0, temp[0] - temp[2] );
 	temp[3] = ft_get_variable(data, temp[2] );
-	free(temp[2]);
-	temp[2]  = ft_strjoin(temp[1], temp[3], 1);
+	temp[3]  = ft_strjoin(temp[1], temp[3], 1);
+	free (temp[2]);
 	temp[1] = ft_remove_char(ft_substr(temp[0], 0, ft_strlen(temp[0])), '\"');
-	temp[0] = ft_strjoin(temp[2] , temp[1], 1);
+	temp[0] = ft_strjoin(temp[3] , temp[1], 1);
 	free(temp[1]);
 	if (flag == 1)
 		free (token);
@@ -320,18 +317,26 @@ char	*ft_expand(t_data *data, char *token, int flag)
 
 char	*ft_expand_variable(t_data *data, char *token)
 {
-	//char	*temps;
+	char	*temps;
+	char	*expand;
 
 	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
 		token = ft_get_variable(data, &token[1]);
 	else
 	{
-		token = ft_expand(data, token + 1, 0);
-		/*temps = ft_strjoin("-expand=", token);
+		if (token[0] == '\"')
+			token = ft_expand(data, token + 1, 0);
+		else
+			token = ft_expand(data, token, 0);
+		expand = ft_strjoin(data->expand, "-expand=", 0);
+		temps = ft_strjoin(expand, token, 0);
 		free(token);
-		ft_export(temps, 0);
+		ft_export(data, temps);
 		free(temps);
-		token = ft_getvariable(data, "-expand");*/
+		expand[ft_strlen(expand) - 1] = '\0';
+		token = ft_get_variable(data, expand);
+		free(expand);
+		data->expand[0] = data->expand[0] + 1; 
 	}
 	return (token);
 }
@@ -467,6 +472,7 @@ int	main(int ac, char **argv, char **env)
 			while (++i < data.cmd_count)
 				ft_make_child_process(&data, i);
 			ft_free_table(&data);// Free the table for next iteration
+			
 		}
 	}
 }

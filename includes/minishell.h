@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/05 14:08:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/06 11:12:41 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ typedef struct		s_data
 	char	*buffer;		//buffer for readline
 	char	*prompt;		//prompt message for readline
 	int 	cmd_count;		//count of commands
+	char	expand[2];		//flag for expansion
 	t_cmd	*cmd;			//array of cmd
 
 }					t_data;
