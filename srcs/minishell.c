@@ -320,11 +320,18 @@ char	*ft_expand(t_data *data, char *token, int flag)
 
 char	*ft_expand_variable(t_data *data, char *token)
 {
+char *temps;
+
 	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
 		token = ft_get_variable(data, &token[1]);
 	else
 	{
 		token = ft_expand(data, token + 1, 0);
+temps = ft_strjoin("-expand=", token);
+free(token);
+ft_export(temps, 0);
+free(temps);
+token = ft_getvariable(data, "-expand");
 	}
 	return (token);
 }
