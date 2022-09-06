@@ -303,19 +303,26 @@ char	*ft_expand(t_data *data, char *token)
 
 	index = ft_strchr(token, '$');
 	start = ft_substr(token, 0, index - token);
-	printf("start = [%s]\n", start);
-	var = index + 1;
-	while (ft_strchr("$ \'\"", *var))
-		var++;
-	middle = ft_substr(index + 1, 0, var - index);
+	ft_remove_char(start, '\"');
+	middle = index + 1;
+	while (++index)
+	{
+		if (*index == '\0' || *index == ' ' || *index == '$' || *index == '"' || *index == '\'')
+			break ;
+	}
+	middle = ft_substr(middle, 0, index - middle);
 	var = ft_get_variable(data, middle);
-	printf("var = [%s]\n", var);
-	free(middle);
+	free (middle);
 	middle = ft_strjoin(start, var, 0);
-	printf("first chunk = [%s]\n", middle);
+	free (start);
 	index++;
-	index = ft_substr(index, 0, ft_strlen(index));
-	return (token);
+	start = ft_substr(index, 0, ft_strlen(index));
+	ft_remove_char(start, '\"');
+	index = ft_strjoin(middle, start, 0);
+	free (middle);
+	free (start);
+	printf("index = %s\n", index);
+	return (index);
 }
 
 char	*ft_expand_variable(t_data *data, char *token)
