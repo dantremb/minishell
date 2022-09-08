@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/08 12:29:22 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/08 12:38:06 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -474,7 +474,6 @@ void	ft_execute_command(t_data *data, char *cmd_path, int nb)
 	//printf("minishell: %s: command not found\n", data->cmd[nb].token[0]);
 }
 
-/* ***********************MAIN*********************************************** */
 
 void	ft_subshell(t_data *data)
 {
@@ -494,6 +493,8 @@ void	ft_subshell(t_data *data)
 	}
 	waitpid(pid, NULL, 0);
 }
+
+/* ***********************MAIN*********************************************** */
 
 void	ft_minishell(t_data *data)
 {

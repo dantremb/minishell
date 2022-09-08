@@ -1,0 +1,13 @@
+Makefile
+README.md
+includes
+infile
+libs
+minishell
+minishell.dSYM
+objs
+outfile
+srcs
+test
+test1
+test2

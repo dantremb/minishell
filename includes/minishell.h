@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/06 15:28:19 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/08 12:49:21 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ typedef struct		s_cmd
 {
 	char	*buffer;		//indivividual buffer
 	char	**token;		//tokenized buffer
-	int		infile;			//for open input file
-	int		outfile;		//for open output file
-	int		outappend;		//for open output file in append mode
+	char	*infile;			//for open input file
+	char	*outfile;		//for open output file
+	char	*outechond;		//for open output file in append mode
 	int		file_error;		//for open error file
 }					t_cmd;
 
