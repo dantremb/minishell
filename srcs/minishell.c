@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/08 12:01:05 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/08 12:29:22 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -476,6 +476,25 @@ void	ft_execute_command(t_data *data, char *cmd_path, int nb)
 
 /* ***********************MAIN*********************************************** */
 
+void	ft_subshell(t_data *data)
+{
+	pid_t	pid;
+	int		i;
+	
+	i = -1;
+	pid = fork();
+	if (pid == 0)
+	{
+		while (++i < data->cmd_count)//execute each command
+		{
+			if (!ft_execute_builtin(data, i))
+				ft_execute_command(data, ft_get_path(data, data->cmd[0].token[0]), i);
+		}
+		exit(0);
+	}
+	waitpid(pid, NULL, 0);
+}
+
 void	ft_minishell(t_data *data)
 {
 	int i;
@@ -483,19 +502,13 @@ void	ft_minishell(t_data *data)
 	i = -1;
 	ft_parse(data);//tokenize the buffer
 	ft_print_table(data);//print the table with all the tokens
-	if (data->cmd_count == 1)
+	if (data->cmd_count == 1)//if only one command we do not open a subshell
 	{
 		if (!ft_execute_builtin(data, 0))
 			ft_execute_command(data, ft_get_path(data, data->cmd[0].token[0]), 0);
 	}
-	else
-	{
-		while (++i < data->cmd_count)
-		{
-			if (!ft_execute_builtin(data, i))
-				ft_execute_command(data, ft_get_path(data, data->cmd[0].token[0]), i);
-		}
-	}
+	else//if we have multiple commands we open a subshell
+		ft_subshell(data);
 	ft_free_table(data);// Free the table for next iteration
 }
 
