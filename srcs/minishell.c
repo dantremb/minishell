@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/08 12:38:06 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/08 13:50:52 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -466,10 +466,17 @@ bool	ft_execute_builtin(t_data *data, int nb)
 void	ft_execute_command(t_data *data, char *cmd_path, int nb)
 {
 	pid_t	pid;
-
+	int		fd[2];
+	
+	pipe(fd);
 	pid = fork();
 	if (pid == 0)
+	{
+		close(fd[1]);
+		dup2(cmd->file, 1);
 		execve(cmd_path, data->cmd[nb].token, data->env);
+		close(fd[0]);
+	}
 	waitpid(pid, NULL, 0);
 	//printf("minishell: %s: command not found\n", data->cmd[nb].token[0]);
 }
