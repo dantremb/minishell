@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/08 16:12:35 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/08 17:22:45 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -419,7 +419,6 @@ char	*ft_get_path(t_data *data, char *buffer)
 	char 	*test_path;
 	int		i;
 	i = 0;
-	
 	if (access(buffer, F_OK | X_OK) == 0)
 		return (buffer);
 	program = ft_strjoin("/", buffer, 0);
@@ -445,7 +444,7 @@ char	*ft_get_path(t_data *data, char *buffer)
 
 bool	ft_execute_builtin(t_data *data, int nb)
 {
-	printf("check and execute builtin on command no %d\n", nb);
+	printf("Builtin %d\n", nb);
 	if (ft_strncmp(data->cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(data->cmd[nb].token);
 	else if (ft_strncmp(data->cmd[nb].token[0], "env", 3) == 0)
@@ -467,30 +466,19 @@ bool	ft_execute_builtin(t_data *data, int nb)
 
 void	ft_execute_command(t_data *data, char *cmd_path, int nb)
 {
-	printf("comand path = %s\n", cmd_path);
-	printf("execute command no %d", nb);
+	printf("execute cmd %d\n", nb);
 	pid_t	pid;
 	int		fd[2];
-	
-	pipe(fd);
+
 	pid = fork();
 	if (pid == 0)
-	{
-		close(fd[0]);
-		dup2(fd[1], 1);
 		execve(cmd_path, data->cmd[nb].token, data->env);
-		dprintf(2, "execve error\n");
-		exit(1);
-	}
-	close(fd[1]);
-	dup2(fd[0], 0);
 	waitpid(pid, NULL, 0);
 }
 
 
 void	ft_subshell(t_data *data)
 {
-	printf("enter subshell\n");
 	pid_t	pid;
 	int		i;
 	
@@ -498,12 +486,14 @@ void	ft_subshell(t_data *data)
 	pid = fork();
 	if (pid == 0)
 	{
-		while (++i < data->cmd_count -1)//execute each command
+		while (++i < data->cmd_count)//execute each command
 		{
-			if (!ft_execute_builtin(data, i))
+			if (ft_execute_builtin(data, i) == false)
+			{
+				printf("Not\n");
 				ft_execute_command(data, ft_get_path(data, data->cmd[0].token[0]), i);
+			}
 		}
-		exit(0);
 	}
 	waitpid(pid, NULL, 0);
 }
@@ -516,18 +506,20 @@ void	ft_minishell(t_data *data)
 
 	i = -1;
 	ft_parse(data);//tokenize the buffer
+	printf("command count = %d\n", data->cmd_count);
 	ft_print_table(data);//print the table with all the tokens
-	printf("cmd_count = %d\n", data->cmd_count);
 	if (data->cmd_count == 1)//if only one command we do not open a subshell
 	{
 		if (!ft_execute_builtin(data, 0))
+		{
+			printf("Not a builtin\n");
 			ft_execute_command(data, ft_get_path(data, data->cmd[0].token[0]), 0);
+		}
 	}
-	/*else//if we have multiple commands we open a subshell
-		ft_subshell(data);*/
+	//else//if we have multiple commands we open a subshell
+	//	ft_subshell(data);
 	ft_free_table(data);// Free the table for next iteration
 }
-
 int	main(int ac, char **argv, char **env)
 {
 	(void)ac;
