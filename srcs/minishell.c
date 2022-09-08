@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/06 15:27:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/08 12:01:05 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -411,7 +411,38 @@ void 	ft_parse(t_data *data)
 
 /* **********************ENGINE********************************************** */
 
-void	ft_execute_builtin(t_data *data, int nb)
+char	*ft_get_path(t_data *data, char *buffer)
+{
+	char	*program;
+	char	*env_path;
+	char	**fcnt_path;
+	char 	*test_path;
+	int		i;
+	i = 0;
+	if (access(buffer, F_OK | X_OK) == 0)
+		return (buffer);
+	program = ft_strjoin("/", buffer, 0);
+	env_path = ft_get_variable(data, "PATH");
+	if (env_path == NULL || program == NULL)
+		return (NULL);
+	fcnt_path = ft_split(env_path, ':');
+	if (fcnt_path == NULL)
+		return (NULL);
+	while (fcnt_path[i])
+	{
+		test_path = ft_strjoin(fcnt_path[i], program, 0);
+		if (access(test_path, F_OK | X_OK) == 0)
+			break ;
+		free (test_path);
+		test_path = NULL;
+		i++;
+	}
+	ft_free_array(fcnt_path);
+	free(program);
+	return (test_path);
+}
+
+bool	ft_execute_builtin(t_data *data, int nb)
 {
 	if (ft_strncmp(data->cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(data->cmd[nb].token);
@@ -423,58 +454,66 @@ void	ft_execute_builtin(t_data *data, int nb)
 		ft_unset(data, data->cmd[nb].token[1]); 
 	else if (ft_strncmp(data->cmd[nb].token[0], "pwd", 3) == 0)
 		printf("%s\n", ft_get_variable(data, "PWD"));
-	else if (ft_strncmp(data->cmd[nb].token[0], "exit", 5) == 0)
-		ft_exit(data, "Goodbye\n", 3);
 	else if (ft_strncmp(data->cmd[nb].buffer, "cd", 2) == 0)
 		ft_cd(data, data->cmd[nb].token[1]);
+	else if (ft_strncmp(data->cmd[nb].token[0], "exit", 5) == 0)
+		ft_exit(data, "Goodbye\n", 3);
 	else
-	{
-		ft_color(RED);
-		printf("<%s> is not a builtin command\n", data->cmd[nb].buffer);
-		ft_color(WHITE);
-	}
+		return (false);
+	return (true);
 }
 
-void	ft_make_child_process(t_data *data, int nb)
+void	ft_execute_command(t_data *data, char *cmd_path, int nb)
 {
-	//pid
-	//dup2
-	//fork
-		//enter child process
-		//ft_find_redirect(data, nb);
-		//if builtin
-		ft_execute_builtin(data, nb);
-		//else
-		//ft_execute(data, nb);
-	//wait pid child
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == 0)
+		execve(cmd_path, data->cmd[nb].token, data->env);
+	waitpid(pid, NULL, 0);
+	//printf("minishell: %s: command not found\n", data->cmd[nb].token[0]);
 }
 
 /* ***********************MAIN*********************************************** */
+
+void	ft_minishell(t_data *data)
+{
+	int i;
+
+	i = -1;
+	ft_parse(data);//tokenize the buffer
+	ft_print_table(data);//print the table with all the tokens
+	if (data->cmd_count == 1)
+	{
+		if (!ft_execute_builtin(data, 0))
+			ft_execute_command(data, ft_get_path(data, data->cmd[0].token[0]), 0);
+	}
+	else
+	{
+		while (++i < data->cmd_count)
+		{
+			if (!ft_execute_builtin(data, i))
+				ft_execute_command(data, ft_get_path(data, data->cmd[0].token[0]), i);
+		}
+	}
+	ft_free_table(data);// Free the table for next iteration
+}
 
 int	main(int ac, char **argv, char **env)
 {
 	(void)ac;
 	(void)argv;
 	t_data data;
-	int i;
 
 	ft_init_environement(&data, env);// Copy environement variable in main struct
 	while (1)
 	{
-		i = -1;
 		data.prompt = ft_get_prompt(&data);// Get user and path for prompt
 		data.buffer = readline(data.prompt);// Fill the buffer with user input
 		free(data.prompt);// Free the prompt for next iteration
 		if (ft_is_only(data.buffer, ' '))// Newline on empty buffer
-			free(data.buffer);
+			free(data.buffer);// Free the buffer for next iteration
 		else
-		{
-			ft_parse(&data);//tokenize the buffer
-			ft_print_table(&data);//print the table with all the tokens
-			while (++i < data.cmd_count)
-				ft_make_child_process(&data, i);
-			ft_free_table(&data);// Free the table for next iteration
-			
-		}
+			ft_minishell(&data);// Parse / Execute / Free
 	}
 }
