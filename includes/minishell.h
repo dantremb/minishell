@@ -17,6 +17,7 @@
 # include <stdio.h>
 # include <fcntl.h>
 # include <readline/readline.h>
+# include <readline/history.h>
 # include "../libs/libft/includes/libft.h"
 # include <stdbool.h>
 
@@ -26,27 +27,28 @@ typedef struct		s_cmd
 	char	*buffer;		//indivividual buffer
 	char	**token;		//tokenized buffer
 	
-	char	*infile;		//name of file to open for input
-	int		fd_in;			//fd to open the input file
+	char	*infile;		//for open input file
+	int		fd_in;			//for open input file
 	
-	char	*outfile;		//name of file to open for output
-	char	*outappend;		//name of file to open for output in append mode
-	int		fd_out;			//fd for open output file
+	char	*outfile;		//for open output file
+	char	*outappend;		//for open output file in append mode
+	int		fd_out;			//for open output file
+	
+	int		file;			//for open input file
+	int		file_error;		//for open error file
 	
 }					t_cmd;
 
 typedef struct		s_data
 {
 	char	**env;			//copy of env
-	
 	char	*buffer;		//buffer for readline
 	char	*prompt;		//prompt message for readline
-	
 	int 	cmd_count;		//count of commands
 	char	expand[2];		//flag for expansion
 	char	heredoc[2];		//flag for heredoc
+	pid_t	*pid;			//pids for all process
 	t_cmd	*cmd;			//array of cmd
-
 }					t_data;
 
 #endif

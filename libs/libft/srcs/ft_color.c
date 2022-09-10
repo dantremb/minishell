@@ -29,4 +29,6 @@ void	ft_color(int color)
 		printf("\033[1;36m");
 	else if (color == 7)
 		printf("\033[1;37m");
+	else if (color == 8)
+		printf("\033[0m");
 }

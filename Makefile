@@ -24,6 +24,7 @@ RLFLAGS = -lreadline -lncurses
 LIBFT = libs/libft/libft.a
 LIBFT_PATH = libs/libft/
 READLINE = libs/readline/libreadline.a
+READHISTORY = libs/readline/libhistory.a
 
 # Sources files
 S = srcs/
@@ -50,7 +51,7 @@ init:
 
 # Creating  executable
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE) $(RLFLAGS)
+	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE) $(RLFLAGS) $(READHISTORY)
 
 # Cleaning
 REMOVE = rm -rf
