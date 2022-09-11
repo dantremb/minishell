@@ -45,6 +45,7 @@ typedef struct		s_data
 	char	*buffer;		//buffer for readline
 	char	*prompt;		//prompt message for readline
 	int 	cmd_count;		//count of commands
+	int		ct;
 	char	expand[2];		//flag for expansion
 	char	heredoc[2];		//flag for heredoc
 	pid_t	*pid;			//pids for all process
