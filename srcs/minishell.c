@@ -523,19 +523,15 @@ char	*ft_expand_heredoc(char *heredoc)
 	char	*expand;
 
 	expand = ft_strjoin("<", &data.heredoc, 0);
-	printf("expand = %s\n", expand);
 	expand = ft_strjoin(expand, "=", 1);
-	printf("expand = %s\n", expand);
 	temps = ft_strjoin(expand, heredoc, 0);
 	free(heredoc);
-	printf("temps = %s\n", temps);
 	ft_export(temps);
 	free(temps);
 	expand[ft_strlen(expand) - 1] = '\0';
 	heredoc = ft_get_variable(expand);
 	free(expand);
 	data.heredoc = data.heredoc + 1;
-
 	return (heredoc);
 }
 
