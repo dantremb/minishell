@@ -161,8 +161,7 @@ void	ft_init_environement(char **env)
 
 	data.expand[0] = 'a';
 	data.expand[1] = '\0';
-	data.heredoc[0] = 'a';
-	data.heredoc[1] = '\0';
+	data.heredoc= 'a';
 	data.buffer = NULL;
 	data.prompt = NULL;
 	data.cmd_count = 0;
@@ -294,34 +293,39 @@ void	ft_export(char *arg)
 		ft_env();
 }
 
-void	ft_heredoc(char *limiter, char *heredoc)
+void	ft_redirect(t_cmd	*cmd, char *meta, int size, char **file)
 {
-	char	*str;
-	int		fd;
-	int		i;
+	//ft_redirect(&data.cmd[c], "<", 1, &data.cmd[c].infile);
+	//ft_redirect(&data.cmd[c], ">>", 2, &data.cmd[c].outappend);
+	//ft_redirect(&data.cmd[c], ">", 1, &data.cmd[c].outfile);
+	int i;
 
-	fd = ft_open_fd(heredoc, 2);
-	if (fd == -1)
+	i = -1;
+	while (cmd->token[++i])
 	{
-		printf("Error: heredoc file could not be opened\n");
-		return ;
+		printf("TOP LOOP token[%d] = %s\n", i, cmd->token[i]);
+		if (ft_strncmp(cmd->token[i], meta, size) == 0)
+		{
+			if (cmd->token[i][size] == '\0')
+			{
+				printf("2 TOK cmd->token[%d][%d] == %c\n", i, size, cmd->token[i][size]);
+				*file = cmd->token[i + 1];
+				if (i == 0)
+					cmd->token = cmd->token + 2;
+				else
+					cmd->token[i] = NULL;
+			}
+			else
+			{
+				printf("1 TOK cmd->token[%d][%d] == %c\n", i, size, cmd->token[i][size]);
+				*file = &cmd->token[i][size];
+				if (i == 0)
+					cmd->token = cmd->token + 1;
+				else
+					cmd->token[i] = NULL;
+			}
+		}
 	}
-	str = readline("<heredoc> ");
-	i = 1;
-	while (str)
-	{
-		if (ft_strnstr(str, limiter, ft_strlen(limiter)) != 0
-			&& str[ft_strlen(limiter)] == '\0')
-			break ;
-		else if (i != 1)
-			ft_putstr_fd("\n", fd);
-		ft_putstr_fd(str, fd);
-		free(str);
-		str = readline("<heredoc> ");
-		i = 0;
-	}
-	close(fd);
-	free(str);
 }
 
 /* **********************PARSING********************************************* */
@@ -486,48 +490,85 @@ void	ft_clean_token(char **token)
 	}
 }
 
+void	ft_heredoc(char *limiter, char *heredoc)
+{
+	char	*str;
+	int		fd;
+	int		i;
+
+	fd = ft_open_fd(heredoc, 2);
+	if (fd == -1)
+		ft_exit("Error: heredoc file not found", 1);
+	str = readline("<heredoc> ");
+	i = 1;
+	while (str)
+	{
+		if (ft_strnstr(str, limiter, ft_strlen(limiter)) != 0
+			&& str[ft_strlen(limiter)] == '\0')
+			break ;
+		else if (i != 1)
+			ft_putstr_fd("\n", fd);
+		ft_putstr_fd(str, fd);
+		free(str);
+		str = readline("<heredoc> ");
+		i = 0;
+	}
+	close(fd);
+	free(str);
+}
+
 char	*ft_expand_heredoc(char *heredoc)
 {
 	char	*temps;
 	char	*expand;
 
-	expand = ft_strjoin(data.heredoc, "heredoc=", 0);
+	expand = ft_strjoin("<", &data.heredoc, 0);
+	printf("expand = %s\n", expand);
+	expand = ft_strjoin(expand, "=", 1);
+	printf("expand = %s\n", expand);
 	temps = ft_strjoin(expand, heredoc, 0);
 	free(heredoc);
+	printf("temps = %s\n", temps);
 	ft_export(temps);
 	free(temps);
 	expand[ft_strlen(expand) - 1] = '\0';
 	heredoc = ft_get_variable(expand);
 	free(expand);
-	data.heredoc[0] = data.heredoc[0] + 1; 
+	data.heredoc = data.heredoc + 1;
 
 	return (heredoc);
 }
 
-void	ft_parse_redirect(t_cmd	*cmd, char *meta, int size, char **file)
+void	ft_parse_heredoc(char **token)
 {
 	int i;
+	char	*str;
 
 	i = -1;
-	while (cmd->token[++i])
+	while (token[++i])
 	{
-		if (ft_strncmp(cmd->token[i], meta, size) == 0)
+		if (ft_strncmp(token[i], "<<", 2) == 0)
 		{
-			if (cmd->token[i][size] == '\0')
+			if (token[i][2] == '\0')
 			{
-				*file = cmd->token[i + 1];
-				cmd->token = cmd->token + 2;
+				str = ft_expand_heredoc(ft_strjoin("<", &data.heredoc, 0));
+				ft_heredoc(token[i + 1], str);
+				token[i][1] = '\0';
+				token[i + 1] = str + 1;
+				printf("env = %s\n", ft_get_variable(str));
 			}
 			else
 			{
-				*file = &cmd->token[i][size];
-				cmd->token = cmd->token + 1;
+				str = ft_expand_heredoc(ft_strjoin("<", &data.heredoc, 0));
+				ft_heredoc(&token[i][2], str);
+				token[i] = str;
+				printf("env = %s\n", ft_get_variable(str));
 			}
 		}
 	}
 }
 
-// ft_make_token(void) will split the individual buffer into a token list to be trim and expand
+// ft_parse_token(void) will split the individual buffer into a token list to be trim and expand
 void	ft_parse_token(void)
 {
 	int c;
@@ -543,11 +584,12 @@ void	ft_parse_token(void)
 		data.cmd[c].token[t] = ft_strtok(data.cmd[c].buffer, ' '); // get the first token
 		while (data.cmd[c].token[t++])// until strtok return NULL
 			data.cmd[c].token[t] = ft_strtok(NULL, ' '); // get the next token
+		ft_parse_heredoc(data.cmd[c].token); // parse the heredoc
 	}
 }
 
-// ft_make_cmd(void) will split the readline buffer into smaller buffer for each command
-void	ft_parse_cmd(void)
+// ft_parse_cmd(void) will split the readline buffer into smaller buffer for each command
+void 	ft_parse_cmd(void)
 {
 	int i;
 
@@ -560,22 +602,7 @@ void	ft_parse_cmd(void)
 	data.cmd[0].buffer = ft_trim_token(ft_strtok(data.buffer, '|'), ' '); // get the first token
 	while (++i < data.cmd_count)// until strtok return NULL
 		data.cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' '); // get the next token
-}
-
-// ft_parse(void) is the main function to call others functions to make tokens and analyzes them
-void 	ft_parse(void)
-{
-	int c;
-	ft_parse_cmd(); // make cmd struct for each pipe
 	ft_parse_token(); // make token for each cmd
-	c = -1;
-	while (++c < data.cmd_count) // for each cmd token list
-	{
-		ft_parse_redirect(&data.cmd[c], "<<", 2, &data.cmd[c].infile);
-		ft_parse_redirect(&data.cmd[c], "<", 1, &data.cmd[c].infile);
-		ft_parse_redirect(&data.cmd[c], ">>", 2, &data.cmd[c].outappend);
-		ft_parse_redirect(&data.cmd[c], ">", 1, &data.cmd[c].outfile);
-	}
 }
 
 /* **********************ENGINE********************************************** */
@@ -768,7 +795,7 @@ int	main(int ac, char **argv, char **env)
 			free(data.buffer);
 		else
 		{
-			ft_parse(); // tokenize the buffer
+			ft_parse_cmd(); // tokenize the buffer
 			ft_print_table(); //print the table with all the tokens
 			/*if (ft_check_builtin(0, 0) == 1 && data.cmd_count == 1)
 			{

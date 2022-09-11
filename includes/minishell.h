@@ -47,7 +47,7 @@ typedef struct		s_data
 	int 	cmd_count;		//count of commands
 	int		ct;
 	char	expand[2];		//flag for expansion
-	char	heredoc[2];		//flag for heredoc
+	char	heredoc;		//flag for heredoc
 	pid_t	*pid;			//pids for all process
 	t_cmd	*cmd;			//array of cmd
 }					t_data;

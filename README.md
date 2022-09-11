@@ -29,10 +29,10 @@
 << end cat
 <infile cat
 < infile cat
+echo test >>outfile
+echo test >> outfile
 echo test > outfile
 echo test >outfile
-echo test >> outfile
-echo test >>outfile
 
 <<end cat | << end cat | <infile cat | < infile cat | echo test > outfile | echo test >outfile | echo test >> outfile | echo test >>outfile
 
