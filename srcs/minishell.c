@@ -49,24 +49,37 @@ void	ft_print_table(void)
 	int	j;
 
 	i = 0;
-	ft_color(1);
-	dprintf(2, "---------- COMAND TABLE ----------\n");
 	while (i < data.cmd_count)
 	{
 		j = 0;
+		ft_color(1);
+		printf("------------ TOKEN -----------------\n");
 		ft_color(6);
-		dprintf(2, "[cmd %d]", i);
+		printf("cmd %d = \t", i);
 		while (data.cmd[i].token[j])
 		{
 			ft_color(3);
-			dprintf(2, "[%s]", data.cmd[i].token[j]);
+			printf("[\033[1;34m%s\033[1;33m]", data.cmd[i].token[j]);
 			j++;
 		}
-		dprintf(2, "\n");
+		printf("\n");
+		printf("------------ COMAND TABLE ----------\n");
+		ft_color(6);
+		printf("infile =\t");
+		ft_color(3);
+		printf("[\033[1;34m%s\033[1;33m]\n", data.cmd[i].infile);
+		ft_color(6);
+		printf("outfile =\t");
+		ft_color(3);
+		printf("[\033[1;34m%s\033[1;33m]\n", data.cmd[i].outfile);
+		ft_color(6);
+		printf("append =\t");
+		ft_color(3);
+		printf("[\033[1;34m%s\033[1;33m]\n", data.cmd[i].outappend);
+		ft_color(1);
 		i++;
 	}
-	ft_color(1);
-	dprintf(2, "---------------END----------------\n");
+		printf("------------------------------------\n");
 	ft_color(0);
 }
 
@@ -491,31 +504,31 @@ char	*ft_expand_heredoc(char *heredoc)
 	return (heredoc);
 }
 
-void	ft_check_redirect(char **token)
+void	ft_parse_redirect(t_cmd	*cmd, char *meta, int size, char **file)
 {
 	int i;
-	char	*str;
 
 	i = -1;
-	while (token[++i])
+	while (cmd->token[++i])
 	{
-		if (ft_strncmp(token[i], "<<\0", 3) == 0)
+		if (ft_strncmp(cmd->token[i], meta, size) == 0)
 		{
-			str = ft_expand_heredoc(ft_strjoin(&data.heredoc[0], "heredoc", 0));
-			ft_heredoc(token[i + 1], str);
-			token[i][1] = '\0';
-			token[i + 1] = str;
-		}
-		else if (ft_strncmp(token[i], "<<", 2) == 0)
-		{
-			
-			return;
+			if (cmd->token[i][size] == '\0')
+			{
+				*file = cmd->token[i + 1];
+				cmd->token = cmd->token + 2;
+			}
+			else
+			{
+				*file = &cmd->token[i][size];
+				cmd->token = cmd->token + 1;
+			}
 		}
 	}
 }
 
 // ft_make_token(void) will split the individual buffer into a token list to be trim and expand
-void	ft_make_token(void)
+void	ft_parse_token(void)
 {
 	int c;
 	int t;
@@ -534,7 +547,7 @@ void	ft_make_token(void)
 }
 
 // ft_make_cmd(void) will split the readline buffer into smaller buffer for each command
-void	ft_make_cmd(void)
+void	ft_parse_cmd(void)
 {
 	int i;
 
@@ -549,15 +562,19 @@ void	ft_make_cmd(void)
 		data.cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' '); // get the next token
 }
 
+// ft_parse(void) is the main function to call others functions to make tokens and analyzes them
 void 	ft_parse(void)
 {
 	int c;
-	ft_make_cmd(); // make cmd struct for each pipe
-	ft_make_token(); // make token for each cmd
+	ft_parse_cmd(); // make cmd struct for each pipe
+	ft_parse_token(); // make token for each cmd
 	c = -1;
 	while (++c < data.cmd_count) // for each cmd token list
 	{
-		ft_check_redirect(data.cmd[c].token); // check if there is a heredoc or redirection
+		ft_parse_redirect(&data.cmd[c], "<<", 2, &data.cmd[c].infile);
+		ft_parse_redirect(&data.cmd[c], "<", 1, &data.cmd[c].infile);
+		ft_parse_redirect(&data.cmd[c], ">>", 2, &data.cmd[c].outappend);
+		ft_parse_redirect(&data.cmd[c], ">", 1, &data.cmd[c].outfile);
 	}
 }
 
@@ -716,7 +733,7 @@ void	ft_fork_main(int nb)
 		ft_exit("Fork failed", 3);
 	if (pid == 0)
 	{
-		// ft_print_table();				//print the table with all the tokens
+		// ft_print_table(); //print the table with all the tokens
 		while (++nb < data.cmd_count - 1)
 			ft_make_child_process(nb);
 		ft_find_redirect(nb);
@@ -739,20 +756,20 @@ int	main(int ac, char **argv, char **env)
 	(void)argv;
 	//int		i;
 
-	ft_init_environement(env);					// Copy environement variable in main struct
+	ft_init_environement(env); // Copy environement variable in main struct
 	while (1)
 	{
 		//i = -1;
-		data.prompt = ft_get_prompt();			// Get user and current folder path for prompt
-		data.buffer = readline(data.prompt);	// Fill the buffer with user input
-		free(data.prompt);						// Free the prompt for next iteration
+		data.prompt = ft_get_prompt(); // Get user and current folder path for prompt
+		data.buffer = readline(data.prompt); // Fill the buffer with user input
+		free(data.prompt); // Free the prompt for next iteration
 		add_history(data.buffer);
-		if (ft_is_only(data.buffer, ' '))		// Newline on empty buffer
+		if (ft_is_only(data.buffer, ' ')) // Newline on empty buffer
 			free(data.buffer);
 		else
 		{
-			ft_parse(); 						// tokenize the buffer
-			ft_print_table();					//print the table with all the tokens
+			ft_parse(); // tokenize the buffer
+			ft_print_table(); //print the table with all the tokens
 			/*if (ft_check_builtin(0, 0) == 1 && data.cmd_count == 1)
 			{
 				ft_find_redirect(0);
