@@ -514,6 +514,7 @@ void	ft_check_redirect(char **token)
 	}
 }
 
+// ft_make_token(void) will split the individual buffer into a token list to be trim and expand
 void	ft_make_token(void)
 {
 	int c;
@@ -521,43 +522,43 @@ void	ft_make_token(void)
 	int count;
 
 	c = -1;
-	while (++c < data.cmd_count)
+	while (++c < data.cmd_count) // for each command
 	{
-		count = ft_token_count(data.cmd[c].buffer, ' ');
-		data.cmd[c].token = ft_calloc(sizeof(char *), count + 2);
+		count = ft_token_count(data.cmd[c].buffer, ' '); // count the number of token
+		data.cmd[c].token = ft_calloc(sizeof(char *), count + 2); // allocate memory for the token list
 		t = 0;
-		data.cmd[c].token[t] = ft_strtok(data.cmd[c].buffer, ' ');
-		while (data.cmd[c].token[t])
-		{
-			t++;
-			data.cmd[c].token[t] = ft_strtok(NULL, ' ');
-		}
+		data.cmd[c].token[t] = ft_strtok(data.cmd[c].buffer, ' '); // get the first token
+		while (data.cmd[c].token[t++])// until strtok return NULL
+			data.cmd[c].token[t] = ft_strtok(NULL, ' '); // get the next token
 	}
-	c = -1;
-	while (++c < data.cmd_count)
-		ft_check_redirect(data.cmd[c].token);
-	// c = -1;
-	// while (++c < data.cmd_count)
-	// {
-	// 	ft_find_redirect(data, c);
-	// 	ft_clean_token(data, data.cmd[c].token);
-	// }
 }
 
-void 	ft_parse(void)
+// ft_make_cmd(void) will split the readline buffer into smaller buffer for each command
+void	ft_make_cmd(void)
 {
 	int i;
 
 	i = 0;
-	data.cmd_count = ft_token_count(data.buffer, '|');
-	data.cmd = ft_calloc(sizeof(t_cmd), data.cmd_count + 1);
-	data.pid = ft_calloc(sizeof(pid_t), data.cmd_count - 1);
+	data.cmd_count = ft_token_count(data.buffer, '|'); // count the number of pipe
+	data.cmd = ft_calloc(sizeof(t_cmd), data.cmd_count + 1); // allocate memory for the number of pipe
+	data.pid = ft_calloc(sizeof(pid_t), data.cmd_count - 1); // allocate memory for PID table
 	if (data.cmd == NULL || data.pid == NULL)
 		ft_exit("Malloc error\n", 2);
-	data.cmd[0].buffer = ft_trim_token(ft_strtok(data.buffer, '|'), ' ');
-	while (++i < data.cmd_count)
-		data.cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
-	ft_make_token();
+	data.cmd[0].buffer = ft_trim_token(ft_strtok(data.buffer, '|'), ' '); // get the first token
+	while (++i < data.cmd_count)// until strtok return NULL
+		data.cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' '); // get the next token
+}
+
+void 	ft_parse(void)
+{
+	int c;
+	ft_make_cmd(); // make cmd struct for each pipe
+	ft_make_token(); // make token for each cmd
+	c = -1;
+	while (++c < data.cmd_count) // for each cmd token list
+	{
+		ft_check_redirect(data.cmd[c].token); // check if there is a heredoc or redirection
+	}
 }
 
 /* **********************ENGINE********************************************** */
@@ -736,13 +737,13 @@ int	main(int ac, char **argv, char **env)
 {
 	(void)ac;
 	(void)argv;
-	int		i;
+	//int		i;
 
-	ft_init_environement(env);			// Copy environement variable in main struct
+	ft_init_environement(env);					// Copy environement variable in main struct
 	while (1)
 	{
-		i = -1;
-		data.prompt = ft_get_prompt();		// Get user and path for prompt
+		//i = -1;
+		data.prompt = ft_get_prompt();			// Get user and current folder path for prompt
 		data.buffer = readline(data.prompt);	// Fill the buffer with user input
 		free(data.prompt);						// Free the prompt for next iteration
 		add_history(data.buffer);
@@ -750,8 +751,9 @@ int	main(int ac, char **argv, char **env)
 			free(data.buffer);
 		else
 		{
-			ft_parse(); // tokenize the buffer
-			if (ft_check_builtin(0, 0) == 1 && data.cmd_count == 1)
+			ft_parse(); 						// tokenize the buffer
+			ft_print_table();					//print the table with all the tokens
+			/*if (ft_check_builtin(0, 0) == 1 && data.cmd_count == 1)
 			{
 				ft_find_redirect(0);
 				ft_execute_builtin(0);
@@ -759,7 +761,7 @@ int	main(int ac, char **argv, char **env)
 			else
 			{
 				ft_fork_main(i);
-			}
+			}*/
 			ft_free_table();
 		}
 	}
