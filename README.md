@@ -63,4 +63,4 @@ echo test >outfile
 - single quote ne va pas expand les variables et les double quote oui
 - valeur de retour des processus avec $?
 - ctrl-c ctrl-\ ctrl-d
-- executez des commandes avec singles quotes qui ne devrait pas expand les variables
+- executez des commandes avec singles quotes qui ne devrait pas expand les variables et metacaractères
