@@ -115,27 +115,6 @@ char	*ft_get_prompt(void)
 	return (prompt);
 }
 
-bool	ft_check_builtin(int nb, int i)
-{
-	if (ft_strncmp(data.cmd[nb].token[i], "echo", 4) == 0)
-		return (true);
-	else if (ft_strncmp(data.cmd[nb].token[i], "env", 3) == 0)
-		return (true);
-	else if (ft_strncmp(data.cmd[nb].token[i], "export", 6) == 0)
-		return (true);
-	else if (ft_strncmp(data.cmd[nb].token[i], "unset", 5) == 0)
-		return (true);
-	else if (ft_strncmp(data.cmd[nb].token[i], "pwd", 3) == 0)
-		return (true);
-	else if (ft_strncmp(data.cmd[nb].buffer, "cd", 2) == 0)
-		return (true);
-	else if (ft_strncmp(data.cmd[nb].token[i], "exit", 4) == 0)
-		return (true);
-	else
-		return (false);
-	return (true);
-}
-
 int	ft_open_fd(char *str, int i)
 {
 	static int	fd;
@@ -328,7 +307,6 @@ void	ft_redirect(t_cmd	*cmd, char *meta, int size, char **file)
 	}
 }
 
-/* **********************PARSING********************************************* */
 
 char	*ft_remove_char(char *token, char sep)
 {
@@ -490,6 +468,9 @@ void	ft_clean_token(char **token)
 	}
 }
 
+/* **********************PARSING********************************************* */
+
+// ft_heredoc(char *limiter, char *heredoc) make a child process to make the heredoc
 void	ft_heredoc(char *limiter, char *heredoc)
 {
 	char	*str;
@@ -608,7 +589,6 @@ void 	ft_parse_cmd(void)
 
 bool	ft_execute_builtin(int nb)
 {
-	//dprintf(2, "cmd: %s\n", data.cmd[nb].token[0]);
 	if (ft_strncmp(data.cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(data.cmd[nb].token);
 	else if (ft_strncmp(data.cmd[nb].token[0], "env", 3) == 0)
@@ -780,12 +760,12 @@ int	main(int ac, char **argv, char **env)
 {
 	(void)ac;
 	(void)argv;
-	//int		i;
+	int		i;
 
 	ft_init_environement(env); // Copy environement variable in main struct
 	while (1)
 	{
-		//i = -1;
+		i = -1;
 		data.prompt = ft_get_prompt(); // Get user and current folder path for prompt
 		data.buffer = readline(data.prompt); // Fill the buffer with user input
 		free(data.prompt); // Free the prompt for next iteration
@@ -796,7 +776,7 @@ int	main(int ac, char **argv, char **env)
 		{
 			ft_parse_cmd(); // tokenize the buffer
 			ft_print_table(); //print the table with all the tokens
-			/*if (ft_check_builtin(0, 0) == 1 && data.cmd_count == 1)
+			if (ft_check_builtin(0, 0) == 1 && data.cmd_count == 1)
 			{
 				ft_find_redirect(0);
 				ft_execute_builtin(0);
@@ -804,7 +784,7 @@ int	main(int ac, char **argv, char **env)
 			else
 			{
 				ft_fork_main(i);
-			}*/
+			}
 			ft_free_table();
 		}
 	}
