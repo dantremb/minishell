@@ -1,29 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_is_only.c                                       :+:      :+:    :+:   */
+/*   ft_token_count.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/02 16:12:42 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 00:09:55 by dantremb         ###   ########.fr       */
+/*   Created: 2022/09/12 00:12:58 by dantremb          #+#    #+#             */
+/*   Updated: 2022/09/12 00:13:13 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
 
-bool	ft_is_only(char *buffer, char c)
+int	ft_token_count(char *buffer, char sep)
 {
+	char *tmp;
+	char *token;
 	int i;
-
+	
 	i = 0;
-	if (!buffer)
-		return (false);
-	while (buffer[i] != '\0')
+	tmp = ft_strdup(buffer);
+	token = ft_trim_token(ft_strtok(tmp, sep), ' ');
+	while(token)
 	{
-		if (buffer[i] != c)
-			return (false);
 		i++;
+		token = ft_trim_token(ft_strtok(NULL, sep), ' ');
 	}
-	return (true);
+	free(tmp);
+	return (i);
 }

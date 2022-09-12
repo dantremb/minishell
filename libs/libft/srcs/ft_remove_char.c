@@ -1,29 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_is_only.c                                       :+:      :+:    :+:   */
+/*   ft_remove_char.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/02 16:12:42 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 00:09:55 by dantremb         ###   ########.fr       */
+/*   Created: 2022/09/11 22:19:03 by dantremb          #+#    #+#             */
+/*   Updated: 2022/09/11 22:19:20 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/libft.h"
-
-bool	ft_is_only(char *buffer, char c)
+char	*ft_remove_char(char *token, char sep)
 {
 	int i;
-
+	int j;
+	
 	i = 0;
-	if (!buffer)
-		return (false);
-	while (buffer[i] != '\0')
+	j = 0;
+	while (token[i])
 	{
-		if (buffer[i] != c)
-			return (false);
-		i++;
+		if (token[i] == sep)
+		{
+			j = i - 1;
+			while (token[++j])
+				token[j] = token[j + 1];
+		}
+		else
+			i++;
 	}
-	return (true);
+	return (token);
 }

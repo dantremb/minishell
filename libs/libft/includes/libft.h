@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/22 22:40:58 by root              #+#    #+#             */
-/*   Updated: 2022/09/02 16:27:35 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/12 00:13:32 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,5 +99,7 @@ int				ft_array_size(char **array);
 void			ft_color(int color);
 bool			ft_is_only(char *buffer, char c);
 char			*ft_strtok(char *buffer, char sep);
-
+char			*ft_remove_char(char *token, char sep);
+char			*ft_trim_token(char *token, char sep);
+int				ft_token_count(char *buffer, char sep);
 #endif

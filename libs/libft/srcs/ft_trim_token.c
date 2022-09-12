@@ -1,29 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_is_only.c                                       :+:      :+:    :+:   */
+/*   ft_trim_token.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/02 16:12:42 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 00:09:55 by dantremb         ###   ########.fr       */
+/*   Created: 2022/09/11 23:00:44 by dantremb          #+#    #+#             */
+/*   Updated: 2022/09/11 23:11:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
 
-bool	ft_is_only(char *buffer, char c)
+char	*ft_trim_token(char *token, char sep)
 {
-	int i;
-
-	i = 0;
-	if (!buffer)
-		return (false);
-	while (buffer[i] != '\0')
+	int		i;
+	if (!token)
+		return (token);
+	i = ft_strlen(token) - 1;
+	while (token[i] == sep)
 	{
-		if (buffer[i] != c)
-			return (false);
-		i++;
+		token[i] = '\0';
+		i--;
 	}
-	return (true);
+	while (*token == sep)
+		token++;
+	return (token);
 }
