@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 00:16:28 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/12 00:29:14 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -515,18 +515,6 @@ bool	ft_execute_builtin(int nb)
 	return (true);
 }
 
-void	ft_exec_cmd(char *cmd_path, int nb)
-{
-	pid_t	pid;
-
-	pid = fork();
-	if (pid == 0)
-	{
-		if (execve(cmd_path, data.cmd[nb].token, data.env) == -1)
-			exit(127);
-	}
-	waitpid(pid, NULL, 0);
-}
 
 void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
 {
@@ -572,16 +560,28 @@ void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
 	}
 }
 
-/* **********************MAIN************************************************ */
+void	ft_exec_cmd(char *cmd_path, int nb)
+{
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		ft_redirect(&data.cmd[nb], ">>", 2, 6);
+		ft_redirect(&data.cmd[nb], ">", 1, 2);
+		ft_redirect(&data.cmd[nb], "<", 1, 1);
+		execve(cmd_path, data.cmd[nb].token, data.env);
+	}
+	waitpid(pid, NULL, 0);
+}
 
 void	ft_execute(int nb)
 {
-	ft_redirect(&data.cmd[nb], ">>", 2, 6);
-	ft_redirect(&data.cmd[nb], ">", 1, 2);
-	ft_redirect(&data.cmd[nb], "<", 1, 1);
 	if (ft_execute_builtin(nb) == false)
 		ft_exec_cmd(ft_get_path(nb), nb);
 }
+
+/* **********************MAIN************************************************ */
 
 int	main(int ac, char **argv, char **env)
 {
@@ -596,20 +596,16 @@ int	main(int ac, char **argv, char **env)
 		data.prompt = ft_get_prompt(); // Get user and current folder path for prompt
 		data.buffer = readline(data.prompt); // Fill the buffer with user input
 		free(data.prompt); // Free the prompt for next iteration
-		add_history(data.buffer);
 		if (ft_is_only(data.buffer, ' ')) // Newline on empty buffer
-			free(data.buffer);
+			continue;
 		else
 		{
+			add_history(data.buffer);
 			ft_parse_cmd(); // tokenize the buffer
 			ft_print_table(); //print the table with all the tokens
-			if (data.cmd_count == 1)
-				ft_execute(0);
+			if (data.cmd_count == 1) // If there is only one command
+				ft_execute(0); // Execute the command
 			ft_print_table();
-			/*else
-			{
-				ft_fork_main(i);
-			}*/
 			ft_free_table();
 		}
 	}
