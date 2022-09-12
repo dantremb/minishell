@@ -494,71 +494,74 @@ void	ft_heredoc(char *limiter, char *heredoc)
 {
 	char	*str;
 	int		fd;
-	int		i;
+	pid_t	pid;
 
-	fd = ft_open_fd(heredoc, 2);
-	if (fd == -1)
-		ft_exit("Error: heredoc file not found", 1);
-	str = readline("<heredoc> ");
-	i = 1;
-	while (str)
+	pid = fork(); // make a child process
+	if (pid == 0) // if i'm the child
 	{
-		if (ft_strnstr(str, limiter, ft_strlen(limiter)) != 0
-			&& str[ft_strlen(limiter)] == '\0')
-			break ;
-		else if (i != 1)
-			ft_putstr_fd("\n", fd);
-		ft_putstr_fd(str, fd);
-		free(str);
-		str = readline("<heredoc> ");
-		i = 0;
+		fd = ft_open_fd(heredoc, 2); // open file
+		if (fd == -1)
+			ft_exit("Error: heredoc file not found", 1);
+		while (1)
+		{
+			write(1, "<heredoc> ", 10); // print prompt
+			str = ft_get_next_line(0); // get line
+			if (ft_strncmp(str, limiter, ft_strlen(limiter)) == 0 //if str if NULL
+				&& str[ft_strlen(limiter) + 1] == '\0') // or if the line is the limiter
+				break ; // break the loop
+			ft_putstr_fd(str, fd); // write the line in the file
+			free(str); // free the line
+		}
+		close(fd); // close the file
+		free(str); // free the line
+		ft_exit(NULL, 3); // exit the child
 	}
-	close(fd);
-	free(str);
+	waitpid(pid, NULL, 0); // wait the child to finish de heredoc
 }
 
+// ft_expand_heredoc(char *heredoc) will create a variable in environnement with the heredoc name
 char	*ft_expand_heredoc(char *heredoc)
 {
 	char	*temps;
 	char	*expand;
 
-	expand = ft_strjoin("<", &data.heredoc, 0);
-	expand = ft_strjoin(expand, "=", 1);
-	temps = ft_strjoin(expand, heredoc, 0);
+	expand = ft_strjoin("<", &data.heredoc, 0); // add < to heredoc variable *
+	expand = ft_strjoin(expand, "=", 1); // add = after <*
+	temps = ft_strjoin(expand, heredoc, 0);// add the name after <*=<*
 	free(heredoc);
-	ft_export(temps);
+	ft_export(temps); // export <*=<* to env
 	free(temps);
-	expand[ft_strlen(expand) - 1] = '\0';
-	heredoc = ft_get_variable(expand);
+	expand[ft_strlen(expand) - 1] = '\0'; // remove = from <*=
+	heredoc = ft_get_variable(expand); // get back the value of <*
 	free(expand);
-	data.heredoc = data.heredoc + 1;
-	return (heredoc);
+	data.heredoc = data.heredoc + 1; // increment heredoc variable for next heredoc
+	return (heredoc); // return the value of <*= in a pointer not remalloc
 }
 
+// ft_parse_heredoc(char **token) will replace heredoc with a infile redirection on the file created by ft_heredoc
 void	ft_parse_heredoc(char **token)
 {
 	int i;
 	char	*str;
 
 	i = -1;
-	while (token[++i])
+	while (token[++i]) // scan all token
 	{
-		if (ft_strncmp(token[i], "<<", 2) == 0)
+		if (ft_strncmp(token[i], "<<", 2) == 0) //if the 2 first char is "<<"
 		{
-			if (token[i][2] == '\0')
+			if (token[i][2] == '\0') // if its only << in token
 			{
-				str = ft_expand_heredoc(ft_strjoin("<", &data.heredoc, 0));
-				ft_heredoc(token[i + 1], str);
-				token[i][1] = '\0';
-				token[i + 1] = str + 1;
-				printf("env = %s\n", ft_get_variable(str));
+				//if next token do not exist cancel the job
+				str = ft_expand_heredoc(ft_strjoin("<", &data.heredoc, 0)); // create variable for heredoc
+				ft_heredoc(token[i + 1], str); // create the file
+				token[i][1] = '\0'; // replace << by <
+				token[i + 1] = str + 1; // replace the next token by the filename
 			}
-			else
+			else // if the delimiter is on the next token
 			{
-				str = ft_expand_heredoc(ft_strjoin("<", &data.heredoc, 0));
-				ft_heredoc(&token[i][2], str);
-				token[i] = str;
-				printf("env = %s\n", ft_get_variable(str));
+				str = ft_expand_heredoc(ft_strjoin("<", &data.heredoc, 0)); // create variable for heredoc
+				ft_heredoc(&token[i][2], str); // create the file
+				token[i] = str; // replace the token by the filename
 			}
 		}
 	}
@@ -580,7 +583,7 @@ void	ft_parse_token(void)
 		data.cmd[c].token[t] = ft_strtok(data.cmd[c].buffer, ' '); // get the first token
 		while (data.cmd[c].token[t++])// until strtok return NULL
 			data.cmd[c].token[t] = ft_strtok(NULL, ' '); // get the next token
-		ft_parse_heredoc(data.cmd[c].token); // parse the heredoc
+		ft_parse_heredoc(data.cmd[c].token); // check token list for heredoc
 	}
 }
 
