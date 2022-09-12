@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 00:29:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/12 14:44:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,7 +295,7 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 		}
 		close(fd); // close the file
 		free(str); // free the line
-		ft_exit(NULL, 3); // exit the child
+		ft_exit(NULL, 0); // exit the child
 	}
 	waitpid(pid, NULL, 0); // wait the child to finish de heredoc
 }
@@ -563,6 +563,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
 void	ft_exec_cmd(char *cmd_path, int nb)
 {
 	pid_t	pid;
+	int		ret;
 
 	pid = fork();
 	if (pid == 0)
@@ -570,7 +571,9 @@ void	ft_exec_cmd(char *cmd_path, int nb)
 		ft_redirect(&data.cmd[nb], ">>", 2, 6);
 		ft_redirect(&data.cmd[nb], ">", 1, 2);
 		ft_redirect(&data.cmd[nb], "<", 1, 1);
-		execve(cmd_path, data.cmd[nb].token, data.env);
+		ret = execve(cmd_path, data.cmd[nb].token, data.env);
+		if (ret == -1)
+			ft_exit("Error: execve failed\n", 0);
 	}
 	waitpid(pid, NULL, 0);
 }
