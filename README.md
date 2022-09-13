@@ -33,18 +33,13 @@ echo test >>outfile
 echo test >> outfile
 echo test > outfile
 echo test >outfile
+cat sans argument -> ctrl-c doit fermer la fork seulement
 
 <<end cat | << end cat | <infile cat | < infile cat | echo test > outfile | echo test >outfile | echo test >> outfile | echo test >>outfile
 
 ## Defense ##
 
-- avec un Path absolu comme /bin/ls et d'autre path relatif
-- une commande vide
-- une commande avec des espaces et tabulations
-- echo avec et sans arguments
-- echo avec l'option -n
-- exit avec et sans arguments
-- env affiche les variables d'environnement
+*** TODO ***
 - exportez des variables et véfifier si elle sont remplacé si déjà existante
 - cd avec des chemins existant et non existant.
 - cd avec . et ..
@@ -62,5 +57,13 @@ echo test >outfile
 - executez echo avec des variables d'environnement ($variable)
 - single quote ne va pas expand les variables et les double quote oui
 - valeur de retour des processus avec $?
-- ctrl-c ctrl-\ ctrl-d
 - executez des commandes avec singles quotes qui ne devrait pas expand les variables et metacaractères
+- ctrl-c ctrl-\ ctrl-d
+*** DONE ***
+- executez une commande avec un Path absolu comme /bin/ls et d'autre path relatif
+- une commande vide
+- une commande avec des espaces et tabulations
+- echo avec et sans arguments
+- echo avec l'option -n
+- exit avec et sans arguments
+- env affiche les variables d'environnement

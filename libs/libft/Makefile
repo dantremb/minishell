@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/09/12 00:14:17 by dantremb         ###   ########.fr        #
+#    Updated: 2022/09/12 22:25:02 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,7 +33,7 @@ SRCS_FILES = ft_isascii.c ft_strlcpy.c ft_toupper.c ft_memchr.c ft_memmove.c \
 		ft_atoli.c ft_get_next_line.c ft_printf.c ft_printf_utils.c \
 		ft_free_array.c ft_split_size.c ft_array_size.c ft_color.c \
 		ft_is_only.c ft_strtok.c ft_remove_char.c ft_trim_token.c \
-		ft_token_count.c
+		ft_token_count.c ft_open_fd.c
 SRCS = $(addprefix $S, $(SRCS_FILES))
 
 # Objects conversion

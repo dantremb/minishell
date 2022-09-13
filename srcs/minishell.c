@@ -6,14 +6,12 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 14:44:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/12 23:30:42 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 t_data data;
-
-/* **********************MINISHELL UTILS************************************* */
 
 void	ft_free_table(void)
 {
@@ -102,7 +100,7 @@ char	*ft_get_prompt(void)
 
 	prompt = ft_strjoin("\033[0;32m", ft_get_variable("USER"), 0);
 	prompt = ft_strjoin(prompt, "@", 1);
-	prompt = ft_strjoin(prompt, "Minishell", 1);
+	prompt = ft_strjoin(prompt, "minishell", 1);
 	prompt = ft_strjoin(prompt, ": ", 1);
 	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
 	prompt = ft_strjoin(prompt, ft_get_variable("PWD"), 1);
@@ -111,31 +109,13 @@ char	*ft_get_prompt(void)
 	return (prompt);
 }
 
-int	ft_open_fd(char *str, int i)
-{
-	static int	fd;
-
-	if (i == 1)
-		fd = open(str, O_RDONLY, 0644);
-	else if (i == 2)
-		fd = open(str, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	else if (i == 3)
-		fd = open(str, O_RDWR | O_CREAT | O_TRUNC, 0644);
-	else if (i == 4)
-		fd = open(str, O_RDWR | O_CREAT, 0644);
-	else if (i == 5)
-		fd = open(str, O_WRONLY | O_CREAT, 0644);
-	if (!fd)
-		return (-1);
-	return (fd);
-}
-
-void	ft_init_environement(char **env)
+void	ft_init_environement(char **env, int ac, char **argv)
 {
 	int i;
-
-	data.expand[0] = 'a';
-	data.expand[1] = '\0';
+	(void)ac;
+	(void)argv;
+	
+	data.expand = 'a';
 	data.heredoc= 'a';
 	data.buffer = NULL;
 	data.prompt = NULL;
@@ -152,120 +132,6 @@ void	ft_init_environement(char **env)
 			ft_exit("Malloc Error\n", 0);
 		i++;
 	}
-}
-
-/* **********************BUILT-IN******************************************** */
-
-void	ft_echo(char **arg)
-{
-	int	i;
-	int	flag;
-
-	flag = 0;
-	i = 1;
-	if (arg[1] && ft_strncmp(arg[1], "-n\0", 3) == 0)
-	{
-		flag = 1;
-		i++;
-	}
-	while (arg[i])
-	{
-		if (ft_is_only(arg[i], ' '))
-			i++;
-		else
-		{
-			printf("%s", arg[i++]);
-			if (arg[i])
-				printf(" ");
-		}
-	}
-	if (flag == 0)
-		printf("\n");
-}
-
-void	ft_env(void)
-{
-	int	i;
-
-	i = -1;
-	while (data.env[++i])
-		printf("%s\n", data.env[i]);
-}
-
-void	ft_cd(char *buffer)
-{
-	int	new;
-	int	old;
-	int	ret;
-
-	ret = chdir(buffer);
-	old = -1;
-	while (data.env[++old])
-	{
-		if (ft_strncmp(data.env[old], "OLDPWD=", 7) == 0)
-			break ;
-	}
-	new = -1;
-	while (data.env[++new])
-	{
-		if (ft_strncmp(data.env[new], "PWD=", 4) == 0)
-			break ;
-	}
-	if (ret == 0)
-	{
-		free (data.env[old]);
-		data.env[old] = data.env[new];
-		data.env[new] = ft_strjoin("PWD=", getcwd(NULL, 0), 0);
-	}
-}
-
-void	ft_unset(char *buffer)
-{
-	int	i;
-
-	i = -1;
-	while (data.env[++i])
-	{
-		if (ft_strncmp(data.env[i], buffer, ft_strlen(buffer)) == 0
-			&& data.env[i][ft_strlen(buffer)] == '=')
-		{
-			free(data.env[i]);
-			while (data.env[i + 1])
-			{
-				data.env[i] = data.env[i + 1];
-				i++;
-			}
-			data.env[i] = NULL;
-		}
-	}
-}
-
-void	ft_export(char *arg)
-{
-	char	**temp;
-	char	*duplicate;
-	char	*var;
-	int		i;
-
-	if (ft_strchr(arg, '=') && arg[0] != '=')
-	{
-		duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
-		var = ft_get_variable(duplicate);
-		if (var)
-			ft_unset(duplicate);
-		free (duplicate);
-		temp = ft_calloc(sizeof(char *), ft_array_size(data.env) + 2);
-		if (temp == NULL)
-			ft_exit("Malloc Error\n", 3);
-		i = -1;
-		while (data.env[++i])
-			temp[i] = data.env[i];
-		temp[i] = ft_strdup(arg);
-		free(data.env);
-		data.env = temp;
-	}
-	else if (arg == NULL)
-		ft_env();
 }
 
 /* **********************PARSING********************************************* */
@@ -455,7 +321,7 @@ char	*ft_expand_variable(char *token)
 			token = ft_expand(token + 1, 0);
 		else
 			token = ft_expand(token, 0);
-		expand = ft_strjoin(data.expand, "-expand=", 0);
+		expand = ft_strjoin(&data.expand, "-expand=", 0);
 		temps = ft_strjoin(expand, token, 0);
 		free(token);
 		ft_export(temps);
@@ -463,7 +329,7 @@ char	*ft_expand_variable(char *token)
 		expand[ft_strlen(expand) - 1] = '\0';
 		token = ft_get_variable(expand);
 		free(expand);
-		data.expand[0] = data.expand[0] + 1; 
+		data.expand = data.expand + 1; 
 	}
 	return (token);
 }
@@ -499,7 +365,7 @@ bool	ft_execute_builtin(int nb)
 	if (ft_strncmp(data.cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(data.cmd[nb].token);
 	else if (ft_strncmp(data.cmd[nb].token[0], "env", 3) == 0)
-		ft_env();
+		ft_env(1);
 	else if (ft_strncmp(data.cmd[nb].token[0], "export", 6) == 0)
 		ft_export(data.cmd[nb].token[1]);
 	else if (ft_strncmp(data.cmd[nb].token[0], "unset\0", 6) == 0)
@@ -508,7 +374,7 @@ bool	ft_execute_builtin(int nb)
 		printf("%s\n", ft_get_variable("PWD"));
 	else if (ft_strncmp(data.cmd[nb].buffer, "cd", 2) == 0)
 		ft_cd(data.cmd[nb].token[1]);
-	else if (ft_strncmp(data.cmd[nb].token[0], "exit", 4) == 0)
+	else if (ft_strncmp(data.cmd[nb].token[0], "exit\0", 5) == 0)
 		ft_exit("Goodbye\n", 3);
 	else
 		return (false);
@@ -572,8 +438,9 @@ void	ft_exec_cmd(char *cmd_path, int nb)
 		ft_redirect(&data.cmd[nb], ">", 1, 2);
 		ft_redirect(&data.cmd[nb], "<", 1, 1);
 		ret = execve(cmd_path, data.cmd[nb].token, data.env);
+		free(cmd_path);
 		if (ret == -1)
-			ft_exit("Error: execve failed\n", 0);
+			ft_exit("command not found\n", 0);
 	}
 	waitpid(pid, NULL, 0);
 }
@@ -588,27 +455,21 @@ void	ft_execute(int nb)
 
 int	main(int ac, char **argv, char **env)
 {
-	(void)ac;
-	(void)argv;
-	//int		i;
 
-	ft_init_environement(env); // Copy environement variable in main struct
+	ft_init_environement(env, ac, argv);
 	while (1)
 	{
-		//i = -1;
-		data.prompt = ft_get_prompt(); // Get user and current folder path for prompt
-		data.buffer = readline(data.prompt); // Fill the buffer with user input
-		free(data.prompt); // Free the prompt for next iteration
-		if (ft_is_only(data.buffer, ' ')) // Newline on empty buffer
+		data.prompt = ft_get_prompt();
+		data.buffer = readline(data.prompt);
+		free(data.prompt);
+		if (ft_is_only(data.buffer, ' '))
 			continue;
 		else
 		{
 			add_history(data.buffer);
-			ft_parse_cmd(); // tokenize the buffer
-			ft_print_table(); //print the table with all the tokens
-			if (data.cmd_count == 1) // If there is only one command
-				ft_execute(0); // Execute the command
-			ft_print_table();
+			ft_parse_cmd();
+			//ft_print_table();
+			ft_execute(0);
 			ft_free_table();
 		}
 	}
