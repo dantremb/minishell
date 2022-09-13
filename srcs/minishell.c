@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 23:30:42 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/12 23:42:21 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -370,7 +370,7 @@ bool	ft_execute_builtin(int nb)
 		ft_export(data.cmd[nb].token[1]);
 	else if (ft_strncmp(data.cmd[nb].token[0], "unset\0", 6) == 0)
 		ft_unset(data.cmd[nb].token[1]);
-	else if (ft_strncmp(data.cmd[nb].token[0], "pwd", 3) == 0)
+	else if (ft_strncmp(data.cmd[nb].token[0], "pwd\0", 4) == 0)
 		printf("%s\n", ft_get_variable("PWD"));
 	else if (ft_strncmp(data.cmd[nb].buffer, "cd", 2) == 0)
 		ft_cd(data.cmd[nb].token[1]);
@@ -381,51 +381,6 @@ bool	ft_execute_builtin(int nb)
 	return (true);
 }
 
-
-void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
-{
-	int i;
-	int fd;
-
-	i = -1;
-	while (cmd->token[++i])
-	{
-		if (ft_strncmp(cmd->token[i], meta, size) == 0)
-		{
-			if (cmd->token[i][size] == '\0')
-			{
-				fd = ft_open_fd(cmd->token[i + 1], flag);
-				dprintf(2, "fd open 1tok = %d\n", fd);
-				if (i == 0)
-					cmd->token = cmd->token + 2;
-				else
-					cmd->token[i] = NULL;
-			}
-			else
-			{
-				fd = ft_open_fd(&cmd->token[i][size], flag);
-				dprintf(2, "fd open 2tok = %d\n", fd);
-				if (i == 0)
-					cmd->token = cmd->token + 1;
-				else
-					cmd->token[i] = NULL;
-			}
-			if (meta[0] == '<')
-			{
-				cmd->fd_in = fd;
-				dprintf(2, "redirect in %d\n", cmd->fd_in);
-				dup2(cmd->fd_in, 0);
-			}
-			else
-			{
-				cmd->fd_out = fd;
-				dprintf(2, "redirect out %d\n", cmd->fd_out);
-				dup2(cmd->fd_out, 1);
-			} 
-		}
-	}
-}
-
 void	ft_exec_cmd(char *cmd_path, int nb)
 {
 	pid_t	pid;
@@ -434,9 +389,6 @@ void	ft_exec_cmd(char *cmd_path, int nb)
 	pid = fork();
 	if (pid == 0)
 	{
-		ft_redirect(&data.cmd[nb], ">>", 2, 6);
-		ft_redirect(&data.cmd[nb], ">", 1, 2);
-		ft_redirect(&data.cmd[nb], "<", 1, 1);
 		ret = execve(cmd_path, data.cmd[nb].token, data.env);
 		free(cmd_path);
 		if (ret == -1)
@@ -447,11 +399,10 @@ void	ft_exec_cmd(char *cmd_path, int nb)
 
 void	ft_execute(int nb)
 {
+	ft_clean_token(data.cmd[nb].token);
 	if (ft_execute_builtin(nb) == false)
 		ft_exec_cmd(ft_get_path(nb), nb);
 }
-
-/* **********************MAIN************************************************ */
 
 int	main(int ac, char **argv, char **env)
 {
