@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 23:42:21 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/14 03:07:29 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -380,33 +380,52 @@ bool	ft_execute_builtin(int nb)
 		return (false);
 	return (true);
 }
+void	ft_execve(int nb)
+{
+	char	*cmd_path;
+	
+	cmd_path = ft_get_path(nb);
+	if (execve(cmd_path, data.cmd[nb].token, data.env))
+		printf("command not found\n");
+}
 
-void	ft_exec_cmd(char *cmd_path, int nb)
+void	ft_exec_cmd(int nb)
 {
 	pid_t	pid;
-	int		ret;
+	int		fd[2];
 
+	if (pipe(fd) == -1)
+		ft_exit("pipe error\n", 3);
 	pid = fork();
+	if (pid == -1)
+		ft_exit("fork error\n", 3);
 	if (pid == 0)
 	{
-		ret = execve(cmd_path, data.cmd[nb].token, data.env);
-		free(cmd_path);
-		if (ret == -1)
-			ft_exit("command not found\n", 0);
+		close(fd[0]);
+		if (nb != data.cmd_count - 1)
+			dup2(fd[1], 1);
+		ft_execve(nb);
 	}
-	waitpid(pid, NULL, 0);
+	else
+	{
+		close(fd[1]);
+		if (nb == data.cmd_count)
+			dup2(fd[0], 0);
+		waitpid(pid, NULL, 0);
+	}
 }
 
 void	ft_execute(int nb)
 {
 	ft_clean_token(data.cmd[nb].token);
 	if (ft_execute_builtin(nb) == false)
-		ft_exec_cmd(ft_get_path(nb), nb);
+		ft_exec_cmd(nb);
 }
 
 int	main(int ac, char **argv, char **env)
 {
-
+	int i;
+	
 	ft_init_environement(env, ac, argv);
 	while (1)
 	{
@@ -420,7 +439,9 @@ int	main(int ac, char **argv, char **env)
 			add_history(data.buffer);
 			ft_parse_cmd();
 			//ft_print_table();
-			ft_execute(0);
+			i = -1;
+			while (++i < data.cmd_count)
+				ft_execute(i);
 			ft_free_table();
 		}
 	}
