@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/17 23:52:17 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 00:28:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,7 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 		}
 		close(fd); // close the file
 		free(str); // free the line
-		ft_exit(NULL, 0); // exit the child
+		ft_exit(NULL, 3); // exit the child
 	}
 	waitpid(pid, NULL, 0); // wait the child to finish de heredoc
 }
@@ -179,10 +179,10 @@ char	*ft_expand_heredoc(char *heredoc)
 	ft_export(temps); // export <*=<* to env
 	free(temps);
 	expand[ft_strlen(expand) - 1] = '\0'; // remove = from <*=
-	heredoc = ft_get_variable(expand); // get back the value of <*
+	temps = ft_get_variable(expand); // get back the value of <*
 	free(expand);
 	data.heredoc = data.heredoc + 1; // increment heredoc variable for next heredoc
-	return (heredoc); // return the value of <*= in a pointer not remalloc
+	return (temps); // return the value of <*= in a pointer not remalloc
 }
 
 // ft_parse_heredoc(char **token) will replace heredoc with a infile redirection on the file created by ft_heredoc
@@ -424,7 +424,7 @@ void	ft_execute(int nb)
 
 int	main(int ac, char **argv, char **env)
 {
-	//int i;
+	int i;
 	
 	ft_init_environement(env, ac, argv);
 	while (1)
@@ -438,11 +438,11 @@ int	main(int ac, char **argv, char **env)
 		{
 			add_history(data.buffer);
 			ft_parse_cmd();
+			i = -1;
+			while (++i < data.cmd_count)
+				ft_execute(i);
 			ft_print_table();
-			//i = -1;
-			//while (++i < data.cmd_count)
-			//	ft_execute(i);
-			//ft_free_table();
+			ft_free_table();
 		}
 	}
 }

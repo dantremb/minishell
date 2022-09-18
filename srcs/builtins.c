@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 23:30:24 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 00:41:17 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,21 @@ void	ft_export(char *arg)
 
 void	ft_cd(char *buffer)
 {
+	char	*temp[2];
+	
 	if (chdir(buffer) == 0)
 	{
 		ft_unset("OLDPWD");
-		ft_export(ft_strjoin("OLDPWD=", ft_get_variable("PWD"), 0));
+		temp[0] = ft_get_variable("PWD");
+		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0);
+		ft_export(temp[1]);
+		free(temp[1]);
 		ft_unset("PWD");
-		ft_export(ft_strjoin("OLDPWD=", getcwd(NULL, 0), 0));
+		temp[0] = getcwd(NULL, 0);
+		temp[1] = ft_strjoin("PWD=", temp[0], 0);
+		ft_export(temp[1]);
+		free(temp[0]);
+		free(temp[1]);
 	}
 	else
 		printf("cd: %s: No such file or directory\n", buffer);
