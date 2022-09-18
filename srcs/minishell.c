@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/14 03:07:29 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/17 23:52:17 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -424,7 +424,7 @@ void	ft_execute(int nb)
 
 int	main(int ac, char **argv, char **env)
 {
-	int i;
+	//int i;
 	
 	ft_init_environement(env, ac, argv);
 	while (1)
@@ -438,11 +438,11 @@ int	main(int ac, char **argv, char **env)
 		{
 			add_history(data.buffer);
 			ft_parse_cmd();
-			//ft_print_table();
-			i = -1;
-			while (++i < data.cmd_count)
-				ft_execute(i);
-			ft_free_table();
+			ft_print_table();
+			//i = -1;
+			//while (++i < data.cmd_count)
+			//	ft_execute(i);
+			//ft_free_table();
 		}
 	}
 }
