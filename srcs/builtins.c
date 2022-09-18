@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 01:36:40 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 01:58:15 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,17 +111,17 @@ void	ft_cd(char *buffer)
 {
 	char	*temp[2];
 	
-	if (chdir(buffer) == 0)
-	{
-		ft_unset("OLDPWD");
-		temp[0] = ft_get_variable("PWD");
-		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0);
-		ft_export(temp[1]);
+	if (chdir(buffer) == 0) // try switch directory with buffer
+	{						// if success
+		ft_unset("OLDPWD"); // unset OLDPWD
+		temp[0] = ft_get_variable("PWD"); //get the current PWD
+		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0); // make the OLDPWD with the current PWD
+		ft_export(temp[1]); // export the OLDPWD we just made
 		free(temp[1]);
-		ft_unset("PWD");
-		temp[0] = getcwd(NULL, 0);
-		temp[1] = ft_strjoin("PWD=", temp[0], 0);
-		ft_export(temp[1]);
+		ft_unset("PWD"); // unset the current PWD
+		temp[0] = getcwd(NULL, 0); // get the new PWD with getcwd
+		temp[1] = ft_strjoin("PWD=", temp[0], 0); // make the new PWD to export
+		ft_export(temp[1]); // export the new PWD
 		free(temp[0]);
 		free(temp[1]);
 	}
