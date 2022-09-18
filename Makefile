@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/09/12 22:19:52 by dantremb         ###   ########.fr        #
+#    Updated: 2022/09/18 01:20:01 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ READHISTORY = libs/readline/libhistory.a
 
 # Sources files
 S = srcs/
-SRCS_FILES = minishell.c builtins.c
+SRCS_FILES = minishell.c builtins.c parsing.c
 SRCS = $(addprefix $S, $(SRCS_FILES))
 
 # Objects conversion

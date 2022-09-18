@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 00:41:17 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 01:36:40 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	ft_env(int flag)
 	{
 		while (data.env[++i])
 		{
-			if (data.env[i][0] != '<' || data.env[i][0] != '-')
+			if (data.env[i][0] != '<' && data.env[i][1] != '-' && ft_strchr(data.env[i], '='))
 				printf("%s\n", data.env[i]);
 		}
 	}
@@ -85,27 +85,25 @@ void	ft_export(char *arg)
 {
 	char	**temp;
 	char	*duplicate;
-	char	*var;
 	int		i;
 
-	if (ft_strchr(arg, '=') && arg[0] != '=')
+	if (ft_strchr(arg, '='))
 	{
 		duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
-		var = ft_get_variable(duplicate);
-		if (var)
+		if (ft_get_variable(duplicate))
 			ft_unset(duplicate);
 		free (duplicate);
-		temp = ft_calloc(sizeof(char *), ft_array_size(data.env) + 2);
-		if (temp == NULL)
-			ft_exit("Malloc Error\n", 3);
-		i = -1;
-		while (data.env[++i])
-			temp[i] = data.env[i];
-		temp[i] = ft_strdup(arg);
-		free(data.env);
-		data.env = temp;
 	}
-	else if (arg == NULL)
+	temp = ft_calloc(sizeof(char *), ft_array_size(data.env) + 2);
+	if (temp == NULL)
+		ft_exit("Malloc Error\n", 3);
+	i = -1;
+	while (data.env[++i])
+		temp[i] = data.env[i];
+	temp[i] = ft_strdup(arg);
+	free(data.env);
+	data.env = temp;
+	if (arg == NULL)
 		ft_env(0);
 }
 

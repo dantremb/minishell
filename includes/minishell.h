@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 23:30:56 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 01:32:01 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ typedef struct		s_data
 	char	*prompt;		//prompt message for readline
 	int 	cmd_count;		//count of commands
 	int		ct;
-	char	expand;		//flag for expansion
-	char	heredoc;		//flag for heredoc
+	char	expand[2];		//flag for expansion
+	char	heredoc[2];		//flag for heredoc
 	pid_t	*pid;			//pids for all process
 	t_cmd	*cmd;			//array of cmd
 }					t_data;
@@ -54,5 +54,5 @@ void	ft_exit(char *str, int s);
 void	ft_print_table(void);
 char	*ft_get_variable(char *buffer);
 char	*ft_get_prompt(void);
-
+void 	ft_parse_cmd(void);
 
