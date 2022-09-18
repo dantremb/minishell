@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 02:19:54 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 02:24:12 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,8 +294,7 @@ void	ft_exec_cmd(int nb)
 	else
 	{
 		close(fd[1]);
-		if (nb > 0)
-			dup2(fd[0], 0);
+		dup2(fd[0], 0);
 		waitpid(pid, NULL, 0);
 	}
 }
