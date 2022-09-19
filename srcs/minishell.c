@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 02:24:12 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 22:27:57 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,9 +268,8 @@ void	ft_execve(int nb)
 	char	*cmd_path;
 	
 	cmd_path = ft_get_path(nb);
-	dprintf(2, "cmd_path = %s\n", cmd_path);
 	if (execve(cmd_path, data.cmd[nb].token, data.env))
-		dprintf(2, "command not found\n");
+		printf("command not found\n");
 }
 
 void	ft_exec_cmd(int nb)
@@ -286,15 +285,15 @@ void	ft_exec_cmd(int nb)
 	if (pid == 0)
 	{
 		close(fd[0]);
-		dprintf(2, "data.cmd_cound = %d\n", data.cmd_count);
-		if (nb < data.cmd_count - 1)
+		if (nb != data.cmd_count - 1)
 			dup2(fd[1], 1);
 		ft_execve(nb);
 	}
 	else
 	{
 		close(fd[1]);
-		dup2(fd[0], 0);
+		if (nb == data.cmd_count)
+			dup2(fd[0], 0);
 		waitpid(pid, NULL, 0);
 	}
 }
