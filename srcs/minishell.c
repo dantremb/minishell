@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 22:27:57 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 22:49:54 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ void	ft_free_table(void)
 	while (++i < data.cmd_count)
 		free(data.cmd[i].token);
 	free(data.cmd);
-	free(data.pid);
 	free(data.buffer);
 }
 
@@ -32,10 +31,7 @@ void	ft_exit(char *str, int s)
 	if (s <= 1)
 		free(data.buffer);
 	if (s <= 2)
-	{
 		ft_free_array(data.env);
-		free(data.pid);
-	}
 	if (s <= 3)
 		ft_free_table();
 	exit(0);
@@ -102,7 +98,7 @@ char	*ft_get_prompt(void)
 	prompt = ft_strjoin(prompt, "@", 1);
 	prompt = ft_strjoin(prompt, "minishell", 1);
 	prompt = ft_strjoin(prompt, ": ", 1);
-	prompt = ft_strjoin(prompt, "\033[0;34m", 1);
+	prompt = ft_strjoin(prompt, "\033[0;33m", 1);
 	prompt = ft_strjoin(prompt, ft_get_variable("PWD"), 1);
 	prompt = ft_strjoin(prompt, "> ", 1);
 	prompt = ft_strjoin(prompt, "\033[0m", 1);
@@ -202,9 +198,7 @@ char	*ft_expand_variable(char *token)
 			token = ft_expand(token + 1, 0);
 		else
 			token = ft_expand(token, 0);
-		printf("data.expand = %s\n", &data.expand[0]);
 		expand = ft_strjoin(&data.expand[0], "-expand=", 0);
-		printf("expand = %s\n", expand);
 		temps = ft_strjoin(expand, token, 0);
 		free(token);
 		ft_export(temps);
@@ -269,7 +263,7 @@ void	ft_execve(int nb)
 	
 	cmd_path = ft_get_path(nb);
 	if (execve(cmd_path, data.cmd[nb].token, data.env))
-		printf("command not found\n");
+		printf("%s: command not found\n", data.cmd[nb].token[0]);
 }
 
 void	ft_exec_cmd(int nb)
@@ -292,7 +286,7 @@ void	ft_exec_cmd(int nb)
 	else
 	{
 		close(fd[1]);
-		if (nb == data.cmd_count)
+		if (nb > 0)
 			dup2(fd[0], 0);
 		waitpid(pid, NULL, 0);
 	}
@@ -324,7 +318,7 @@ int	main(int ac, char **argv, char **env)
 			i = -1;
 			while (++i < data.cmd_count)
 				ft_execute(i);
-			ft_print_table();
+			//ft_print_table();
 			ft_free_table();
 		}
 	}

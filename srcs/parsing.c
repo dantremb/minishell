@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 22:27:46 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/18 22:47:12 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,9 +120,8 @@ void 	ft_parse_cmd(void)
 
 	i = 0;
 	data.cmd_count = ft_token_count(data.buffer, '|'); // count the number of pipe
-	data.cmd = ft_calloc(sizeof(t_cmd), data.cmd_count + 1); // allocate memory for the number of pipe
-	data.pid = ft_calloc(sizeof(pid_t), data.cmd_count - 1); // allocate memory for PID table
-	if (data.cmd == NULL || data.pid == NULL)
+	data.cmd = ft_calloc(sizeof(t_cmd), data.cmd_count + 2); // allocate memory for the number of pipe
+	if (data.cmd == NULL)
 		ft_exit("Malloc error\n", 2);
 	data.cmd[0].buffer = ft_trim_token(ft_strtok(data.buffer, '|'), ' '); // get the first token
 	while (++i < data.cmd_count)// until strtok return NULL
