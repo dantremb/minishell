@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 22:49:54 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/19 22:22:29 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,15 +279,14 @@ void	ft_exec_cmd(int nb)
 	if (pid == 0)
 	{
 		close(fd[0]);
-		if (nb != data.cmd_count - 1)
+		if (nb < data.cmd_count && data.cmd_count > 1)
 			dup2(fd[1], 1);
 		ft_execve(nb);
 	}
 	else
 	{
 		close(fd[1]);
-		if (nb > 0)
-			dup2(fd[0], 0);
+		dup2(fd[0], 0);
 		waitpid(pid, NULL, 0);
 	}
 }
@@ -315,10 +314,10 @@ int	main(int ac, char **argv, char **env)
 		{
 			add_history(data.buffer);
 			ft_parse_cmd();
-			i = -1;
-			while (++i < data.cmd_count)
-				ft_execute(i);
 			//ft_print_table();
+			i = 0;
+			while (i < data.cmd_count) 
+				ft_execute(i++);
 			ft_free_table();
 		}
 	}
