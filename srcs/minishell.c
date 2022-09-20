@@ -270,29 +270,39 @@ void	ft_exec_cmd(int nb)
 {
 	pid_t	pid;
 	int		fd[2];
-
-	if (pipe(fd) == -1)
-		ft_exit("pipe error\n", 3);
+	
+	if (nb < data.cmd_count - 1 && data.cmd_count > 1){
+		dprintf(2, "pipe on cmd %d\n", nb);
+		if (pipe(fd) == -1)
+			ft_exit("pipe error\n", 3);
+	}
 	pid = fork();
 	if (pid == -1)
 		ft_exit("fork error\n", 3);
 	if (pid == 0)
 	{
-		close(fd[0]);
-		if (nb < data.cmd_count && data.cmd_count > 1)
+		if (nb < data.cmd_count - 1 && data.cmd_count > 1){
+			close(fd[0]);
+			dprintf(2, "if %d < %d\n", nb , data.cmd_count - 1);
 			dup2(fd[1], 1);
+		}
 		ft_execve(nb);
 	}
 	else
 	{
-		close(fd[1]);
-		dup2(fd[0], 0);
+		if (nb != data.cmd_count - 1)
+		{
+			close(fd[1]);
+			dprintf(2, "if %d < %d\n", nb , data.cmd_count - 1);
+			dup2(fd[0], 0);
+		}
 		waitpid(pid, NULL, 0);
 	}
 }
 
 void	ft_execute(int nb)
 {
+	dprintf(2, "execute cmd no %d\n", nb);
 	ft_clean_token(data.cmd[nb].token);
 	if (ft_execute_builtin(nb) == false)
 		ft_exec_cmd(nb);
@@ -308,10 +318,10 @@ int	main(int ac, char **argv, char **env)
 		data.prompt = ft_get_prompt();
 		data.buffer = readline(data.prompt);
 		free(data.prompt);
-		if (ft_is_only(data.buffer, ' '))
+		/*if (ft_is_only(data.buffer, ' '))
 			continue;
 		else
-		{
+		{*/
 			add_history(data.buffer);
 			ft_parse_cmd();
 			//ft_print_table();
@@ -321,4 +331,4 @@ int	main(int ac, char **argv, char **env)
 			ft_free_table();
 		}
 	}
-}
+//}
