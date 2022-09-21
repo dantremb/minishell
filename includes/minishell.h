@@ -25,7 +25,7 @@ typedef struct		s_cmd
 	char	**token;		//tokenized buffer
 	int		fd_in;			//for open input file
 	int		fd_out;			//for open output file
-		
+	pid_t	pid;			//for fork
 }					t_cmd;
 
 typedef struct		s_data

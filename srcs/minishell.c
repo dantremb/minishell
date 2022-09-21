@@ -261,74 +261,54 @@ void	ft_execve(int nb)
 {
 	char	*cmd_path;
 	
-	cmd_path = ft_get_path(nb);
-	if (execve(cmd_path, data.cmd[nb].token, data.env))
-		printf("%s: command not found\n", data.cmd[nb].token[0]);
+	ft_clean_token(data.cmd[nb].token);
+	if (ft_execute_builtin(nb) == false)
+	{
+		cmd_path = ft_get_path(nb);
+		if (execve(cmd_path, data.cmd[nb].token, data.env))
+			printf("%s: command not found\n", data.cmd[nb].token[0]);
+	}
+	exit(0);
 }
 
 void	ft_exec_cmd(int nb)
 {
-	pid_t	pid;
-	int		fd[2];
-	
-	if (nb < data.cmd_count - 1 && data.cmd_count > 1){
-		dprintf(2, "pipe on cmd %d\n", nb);
-		if (pipe(fd) == -1)
-			ft_exit("pipe error\n", 3);
-	}
-	pid = fork();
-	if (pid == -1)
-		ft_exit("fork error\n", 3);
-	if (pid == 0)
-	{
-		if (nb < data.cmd_count - 1 && data.cmd_count > 1){
-			close(fd[0]);
-			dprintf(2, "if %d < %d\n", nb , data.cmd_count - 1);
-			dup2(fd[1], 1);
-		}
+	dprintf(2, "execute cmd no %d\n", nb);
+	data.cmd[nb].pid = fork();
+	if (data.cmd[nb].pid == 0)
 		ft_execve(nb);
-	}
-	else
-	{
-		if (nb != data.cmd_count - 1)
-		{
-			close(fd[1]);
-			dprintf(2, "if %d < %d\n", nb , data.cmd_count - 1);
-			dup2(fd[0], 0);
-		}
-		waitpid(pid, NULL, 0);
-	}
 }
 
-void	ft_execute(int nb)
+void	ft_execute(void)
 {
-	dprintf(2, "execute cmd no %d\n", nb);
-	ft_clean_token(data.cmd[nb].token);
-	if (ft_execute_builtin(nb) == false)
-		ft_exec_cmd(nb);
+	int i;
+
+	i = -1;
+	while (++i < data.cmd_count) 
+		ft_exec_cmd(i);
+	i = -1;
+	while (++i < data.cmd_count)
+		waitpid(data.cmd[i].pid, NULL, 0);
 }
 
 int	main(int ac, char **argv, char **env)
 {
-	int i;
+	char	*prompt;
 	
 	ft_init_environement(env, ac, argv);
 	while (1)
 	{
-		data.prompt = ft_get_prompt();
-		data.buffer = readline(data.prompt);
-		free(data.prompt);
-		/*if (ft_is_only(data.buffer, ' '))
+		prompt = ft_get_prompt();
+		data.buffer = readline(prompt);
+		free(prompt);
+		if (ft_is_only(data.buffer, ' '))
 			continue;
 		else
-		{*/
+		{
 			add_history(data.buffer);
 			ft_parse_cmd();
-			//ft_print_table();
-			i = 0;
-			while (i < data.cmd_count) 
-				ft_execute(i++);
+			ft_execute();
 			ft_free_table();
 		}
 	}
-//}
+}
