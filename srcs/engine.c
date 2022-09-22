@@ -13,6 +13,46 @@
 #include "../includes/minishell.h"
 extern t_data data;
 
+void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
+{
+	int i;
+	int fd;
+
+	i = -1;
+	while (cmd->token[++i])
+	{
+		if (ft_strncmp(cmd->token[i], meta, size) == 0)
+		{
+			if (cmd->token[i][size] == '\0')
+			{
+				fd = ft_open_fd(cmd->token[i + 1], flag);
+				if (i == 0)
+					cmd->token = cmd->token + 2;
+				else
+					cmd->token[i] = NULL;
+			}
+			else
+			{
+				fd = ft_open_fd(&cmd->token[i][size], flag);
+				if (i == 0)
+					cmd->token = cmd->token + 1;
+				else
+					cmd->token[i] = NULL;
+			}
+			if (meta[0] == '<')
+			{
+				cmd->fd_in = fd;
+				dup2(cmd->fd_in, 0);
+			}
+			else
+			{
+				cmd->fd_out = fd;
+				dup2(cmd->fd_out, 1);
+			} 
+		}
+	}
+}
+
 bool	ft_execute_builtin(int nb)
 {
 	if (ft_strncmp(data.cmd[nb].token[0], "echo", 4) == 0)
@@ -33,10 +73,14 @@ bool	ft_execute_builtin(int nb)
 		return (false);
 	return (true);
 }
+
 void	ft_execve(int nb)
 {
 	char	*cmd_path;
 	
+	ft_redirect(&data.cmd[nb], ">>", 2, 6);
+	ft_redirect(&data.cmd[nb], ">", 1, 2);
+	ft_redirect(&data.cmd[nb], "<", 1, 1);
 	ft_clean_token(data.cmd[nb].token);
 	if (ft_execute_builtin(nb) == false)
 	{
@@ -73,12 +117,26 @@ void	ft_exec_cmd(int nb)
 void	ft_execute_cmd(int nb)
 {
 	int old_stdin;
-	
+
 	old_stdin = dup(STDIN_FILENO);
-	while (nb < data.cmd_count) 
-		ft_exec_cmd(nb++);
-	nb = 0;
-	while (nb < data.cmd_count)
-		waitpid(data.cmd[nb++].pid, NULL, 0);
+	if (data.cmd_count > 1)
+	{
+		while (nb < data.cmd_count) 
+			ft_exec_cmd(nb++);
+		nb = 0;
+		while (nb < data.cmd_count)
+			waitpid(data.cmd[nb++].pid, NULL, 0);
+	}
+	else
+	{
+		if (ft_execute_builtin(nb) == false)
+		{
+			data.cmd[nb].pid = fork();
+			if (data.cmd[nb].pid == 0)
+				ft_execve(nb);
+			else
+				waitpid(data.cmd[nb].pid, NULL, 0);
+		}
+	}
 	dup2(old_stdin, STDIN_FILENO);
 }

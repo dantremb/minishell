@@ -23,6 +23,8 @@ typedef struct		s_cmd
 {
 	char	*buffer;
 	char	**token;
+	int		fd_in;
+	int		fd_out;
 	pid_t	pid;
 }					t_cmd;
 
