@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/22 00:19:06 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/22 00:53:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,34 +21,34 @@
 
 typedef struct		s_cmd
 {
-	char	*buffer;		//indivividual buffer
-	char	**token;		//tokenized buffer
-	int		fd_in;			//for open input file
-	int		fd_out;			//for open output file
-	pid_t	pid;			//for fork
+	char	*buffer;
+	char	**token;
+	pid_t	pid;
 }					t_cmd;
 
 typedef struct		s_data
 {
-	char	**env;			//copy of env
-	char	*buffer;		//buffer for readline
-	int 	cmd_count;		//count of commands
-	char	expand[2];		//flag for expansion
-	char	heredoc[2];		//flag for heredoc
-	t_cmd	*cmd;			//array of cmd
+	char	**env;
+	char	*buffer;
+	int 	cmd_count;
+	char	expand[2];
+	char	heredoc[2];
+	t_cmd	*cmd;
 }					t_data;
-
-#endif
 
 void	ft_cd(char *buffer);
 void	ft_export(char *arg);
 void	ft_unset(char *buffer);
 void	ft_env(int flag);
 void	ft_echo(char **arg);
-void	ft_free_table(void);
 void	ft_exit(char *str, int s);
+void	ft_free_table(void);
 void	ft_print_table(void);
 char	*ft_get_variable(char *buffer);
-char	*ft_get_prompt(void);
+char	*ft_get_path(int nb);
 void 	ft_parse_cmd(void);
+void	ft_execute_cmd(int nb);
+void	ft_clean_token(char **token);
+void	ft_init_environement(char **env, int ac, char **argv);
 
+#endif
