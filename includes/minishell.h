@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 22:39:17 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/22 00:19:06 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ typedef struct		s_data
 {
 	char	**env;			//copy of env
 	char	*buffer;		//buffer for readline
-	char	*prompt;		//prompt message for readline
 	int 	cmd_count;		//count of commands
 	char	expand[2];		//flag for expansion
 	char	heredoc[2];		//flag for heredoc

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/19 22:25:50 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/22 00:21:41 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,6 @@ void	ft_init_environement(char **env, int ac, char **argv)
 	data.heredoc[0] = 'a';
 	data.heredoc[1] = '\0';
 	data.buffer = NULL;
-	data.prompt = NULL;
 	data.cmd_count = 0;
 	data.cmd = NULL;
 	i = 0;
@@ -273,22 +272,57 @@ void	ft_execve(int nb)
 
 void	ft_exec_cmd(int nb)
 {
-	dprintf(2, "execute cmd no %d\n", nb);
+	int	fd[2];
+	
+	if(pipe(fd) == -1)
+		ft_exit("pipe error\n", 3);
 	data.cmd[nb].pid = fork();
 	if (data.cmd[nb].pid == 0)
+	{
+		if (nb < data.cmd_count - 1)
+		{
+			close(fd[0]);
+			dup2(fd[1], STDOUT_FILENO);
+		}
 		ft_execve(nb);
+	}
+	else if (nb < data.cmd_count - 1)
+	{
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+	}
 }
 
-void	ft_execute(void)
+void	ft_exec_cmd_solo(int nb)
 {
-	int i;
+	char *cmd_path;
+	
+	ft_clean_token(data.cmd[nb].token);
+	if (ft_execute_builtin(nb) == false)
+	{
+		data.cmd[nb].pid = fork();
+		if (data.cmd[nb].pid == 0)
+		{
+			cmd_path = ft_get_path(nb);
+			if (execve(cmd_path, data.cmd[nb].token, data.env))
+				printf("%s: command not found\n", data.cmd[nb].token[0]);
+		}
+		else
+			waitpid(data.cmd[nb].pid, NULL, 0);
+	}
+}
 
-	i = -1;
-	while (++i < data.cmd_count) 
-		ft_exec_cmd(i);
-	i = -1;
-	while (++i < data.cmd_count)
-		waitpid(data.cmd[i].pid, NULL, 0);
+void	ft_execute(int nb)
+{
+	int old_stdin;
+	
+	old_stdin = dup(STDIN_FILENO);
+	while (nb < data.cmd_count) 
+		ft_exec_cmd(nb++);
+	nb = 0;
+	while (nb < data.cmd_count)
+		waitpid(data.cmd[nb++].pid, NULL, 0);
+	dup2(old_stdin, STDIN_FILENO);
 }
 
 int	main(int ac, char **argv, char **env)
@@ -307,7 +341,7 @@ int	main(int ac, char **argv, char **env)
 		{
 			add_history(data.buffer);
 			ft_parse_cmd();
-			ft_execute();
+			ft_execute(0);
 			ft_free_table();
 		}
 	}
