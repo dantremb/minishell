@@ -15,6 +15,7 @@
 
 # include <sys/wait.h>
 # include <stdio.h>
+# include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "../libs/libft/includes/libft.h"
@@ -52,5 +53,7 @@ void 	ft_parse_cmd(void);
 void	ft_execute_cmd(int nb);
 void	ft_clean_token(char **token);
 void	ft_init_environement(char **env, int ac, char **argv);
+char	*ft_get_prompt(void);
+void	handle_sigint(int sig);
 
 #endif

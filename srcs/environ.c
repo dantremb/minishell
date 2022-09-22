@@ -30,6 +30,32 @@ char	*ft_get_variable(char *buffer)
 	return (buffer);
 }
 
+void	handle_sigint(int sig)
+{
+	char *prompt;
+	//printf("SIG: %d\n", sig);
+	if (sig == SIGINT)
+	{
+		printf("SIGINT\n");
+		// if (data.cmd[0].token[0])
+			// ft_free_table();
+		prompt = ft_get_prompt();
+		printf("\n%s", prompt);
+		free(prompt);
+	}
+	else if (sig == SIGSEGV)
+	{
+		printf("SIGSEGV\n");
+		// ft_free_table();
+		ft_exit("Goodbye\n", 1);
+	}
+	else if (sig == SIGQUIT)
+	{
+		//printf("SIGQUIT\n");
+		return ;
+	}
+}
+
 void	ft_init_environement(char **env, int ac, char **argv)
 {
 	int i;

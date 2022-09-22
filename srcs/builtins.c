@@ -87,6 +87,7 @@ void	ft_export(char *arg)
 	char	*duplicate;
 	int		i;
 
+	printf("export arg = %s\n", arg);
 	if (ft_strchr(arg, '='))
 	{
 		duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);

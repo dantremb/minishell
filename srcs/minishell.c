@@ -25,6 +25,9 @@ int	main(int ac, char **argv, char **env)
 		prompt = ft_get_prompt();
 		data.buffer = readline(prompt);
 		free(prompt);
+		signal(SIGINT, handle_sigint);
+		signal(SIGSEGV, handle_sigint);
+		signal(SIGQUIT, handle_sigint);
 		if (ft_is_only(data.buffer, ' '))
 			continue;
 		else
