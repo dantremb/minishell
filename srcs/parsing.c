@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/22 00:51:17 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 23:45:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,13 @@ void	ft_parse_token(void)
 	}
 }
 
-void 	ft_parse_cmd(void)
+int 	ft_parse_cmd(void)
 {
 	int i;
 
 	i = 0;
+	if (ft_check_closed_quote(data.buffer) == 0)
+		return (0);
 	data.cmd_count = ft_token_count(data.buffer, '|');
 	data.cmd = ft_calloc(sizeof(t_cmd), data.cmd_count + 2);
 	if (data.cmd == NULL)
@@ -121,4 +123,5 @@ void 	ft_parse_cmd(void)
 	while (++i < data.cmd_count)
 		data.cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
 	ft_parse_token();
+	return (1);
 }

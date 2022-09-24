@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/23 23:17:26 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 23:45:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,13 @@ void	ft_free_table(void);
 void	ft_print_table(void);
 char	*ft_get_variable(char *buffer);
 char	*ft_get_path(int nb);
-void 	ft_parse_cmd(void);
+int 	ft_parse_cmd(void);
 void	ft_execute_cmd(int nb);
 void	ft_clean_token(char **token);
 void	ft_init_environement(char **env, int ac, char **argv);
-char	*ft_get_prompt(void);
 void	ft_signal(int signal);
+int		ft_check_closed_quote(char *buf);
+//char	*ft_get_prompt(void);
 
 #endif
 	

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/23 15:02:55 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 23:47:46 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,9 @@ char	*ft_get_prompt(void);
 
 int	main(int ac, char **argv, char **env)
 {
-	char	*prompt;
-	
 	signal(SIGINT, ft_signal);
 	ft_init_environement(env, ac, argv);
-	prompt = ft_get_prompt();
-	data.buffer = readline(prompt);
-	free(prompt);
+	data.buffer = readline("Minishell >");
 	while (data.buffer != NULL)
 	{
 		if (ft_is_only(data.buffer, ' '))
@@ -31,13 +27,12 @@ int	main(int ac, char **argv, char **env)
 		else
 		{
 			add_history(data.buffer);
-			ft_parse_cmd();
-			ft_execute_cmd(0);
-			ft_free_table();
+			if (ft_parse_cmd())
+				ft_execute_cmd(0);
+			else
+				free(data.buffer);
 		}
-		prompt = ft_get_prompt();
-		data.buffer = readline(prompt);
-		free(prompt);
+		data.buffer = readline("Minishell >");
 	}
 }
 
@@ -67,7 +62,7 @@ void	ft_print_table(void)
 	ft_color(0);
 }
 
-char	*ft_get_prompt(void)
+/*char	*ft_get_prompt(void)
 {
 	char	*prompt;
 
@@ -80,4 +75,4 @@ char	*ft_get_prompt(void)
 	prompt = ft_strjoin(prompt, "> ", 1);
 	prompt = ft_strjoin(prompt, "\033[0m", 1);
 	return (prompt);
-}
+}*/

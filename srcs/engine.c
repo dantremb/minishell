@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/23 15:49:33 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 23:47:22 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,4 +139,5 @@ void	ft_execute_cmd(int nb)
 		}
 	}
 	dup2(old_stdin, STDIN_FILENO);
+	ft_free_table();
 }
