@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/23 23:47:22 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/24 01:28:35 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ bool	ft_execute_builtin(int nb)
 void	ft_execve(int nb)
 {
 	char	*cmd_path;
+	int		status;
 	
 	ft_redirect(&data.cmd[nb], ">>", 2, 6);
 	ft_redirect(&data.cmd[nb], ">", 1, 2);
@@ -85,10 +86,10 @@ void	ft_execve(int nb)
 	if (ft_execute_builtin(nb) == false)
 	{
 		cmd_path = ft_get_path(nb);
-		execve(cmd_path, data.cmd[nb].token, data.env);
+		status = execve(cmd_path, data.cmd[nb].token, data.env);
 		printf("%s: command not found\n", data.cmd[nb].token[0]);
 	}
-	exit(0);
+	exit(status);
 }
 
 void	ft_exec_cmd(int nb)
@@ -114,9 +115,29 @@ void	ft_exec_cmd(int nb)
 	}
 }
 
+void	ft_execute_solo(int nb)
+{
+	int	status;
+	
+	ft_redirect(&data.cmd[nb], ">>", 2, 6);
+	ft_redirect(&data.cmd[nb], ">", 1, 2);
+	ft_redirect(&data.cmd[nb], "<", 1, 1);
+	ft_clean_token(data.cmd[nb].token);
+	if (ft_execute_builtin(nb) == false)
+	{
+		data.cmd[nb].pid = fork();
+		if (data.cmd[nb].pid == 0)
+			ft_execve(nb);
+		else
+			waitpid(data.cmd[nb].pid, &status, 0);
+		data.err = status;
+	}
+}
+
 void	ft_execute_cmd(int nb)
 {
 	int old_stdin;
+	int	status;
 
 	old_stdin = dup(STDIN_FILENO);
 	if (data.cmd_count > 1)
@@ -125,18 +146,11 @@ void	ft_execute_cmd(int nb)
 			ft_exec_cmd(nb++);
 		nb = 0;
 		while (nb < data.cmd_count)
-			waitpid(data.cmd[nb++].pid, NULL, 0);
-	}
+			waitpid(data.cmd[nb++].pid, &status, 0);
+		data.err = status;	}
 	else
 	{
-		if (ft_execute_builtin(nb) == false)
-		{
-			data.cmd[nb].pid = fork();
-			if (data.cmd[nb].pid == 0)
-				ft_execve(nb);
-			else
-				waitpid(data.cmd[nb].pid, NULL, 0);
-		}
+		ft_execute_solo(nb);
 	}
 	dup2(old_stdin, STDIN_FILENO);
 	ft_free_table();

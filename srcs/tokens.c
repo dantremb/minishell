@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:36:08 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/23 23:40:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/24 01:10:20 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,7 @@ char	*ft_expand(char *token, int flag)
 	temp[1] = ft_remove_char(ft_substr(token, 0, temp[0] - token), '\"');
 	temp[2] = temp[0] + 1;
 	while (++temp[0])
-		if (*temp[0] == '\0' || *temp[0] == ' ' || *temp[0] == '$'
-			|| *temp[0] == '"' || *temp[0] == '\'')
+		if (!ft_isalnum(*temp[0]))
 			break ;
 	temp[2] = ft_substr(temp[2] , 0, temp[0] - temp[2] );
 	temp[3] = ft_get_variable(temp[2] );
@@ -136,7 +135,7 @@ int	ft_check_closed_quote(char *buf)
 	}
 	if ((d && (d % 2) != 0) || (s && (s % 2)) != 0)
 	{
-		printf("Quotes must be closed\n");
+		printf("Error Quote not closed\n");
 		return (0);
 	}
 	return (1);

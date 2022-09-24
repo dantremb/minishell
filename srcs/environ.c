@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/23 15:55:44 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/24 01:29:35 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,22 @@ char	*ft_get_variable(char *buffer)
 	}
 	buffer[0] = '\0';
 	return (buffer);
+}
+
+int	ft_status(void)
+{
+	int	i;
+
+	i = 0;
+	while (data.buffer[i] && (data.buffer[i] == ' ' || data.buffer[i] == '\t'))
+		i++;
+	if (data.buffer[i] == '$' && data.buffer[i + 1] == '?')
+	{
+		printf("%d\n", data.err);
+		data.err = 0;
+		return (1);
+	}
+	return (0);
 }
 
 void	ft_signal(int signal)
@@ -67,34 +83,4 @@ void	ft_init_environement(char **env, int ac, char **argv)
 			ft_exit("Malloc Error\n", 0);
 		i++;
 	}
-}
-
-void	ft_free_table(void)
-{
-	int	i;
-
-	i = -1;
-	while (++i < data.cmd_count)
-		free(data.cmd[i].token);
-	free(data.cmd);
-	free(data.buffer);
-}
-
-void	ft_exit(char *str, int s)
-{
-	int	i;
-
-	if (s <= 0)
-		ft_putstr_fd(str, 2);
-	if (s <= 1)
-		free(data.buffer);
-	if (s <= 2)
-		ft_free_array(data.env);
-	if (s <= 3)
-	{
-		i = -1;
-		while (++i < data.cmd_count)
-			free(data.cmd[i].token);
-	}
-	exit(0);
 }
