@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/22 00:50:22 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 15:02:55 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,15 @@ int	main(int ac, char **argv, char **env)
 {
 	char	*prompt;
 	
+	signal(SIGINT, ft_signal);
 	ft_init_environement(env, ac, argv);
-	while (1)
+	prompt = ft_get_prompt();
+	data.buffer = readline(prompt);
+	free(prompt);
+	while (data.buffer != NULL)
 	{
-		prompt = ft_get_prompt();
-		data.buffer = readline(prompt);
-		free(prompt);
-		signal(SIGINT, handle_sigint);
-		signal(SIGSEGV, handle_sigint);
-		signal(SIGQUIT, handle_sigint);
 		if (ft_is_only(data.buffer, ' '))
-			continue;
+			free (data.buffer);
 		else
 		{
 			add_history(data.buffer);
@@ -37,6 +35,9 @@ int	main(int ac, char **argv, char **env)
 			ft_execute_cmd(0);
 			ft_free_table();
 		}
+		prompt = ft_get_prompt();
+		data.buffer = readline(prompt);
+		free(prompt);
 	}
 }
 

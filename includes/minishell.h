@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/22 00:53:51 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 23:17:26 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ typedef struct		s_data
 	char	expand[2];
 	char	heredoc[2];
 	t_cmd	*cmd;
+	int		err;
 }					t_data;
 
 void	ft_cd(char *buffer);
@@ -54,6 +55,7 @@ void	ft_execute_cmd(int nb);
 void	ft_clean_token(char **token);
 void	ft_init_environement(char **env, int ac, char **argv);
 char	*ft_get_prompt(void);
-void	handle_sigint(int sig);
+void	ft_signal(int signal);
 
 #endif
+	

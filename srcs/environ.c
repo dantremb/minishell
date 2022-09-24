@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/22 00:50:35 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 15:55:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,29 +30,15 @@ char	*ft_get_variable(char *buffer)
 	return (buffer);
 }
 
-void	handle_sigint(int sig)
+void	ft_signal(int signal)
 {
-	char *prompt;
-	//printf("SIG: %d\n", sig);
-	if (sig == SIGINT)
+	if (signal == SIGINT)
 	{
-		printf("SIGINT\n");
-		// if (data.cmd[0].token[0])
-			// ft_free_table();
-		prompt = ft_get_prompt();
-		printf("\n%s", prompt);
-		free(prompt);
-	}
-	else if (sig == SIGSEGV)
-	{
-		printf("SIGSEGV\n");
-		// ft_free_table();
-		ft_exit("Goodbye\n", 1);
-	}
-	else if (sig == SIGQUIT)
-	{
-		//printf("SIGQUIT\n");
-		return ;
+		printf("\n");
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		data.err = 130;
 	}
 }
 
@@ -69,6 +55,7 @@ void	ft_init_environement(char **env, int ac, char **argv)
 	data.buffer = NULL;
 	data.cmd_count = 0;
 	data.cmd = NULL;
+	data.err = 0;
 	i = 0;
 	data.env = ft_calloc(sizeof(char *), ft_array_size(env));
 	if (data.env == NULL)
@@ -95,6 +82,8 @@ void	ft_free_table(void)
 
 void	ft_exit(char *str, int s)
 {
+	int	i;
+
 	if (s <= 0)
 		ft_putstr_fd(str, 2);
 	if (s <= 1)
@@ -102,6 +91,10 @@ void	ft_exit(char *str, int s)
 	if (s <= 2)
 		ft_free_array(data.env);
 	if (s <= 3)
-		ft_free_table();
+	{
+		i = -1;
+		while (++i < data.cmd_count)
+			free(data.cmd[i].token);
+	}
 	exit(0);
 }

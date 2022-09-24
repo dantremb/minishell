@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/22 00:54:58 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 15:49:33 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,8 @@ void	ft_execve(int nb)
 	if (ft_execute_builtin(nb) == false)
 	{
 		cmd_path = ft_get_path(nb);
-		if (execve(cmd_path, data.cmd[nb].token, data.env))
-			printf("%s: command not found\n", data.cmd[nb].token[0]);
+		execve(cmd_path, data.cmd[nb].token, data.env);
+		printf("%s: command not found\n", data.cmd[nb].token[0]);
 	}
 	exit(0);
 }

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/18 22:28:06 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/23 22:14:56 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,9 @@ void	ft_export(char *arg)
 	int		i;
 
 	printf("export arg = %s\n", arg);
+	
+	ft_remove_char(arg, '\"');
+	ft_remove_char(arg, '\'');
 	if (ft_strchr(arg, '='))
 	{
 		duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
