@@ -70,3 +70,8 @@ cat sans argument -> ctrl-c doit fermer la fork seulement
 
 - executez des commandes avec des redirections < << > >> (heredoc n'est pas obliger de mettre a jour l'historique)
 - cat | cat | ls doit fonctionner
+
+*** BUG RESTANT ***
+
+### free(): invalid pointer sur *<output cat* ###
+### Syscall param execve(filename) points to unaddressable byte(s) ###

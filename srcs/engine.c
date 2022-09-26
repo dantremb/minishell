@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/26 00:30:15 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/26 00:35:17 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,9 +134,11 @@ void	ft_execute_solo(int nb)
 void	ft_execute_cmd(int nb)
 {
 	int old_stdin;
+	int old_stdout;
 	int	status;
 
 	old_stdin = dup(STDIN_FILENO);
+	old_stdout = dup(STDOUT_FILENO);
 	if (data.cmd_count > 1)
 	{
 		while (nb < data.cmd_count) 
@@ -156,5 +158,6 @@ void	ft_execute_cmd(int nb)
 		ft_execute_solo(nb);
 	}
 	dup2(old_stdin, STDIN_FILENO);
+	dup2(old_stdout, STDOUT_FILENO);
 	ft_free_table();
 }
