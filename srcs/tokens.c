@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:36:08 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/24 01:10:20 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/25 23:12:06 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ char	*ft_get_path(int nb)
 	if (access(data.cmd[nb].token[0], F_OK | X_OK) == 0)
 		return (data.cmd[nb].token[0]);
 	program = ft_strjoin("/", data.cmd[nb].token[0], 0);
-	env_path = ft_get_variable("PATH");
+	env_path = ft_get_variable("PATH", 0);
 	fcnt_path = ft_split(env_path, ':');
-	if (program == NULL || env_path == NULL || fcnt_path == NULL)
+	if (program == NULL || env_path[0] == '\0' || fcnt_path == NULL)
 		return (NULL);
 	while (fcnt_path[++i])
 	{
@@ -52,7 +52,7 @@ char	*ft_expand(char *token, int flag)
 		if (!ft_isalnum(*temp[0]))
 			break ;
 	temp[2] = ft_substr(temp[2] , 0, temp[0] - temp[2] );
-	temp[3] = ft_get_variable(temp[2] );
+	temp[3] = ft_get_variable(temp[2], 0);
 	temp[3]  = ft_strjoin(temp[1], temp[3], 1);
 	free (temp[2]);
 	temp[1] = ft_remove_char(ft_substr(temp[0], 0, ft_strlen(temp[0])), '\"');
@@ -71,7 +71,7 @@ char	*ft_expand_variable(char *token)
 	char	*expand;
 
 	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
-		token = ft_get_variable(&token[1]);
+		token = ft_get_variable(&token[1], 0);
 	else
 	{
 		if (token[0] == '\"')
@@ -81,10 +81,10 @@ char	*ft_expand_variable(char *token)
 		expand = ft_strjoin(&data.expand[0], "-expand=", 0);
 		temps = ft_strjoin(expand, token, 0);
 		free(token);
-		ft_export(temps);
+		ft_export(temps, 0);
 		free(temps);
 		expand[ft_strlen(expand) - 1] = '\0';
-		token = ft_get_variable(expand);
+		token = ft_get_variable(expand, 0);
 		free(expand);
 		data.expand[0] = data.expand[0] + 1; 
 	}

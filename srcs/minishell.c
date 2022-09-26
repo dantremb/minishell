@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/24 01:48:18 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/25 23:09:20 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,9 @@ t_data data;
 
 int	main(int ac, char **argv, char **env)
 {
-	char	*prompt;
-	
 	ft_init_environement(env, ac, argv);
 	signal(SIGINT, ft_signal);
-	prompt = ft_get_prompt();
-	data.buffer = readline(prompt);
-	free(prompt);
+	data.buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	while (data.buffer != NULL)
 	{
 		if (ft_is_only(data.buffer, ' '))
@@ -35,19 +31,20 @@ int	main(int ac, char **argv, char **env)
 				free(data.buffer);
 		}
 		ft_update_error();
-		prompt = ft_get_prompt();
-		data.buffer = readline(prompt);
-		free(prompt);
+		data.buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	}
 }
 
 void	ft_update_error()
 {
 	char	*tmp;
+	char 	*error;
 	
-	tmp = ft_strjoin("?=", ft_itoa(data.err), 0);
-	ft_export(tmp);
+	error = ft_itoa(data.err);
+	tmp = ft_strjoin("?=", error, 0);
+	ft_export(tmp, 0);
 	free(tmp);
+	free(error);
 }
 
 void	ft_print_table(void)
@@ -74,21 +71,6 @@ void	ft_print_table(void)
 	}
 		printf("------------------------------------\n");
 	ft_color(0);
-}
-
-char	*ft_get_prompt(void)
-{
-	char	*prompt;
-
-	prompt = ft_strjoin("\033[0;32m", ft_get_variable("USER"), 0);
-	prompt = ft_strjoin(prompt, "@", 1);
-	prompt = ft_strjoin(prompt, "minishell", 1);
-	prompt = ft_strjoin(prompt, ": ", 1);
-	prompt = ft_strjoin(prompt, "\033[0;33m", 1);
-	prompt = ft_strjoin(prompt, ft_get_variable("PWD"), 1);
-	prompt = ft_strjoin(prompt, "> ", 1);
-	prompt = ft_strjoin(prompt, "\033[0m", 1);
-	return (prompt);
 }
 
 void	ft_free_table(void)

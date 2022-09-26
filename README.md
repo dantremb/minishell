@@ -39,32 +39,34 @@ cat sans argument -> ctrl-c doit fermer la fork seulement
 
 ## Defense ##
 
-*** TODO ***
-- exportez des variables et véfifier si elle sont remplacé si déjà existante
-- executez des commandes sans la variable PATH
-- executez des commandes avec des redirections < << > >> (heredoc n'est pas obliger de mettre a jour l'historique)
-- executez des commandes avec des pipes, avec des commandes valide et invalide entre 2 pipes
-- entrer une commande, appuyez sur ctrl-C, appuyez sur entrée, le buffer devrait être vide et ne devrait rien executer
-- vérifier des commandes qui ne fonctionne pas
-- cat | cat | ls doit fonctionner
-- essayer des longues commandes avec des tonnes d'arguments. Amusez-vous
-- valeur de retour des processus avec $?
-- ctrl-c ctrl-\ ctrl-d
-
 *** DONE ***
+
+- exportez des variables et véfifier si elle sont remplacé si déjà existante
+- entrer une commande, appuyez sur ctrl-C, appuyez sur entrée, le buffer devrait être vide et ne devrait rien executer
+- ctrl-c ctrl-\ ctrl-d
+- essayer des longues commandes avec des tonnes d'arguments. Amusez-vous
 - executez des commandes avec singles quotes qui ne devrait pas expand les variables et metacaractères
 - single quote ne va pas expand les variables et les double quote oui
 - executez echo avec des variables d'environnement ($variable)
 - naviger dans l'historique avec les flèches du haut et du bas
-- vérifier que les PATH sont bien analysé de gauche a droite dans ft_get_path
 - executez des commandes avec des chemin relatif avec beaucoup de ../
-- pwd avec et sans arguments
-- executez une commande avec un Path absolu comme /bin/ls et d'autre path relatif
 - une commande vide
+- executez une commande avec un Path absolu comme /bin/ls et d'autre path relatif
 - une commande avec des espaces et tabulations
 - echo avec et sans arguments
 - echo avec l'option -n
-- exit avec et sans arguments
-- env affiche les variables d'environnement
+- pwd avec et sans arguments
 - cd avec des chemins existant et non existant.
 - cd avec . et ..
+- env affiche les variables d'environnement
+- exit avec et sans arguments
+- vérifier que les PATH sont bien analysé de gauche a droite dans ft_get_path
+- executez des commandes sans la variable PATH
+- executez des commandes avec des pipes, avec des commandes valide et invalide entre 2 pipes
+- vérifier des commandes qui ne fonctionne pas
+
+*** TODO ***
+
+- executez des commandes avec des redirections < << > >> (heredoc n'est pas obliger de mettre a jour l'historique)
+- cat | cat | ls doit fonctionner
+- valeur de retour des processus avec $?

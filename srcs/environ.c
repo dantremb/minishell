@@ -6,18 +6,20 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/24 01:29:35 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/25 23:08:26 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 extern t_data data;
 
-char	*ft_get_variable(char *buffer)
+char	*ft_get_variable(char *buffer, int flag)
 {
 	int		i;
 
 	i = -1;
+	if (!buffer)
+		return (NULL);
 	while (data.env[++i])
 	{
 		if (ft_strncmp(data.env[i], buffer, ft_strlen(buffer)) == 0)
@@ -26,7 +28,8 @@ char	*ft_get_variable(char *buffer)
 				return (data.env[i] + (ft_strlen(buffer) + 1));
 		}
 	}
-	buffer[0] = '\0';
+	if (flag == 1)
+		buffer[0] = '\0';
 	return (buffer);
 }
 
@@ -73,7 +76,7 @@ void	ft_init_environement(char **env, int ac, char **argv)
 	data.cmd = NULL;
 	data.err = 0;
 	i = 0;
-	data.env = ft_calloc(sizeof(char *), ft_array_size(env));
+	data.env = ft_calloc(sizeof(char *), ft_array_size(env) + 1);
 	if (data.env == NULL)
 		ft_exit("Malloc Error\n", 0);
 	while (env[i])

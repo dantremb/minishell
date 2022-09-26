@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/24 00:07:51 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/25 23:18:48 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	ft_env(int flag)
 	if (flag == 0)
 	{
 		while (data.env[++i])
-			printf("%s\n", data.env[i]);
+			printf("[%d]%s\n", i, data.env[i]);
 	}
 	else
 	{
@@ -81,47 +81,44 @@ void	ft_unset(char *buffer)
 	}
 }
 
-void	ft_export(char *arg)
+void	ft_export(char *arg, int flag)
 {
-	char	**temp;
 	char	*duplicate;
-	int		i;
 
-	if (ft_strchr(arg, '='))
-	{
-		duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
-		if (ft_get_variable(duplicate))
-			ft_unset(duplicate);
-		free (duplicate);
-	}
-	temp = ft_calloc(sizeof(char *), ft_array_size(data.env) + 2);
-	if (temp == NULL)
-		ft_exit("Malloc Error\n", 3);
-	i = -1;
-	while (data.env[++i])
-		temp[i] = data.env[i];
-	temp[i] = ft_strdup(arg);
-	free(data.env);
-	data.env = temp;
-	if (arg == NULL)
+	if (!arg)
 		ft_env(0);
+	else if (arg && ft_isalpha(arg[0]) == 0 && flag == 1)
+		printf("-bash: export: `%s': not a valid identifier\n", arg);
+	else
+	{
+		if (ft_strchr(arg, '='))
+		{
+			duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
+			if (ft_get_variable(duplicate, 0))
+				ft_unset(duplicate);
+			free (duplicate);
+		}
+		data.env = ft_remalloc(data.env, ft_array_size(data.env) + 2);
+		data.env[ft_array_size(data.env)] = 
+			ft_remove_char(ft_remove_char(ft_strdup(arg), '\''), '\"');
+	}
 }
 
 void	ft_cd(char *buffer)
 {
 	char	*temp[2];
 	
-	if (chdir(buffer) == 0)
+	if (buffer && chdir(buffer) == 0)
 	{
 		ft_unset("OLDPWD");
-		temp[0] = ft_get_variable("PWD");
+		temp[0] = ft_get_variable("PWD", 0);
 		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0);
-		ft_export(temp[1]);
+		ft_export(temp[1], 0);
 		free(temp[1]);
 		ft_unset("PWD");
 		temp[0] = getcwd(NULL, 0);
 		temp[1] = ft_strjoin("PWD=", temp[0], 0);
-		ft_export(temp[1]);
+		ft_export(temp[1], 0);
 		free(temp[0]);
 		free(temp[1]);
 	}

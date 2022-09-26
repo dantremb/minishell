@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/24 01:18:31 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/25 23:10:58 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,10 @@ char	*ft_expand_heredoc(char *heredoc)
 	expand = ft_strjoin(expand, "=", 1);
 	temps = ft_strjoin(expand, heredoc, 0);
 	free(heredoc);
-	ft_export(temps);
+	ft_export(temps, 0);
 	free(temps);
 	expand[ft_strlen(expand) - 1] = '\0';
-	temps = ft_get_variable(expand);
+	temps = ft_get_variable(expand, 0);
 	free(expand);
 	data.heredoc[0] = data.heredoc[0] + 1;
 	return (temps);

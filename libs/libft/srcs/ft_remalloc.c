@@ -1,24 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_array_size.c                                    :+:      :+:    :+:   */
+/*   ft_remalloc.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/25 21:59:39 by dantremb         ###   ########.fr       */
+/*   Created: 2022/09/25 20:58:01 by dantremb          #+#    #+#             */
+/*   Updated: 2022/09/25 21:12:12 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
-#include <stdio.h>
 
-int	ft_array_size(char **array)
+char	**ft_remalloc(char **tab, int size)
 {
-	int i;
+	char	**tmp;
+	int		i;
 
-	i = 0;
-	while (array[i])
-		i++;
-	return (i);
+	i = -1;
+	tmp = ft_calloc(sizeof(char *) , size);
+	if (!tmp)
+		return (NULL);
+	while (tab[++i])
+		tmp[i] = ft_strdup(tab[i]);
+	ft_free_array(tab);
+	return (tmp);
 }
