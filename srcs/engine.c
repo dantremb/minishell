@@ -6,14 +6,14 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/25 23:28:38 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/26 00:22:19 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 extern t_data data;
 
-void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
+void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
 {
 	int i;
 	int fd;
@@ -21,11 +21,12 @@ void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
 	i = -1;
 	while (cmd->token[++i])
 	{
-		if (ft_strncmp(cmd->token[i], meta, size) == 0)
+		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
 		{
-			if (cmd->token[i][size] == '\0')
+			if (cmd->token[i][ft_strlen(meta)] == '\0')
 			{
 				fd = ft_open_fd(cmd->token[i + 1], flag);
+				dup2(fd, side);
 				if (i == 0)
 					cmd->token = cmd->token + 2;
 				else
@@ -33,22 +34,13 @@ void	ft_redirect(t_cmd *cmd, char *meta, int size, int flag)
 			}
 			else
 			{
-				fd = ft_open_fd(&cmd->token[i][size], flag);
+				fd = ft_open_fd(&cmd->token[i][ft_strlen(meta)], flag);
+				dup2(fd, side);
 				if (i == 0)
 					cmd->token = cmd->token + 1;
 				else
 					cmd->token[i] = NULL;
 			}
-			if (meta[0] == '<')
-			{
-				cmd->fd_in = fd;
-				dup2(cmd->fd_in, 0);
-			}
-			else
-			{
-				cmd->fd_out = fd;
-				dup2(cmd->fd_out, 1);
-			} 
 		}
 	}
 }
@@ -79,9 +71,9 @@ void	ft_execve(int nb)
 	char	*cmd_path;
 	int		status;
 	
-	ft_redirect(&data.cmd[nb], ">>", 2, 6);
-	ft_redirect(&data.cmd[nb], ">", 1, 2);
-	ft_redirect(&data.cmd[nb], "<", 1, 1);
+	//ft_redirect(&data.cmd[nb], ">>", 1, 6);
+	//ft_redirect(&data.cmd[nb], ">", 1, 2);
+	//ft_redirect(&data.cmd[nb], "<", 0, 1);
 	ft_clean_token(data.cmd[nb].token);
 	if (ft_execute_builtin(nb) == false)
 	{
@@ -119,10 +111,11 @@ void	ft_execute_solo(int nb)
 {
 	int	status;
 	
-	ft_redirect(&data.cmd[nb], ">>", 2, 6);
+	ft_redirect(&data.cmd[nb], ">>", 1, 6);
 	ft_redirect(&data.cmd[nb], ">", 1, 2);
-	ft_redirect(&data.cmd[nb], "<", 1, 1);
+	ft_redirect(&data.cmd[nb], "<", 0, 1);
 	ft_clean_token(data.cmd[nb].token);
+	ft_print_table();
 	if (ft_execute_builtin(nb) == false)
 	{
 		data.cmd[nb].pid = fork();
@@ -130,7 +123,12 @@ void	ft_execute_solo(int nb)
 			ft_execve(nb);
 		else
 			waitpid(data.cmd[nb].pid, &status, 0);
-		data.err = status;
+		if (status > 256)
+			data.err = 127;
+		else if (status == 256)
+			data.err = 1;
+		else
+			data.err = 0;
 	}
 }
 

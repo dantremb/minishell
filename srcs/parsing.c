@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/25 23:10:58 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/26 00:11:18 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,6 @@ void	ft_parse_token(void)
 	c = -1;
 	while (++c < data.cmd_count)
 	{
-		data.cmd[c].fd_in = -1;
-		data.cmd[c].fd_out = -1;
 		count = ft_token_count(data.cmd[c].buffer, ' ');
 		data.cmd[c].token = ft_calloc(sizeof(char *), count + 2);
 		t = 0;

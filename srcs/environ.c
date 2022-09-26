@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/25 23:08:26 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/25 23:39:29 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	ft_status(void)
 		i++;
 	if (data.buffer[i] == '$' && data.buffer[i + 1] == '?')
 	{
-		printf("%d\n", data.err);
+		printf("%d: command not found\n", data.err);
 		data.err = 0;
 		return (1);
 	}

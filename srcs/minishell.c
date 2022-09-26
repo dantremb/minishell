@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/25 23:09:20 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/26 00:14:39 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,20 +57,20 @@ void	ft_print_table(void)
 	{
 		j = 0;
 		ft_color(1);
-		printf("------------ TOKEN -----------------\n");
+		dprintf(2, "------------ TOKEN -----------------\n");
 		ft_color(6);
-		printf("cmd %d = \t", i);
+		dprintf(2, "cmd %d = \t", i);
 		while (data.cmd[i].token[j])
 		{
 			ft_color(3);
-			printf("[\033[1;34m%s\033[1;33m]", data.cmd[i].token[j]);
+			dprintf(2, "[\033[1;34m%s\033[1;33m]", data.cmd[i].token[j]);
 			j++;
 		}
-		printf("\n");
+		dprintf(2, "\n");
 		i++;
 	}
-		printf("------------------------------------\n");
-	ft_color(0);
+		dprintf(2, "------------------------------------\n");
+	ft_color(8);
 }
 
 void	ft_free_table(void)
