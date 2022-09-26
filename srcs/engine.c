@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/26 00:22:19 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/26 00:26:29 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,9 @@ void	ft_execve(int nb)
 	char	*cmd_path;
 	int		status;
 	
-	//ft_redirect(&data.cmd[nb], ">>", 1, 6);
-	//ft_redirect(&data.cmd[nb], ">", 1, 2);
-	//ft_redirect(&data.cmd[nb], "<", 0, 1);
+	ft_redirect(&data.cmd[nb], ">>", 1, 6);
+	ft_redirect(&data.cmd[nb], ">", 1, 2);
+	ft_redirect(&data.cmd[nb], "<", 0, 1);
 	ft_clean_token(data.cmd[nb].token);
 	if (ft_execute_builtin(nb) == false)
 	{
@@ -115,7 +115,6 @@ void	ft_execute_solo(int nb)
 	ft_redirect(&data.cmd[nb], ">", 1, 2);
 	ft_redirect(&data.cmd[nb], "<", 0, 1);
 	ft_clean_token(data.cmd[nb].token);
-	ft_print_table();
 	if (ft_execute_builtin(nb) == false)
 	{
 		data.cmd[nb].pid = fork();
