@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/26 00:26:29 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/26 00:30:15 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,13 @@ void	ft_execute_cmd(int nb)
 		nb = 0;
 		while (nb < data.cmd_count)
 			waitpid(data.cmd[nb++].pid, &status, 0);
-		data.err = status;	}
+		if (status > 256)
+			data.err = 127;
+		else if (status == 256)
+			data.err = 1;
+		else
+			data.err = 0;
+	}
 	else
 	{
 		ft_execute_solo(nb);
