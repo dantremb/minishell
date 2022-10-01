@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/22 22:40:58 by root              #+#    #+#             */
-/*   Updated: 2022/09/25 21:12:57 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/30 23:06:31 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,6 @@ char			*ft_remove_char(char *token, char sep);
 char			*ft_trim_token(char *token, char sep);
 int				ft_token_count(char *buffer, char sep);
 int				ft_open_fd(char *str, int i);
-char**			ft_remalloc(char **tab, int size);
+char			**ft_remalloc(char **tab, int size, int f);
 
 #endif

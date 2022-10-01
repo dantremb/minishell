@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/25 21:59:39 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/09/30 23:40:14 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,5 +20,5 @@ int	ft_array_size(char **array)
 	i = 0;
 	while (array[i])
 		i++;
-	return (i);
+	return (i + 1);
 }

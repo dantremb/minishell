@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/26 22:56:11 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/01 00:43:57 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,26 +20,28 @@
 # include <readline/history.h>
 # include "../libs/libft/includes/libft.h"
 
-char	**env;
-
 typedef struct		s_cmd
 {
 	char	*buffer;
 	char	**token;
 }					t_cmd;
 
-typedef struct		s_data
+typedef struct		s_shell
 {
+	char	**env;
 	char	*buffer;
 	int 	nb_cmd;
 	t_cmd	*cmd;
-}					t_data;
+}					t_shell;
+
+/***get prompt***/
+int	ft_getprompt(t_shell *shell);
 
 /***environement***/
-void	ft_init_minishell(t_data *data, char **envp, int ac, char **argv);
+t_shell	*ft_init_minishell(int ac, char **av, char **env);
 
 /***exit and free***/
-void	ft_exit(t_data *data, char *msg, int status, int flag);
-void	ft_free(t_data *data, int flag);
-
+void	ft_exit(t_shell *shell, char *msg, int status, int flag);
+void	ft_free(t_shell *shell, int flag);
+void	ft_signal(int signal);
 #endif
