@@ -78,6 +78,16 @@ void	ft_free(shell_t *shell, int flag)
 		free(shell->pid);
 		free(shell->cmd);
 	}
+	if (flag == 7){
+		i = -1;
+		while (++i < shell->nb_cmd)
+			free(shell->cmd[i].token);
+		free(shell->pid);
+		free(shell->cmd);
+		free(shell->buffer);
+		ft_free_array(shell->env);
+		free(shell);
+	}
 }
 
 // print le message sur le FD 2
@@ -88,6 +98,191 @@ void	ft_exit(shell_t *shell, char *msg, int status, int flag)
 	ft_putstr_fd(msg, 2);
 	ft_free(shell, flag);
 	exit(status);
+}
+
+// cherche dans la variable d'environnement une ligne avec le buffer
+// avant le = et retourne un pointer sur le premier caractere apres le =
+char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
+{
+	int		i;
+
+	i = -1;
+	if (!buffer)
+		return (NULL);
+	while (shell->env[++i])
+	{
+		if (ft_strncmp(shell->env[i], buffer, ft_strlen(buffer)) == 0)
+		{
+			if (shell->env[i][ft_strlen(buffer)] == '=')
+				return (shell->env[i] + (ft_strlen(buffer) + 1));
+		}
+	}
+	if (flag == 1)
+		buffer[0] = '\0';
+	return (buffer);
+}
+
+// on regarde si la commande est deja un path
+// si oui on retourne le path
+// si non on ajoute un / devant la commande
+// on va chercher la ligne contenant les paths et split avec les <:>
+// on ajoute le path avec la commande path/<commande>
+// on regarde si le programme existe avec access
+// si oui on retourne le path
+// si non on free le path et on continue
+char	*ft_get_path(shell_t *shell, int nb)
+{
+	char	*program;
+	char	*env_path;
+	char	**fcnt_path;
+	char 	*test_path;
+	int		i;
+	i = -1;
+	if (access(shell->cmd[nb].token[0], F_OK | X_OK) == 0)
+		return (shell->cmd[nb].token[0]);
+	program = ft_strjoin("/", shell->cmd[nb].token[0], 0);
+	env_path = ft_get_variable(shell, "PATH", 0);
+	fcnt_path = ft_split(env_path, ':');
+	if (program == NULL || env_path[0] == '\0' || fcnt_path == NULL)
+		return (NULL);
+	while (fcnt_path[++i])
+	{
+		test_path = ft_strjoin(fcnt_path[i], program, 0);
+		if (access(test_path, F_OK | X_OK) == 0)
+			break ;
+		free (test_path);
+		test_path = NULL;
+	}
+	ft_free_array(fcnt_path);
+	free(program);
+	return (test_path);
+}
+
+// trouve le chemin du programme
+// si le chemin est trouvé on execute le programme
+// sinon on affiche un message d'erreur et quitte le child
+void	ft_execve(shell_t *shell, int nb)
+{
+	char	*cmd_path;
+	
+	cmd_path = ft_get_path(shell, nb);
+	if (cmd_path != NULL)
+		execve(cmd_path, shell->cmd[nb].token, shell->env);
+	dprintf(2, "%s: command not found\n", shell->cmd[nb].token[0]);
+	exit(127);
+}
+
+// on regarde si la commande est un builtin et l'éxecute
+bool	ft_execute_builtin(shell_t *shell, int nb)
+{
+	/*if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
+		ft_echo(shell->cmd[nb].token);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
+		ft_env(1);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
+		ft_export(shell->cmd[nb].token[1], 1);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "unset\0", 6) == 0)
+		ft_unset(shell->cmd[nb].token[1]);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
+		printf("%s\n", ft_get_variable("PWD", 0));
+	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
+		ft_cd(shell->cmd[nb].token[1]);
+	else */
+	if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
+		ft_exit(shell, "Goodbye\n", 0, 7);
+	//else
+		return (false);
+	//return (true);
+}
+
+void	ft_exec_cmd(shell_t *shell, int nb)
+{
+	int	fd[2];
+	
+	if(pipe(fd) == -1)
+		ft_exit(shell, "pipe error\n", 14, 7);
+	shell->pid[nb] = fork();
+	if (shell->pid[nb] == 0)
+	{
+		if (nb < shell->nb_cmd - 1)
+		{
+			close(fd[0]);
+			dup2(fd[1], STDOUT_FILENO);
+		}
+		ft_execve(shell, nb);
+	}
+	else if (nb < shell->nb_cmd - 1)
+	{
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+	}
+}
+
+// on crée un child pour executer toutes les commandes
+// a l'intérieur du child on relance un child pour chaque commande
+// on attend la fin de chaque child puis retourne le dernier status
+// on quitte le child du subshell et retourne le status
+int	ft_subshell(shell_t *shell, int nb)
+{
+	int		status;
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == 0) {
+		while (nb < shell->nb_cmd) 
+			ft_exec_cmd(shell, nb++);
+		nb = 0;
+		while (nb < shell->nb_cmd)
+			waitpid(shell->pid[nb++], &status, 0);
+	}
+	else {
+		waitpid(pid, &status, 0);
+	}
+	return (status);
+}
+
+// on execute le builtin si possible
+// sinon on execute le programme dans un child
+// on attend la fin de l'execution du child
+// on retourne le status de la commande
+int	ft_execute_solo(shell_t *shell, int nb)
+{
+	int	status;
+	
+	//ft_clean_token(shell->cmd[nb].token);
+	if (ft_execute_builtin(shell, nb) == false)
+	{
+		shell->pid[nb] = fork();
+		if (shell->pid[nb] == 0)
+			ft_execve(shell, nb);
+		else
+			waitpid(shell->pid[nb], &status, 0);
+	}
+	return (status);
+}
+
+// on sauvegarde le FD de stdin et stdout
+// on lance le subshell si plusieurs commandes
+// sinon on execute la commande solo
+// on récupère le status de la derniere commande
+// on restore le FD de stdin et stdout
+void	ft_execute_cmd(shell_t *shell, int nb)
+{
+	int old_stdin;
+	int old_stdout;
+	int	status;
+
+	old_stdin = dup(STDIN_FILENO);
+	old_stdout = dup(STDOUT_FILENO);
+	if (shell->nb_cmd > 1) {
+		status = ft_subshell(shell, nb);
+	}
+	else {
+		status = ft_execute_solo(shell, nb);
+	}
+	error_status = status;
+	dup2(old_stdin, STDIN_FILENO);
+	dup2(old_stdout, STDOUT_FILENO);
 }
 
 // on skip les espaces et tabulations
@@ -201,8 +396,8 @@ int	ft_getprompt(shell_t *shell)
 		{
 			add_history(shell->buffer);
 			if (ft_parse(shell)){
-				//ft_execute_cmd(shell, 0);
-				ft_free(shell, 4);
+				ft_execute_cmd(shell, 0);
+				ft_free(shell, 6);
 			}
 		}
 		free(shell->buffer);
