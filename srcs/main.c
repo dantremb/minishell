@@ -14,318 +14,85 @@
 
 int error_status;
 
-char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
-{
-	int		i;
-
-	i = -1;
-	if (!buffer)
-		return (NULL);
-	while (shell->env[++i])
-	{
-		if (ft_strncmp(shell->env[i], buffer, ft_strlen(buffer)) == 0)
-		{
-			if (shell->env[i][ft_strlen(buffer)] == '=')
-				return (shell->env[i] + (ft_strlen(buffer) + 1));
-		}
-	}
-	if (flag == 1)
-		buffer[0] = '\0';
-	return (buffer);
-}
-
-void	ft_echo(char **arg)
+// print le tableau de commandes pour debug
+void	ft_print_table(shell_t *shell)
 {
 	int	i;
-	int	flag;
+	int	j;
 
-	flag = 0;
-	i = 1;
-	if (arg[1] && ft_strncmp(arg[1], "-n\0", 3) == 0)
+	i = 0;
+	while (i < shell->nb_cmd)
 	{
-		flag = 1;
+		j = 0;
+		ft_color(1);
+		dprintf(2, "------------ TOKEN -----------------\n");
+		ft_color(6);
+		dprintf(2, "cmd %d = \t", i);
+		while (shell->cmd[i].token[j])
+		{
+			ft_color(3);
+			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
+			j++;
+		}
+		dprintf(2, "\n");
 		i++;
 	}
-	while (arg[i])
-	{
-		if (ft_is_only(arg[i], ' '))
-			i++;
-		else
-		{
-			printf("%s", arg[i++]);
-			if (arg[i])
-				printf(" ");
-		}
-	}
-	if (flag == 0)
-		printf("\n");
+		dprintf(2, "------------------------------------\n");
+	ft_color(8);
 }
 
-void	ft_env(shell_t *shell, int flag)
+// free all the allocated memory
+void	ft_free(shell_t *shell, int flag)
 {
 	int	i;
 
-	i = -1;
-	if (flag == 0)
-	{
-		while (shell->env[++i])
-			printf("[%d]%s\n", i, shell->env[i]);
+	if (flag == 1){
+		free(shell);
 	}
-	else
-	{
-		while (shell->env[++i])
-		{
-			if (shell->env[i][0] != '<' && shell->env[i][1] != '-' && ft_strchr(shell->env[i], '='))
-				printf("%s\n", shell->env[i]);
-		}
+	if (flag == 2){
+		ft_free_array(shell->env);
+		free(shell);
 	}
-}
-
-void	ft_unset(shell_t *shell, char *buffer)
-{
-	int	i;
-
-	i = -1;
-	while (shell->env[++i])
-	{
-		if (ft_strncmp(shell->env[i], buffer, ft_strlen(buffer)) == 0
-			&& shell->env[i][ft_strlen(buffer)] == '=')
-		{
-			free(shell->env[i]);
-			while (shell->env[i + 1])
-			{
-				shell->env[i] = shell->env[i + 1];
-				i++;
-			}
-			shell->env[i] = NULL;
-		}
+	if (flag == 3){
+		free(shell->buffer);
+		ft_free_array(shell->env);
+		free(shell);
+	}
+	if (flag == 4){
+		free(shell->cmd);
+		free(shell->buffer);
+		ft_free_array(shell->env);
+		free(shell);
+	}
+	if (flag == 5){
+		free(shell->pid);
+		free(shell->cmd);
+		free(shell->buffer);
+		ft_free_array(shell->env);
+		free(shell);
+	}
+	if (flag == 6){
+		i = -1;
+		while (++i < shell->nb_cmd)
+			free(shell->cmd[i].token);
+		free(shell->pid);
+		free(shell->cmd);
 	}
 }
 
-void	ft_export(shell_t *shell, char *arg, int flag)
+// print le message sur le FD 2
+// free les elements malloc
+// exit avec le status de la derniere commande
+void	ft_exit(shell_t *shell, char *msg, int status, int flag)
 {
-	char	*duplicate;
-
-	if (!arg)
-		ft_env(shell, 0);
-	else if (arg && ft_isalpha(arg[0]) == 0 && flag == 1)
-		printf("-bash: export: `%s': not a valid identifier\n", arg);
-	else
-	{
-		if (ft_strchr(arg, '='))
-		{
-			duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
-			if (ft_get_variable(shell, duplicate, 0))
-				ft_unset(shell, duplicate);
-			free (duplicate);
-		}
-		shell->env = ft_remalloc(shell->env, 1, 1);
-		shell->env[ft_array_size(shell->env)] = 
-			ft_remove_char(ft_remove_char(ft_strdup(arg), '\''), '\"');
-	}
-}
-
-void	ft_cd(shell_t *shell, char *buffer)
-{
-	char	*temp[2];
-	
-	if (buffer && chdir(buffer) == 0)
-	{
-		ft_unset(shell, "OLDPWD");
-		temp[0] = ft_get_variable(shell, "PWD", 0);
-		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0);
-		ft_export(shell, temp[1], 0);
-		free(temp[1]);
-		ft_unset(shell, "PWD");
-		temp[0] = getcwd(NULL, 0);
-		temp[1] = ft_strjoin("PWD=", temp[0], 0);
-		ft_export(shell, temp[1], 0);
-		free(temp[0]);
-		free(temp[1]);
-	}
-	else
-		printf("cd: %s: No such file or directory\n", buffer);
-}
-
-/*void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
-{
-	int i;
-	int fd;
-
-	i = -1;
-	while (cmd->token[++i])
-	{
-		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
-		{
-			if (cmd->token[i][ft_strlen(meta)] == '\0')
-			{
-				fd = ft_open_fd(cmd->token[i + 1], flag);
-				dup2(fd, side);
-				if (i == 0)
-					cmd->token = cmd->token + 2;
-				else
-					cmd->token[i] = NULL;
-			}
-			else
-			{
-				fd = ft_open_fd(&cmd->token[i][ft_strlen(meta)], flag);
-				dup2(fd, side);
-				if (i == 0)
-					cmd->token = cmd->token + 1;
-				else
-					cmd->token[i] = NULL;
-			}
-		}
-	}
-}*/
-
-bool	ft_execute_builtin(shell_t *shell, int nb)
-{
-	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
-		ft_echo(shell->cmd[nb].token);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
-		ft_env(shell, 1);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
-		ft_export(shell, shell->cmd[nb].token[1], 1);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "unset\0", 6) == 0)
-		ft_unset(shell->cmd[nb].token[1]);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
-		printf("%s\n", ft_get_variable("PWD", 0));
-	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
-		ft_cd(shell->cmd[nb].token[1]);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
-		ft_exit("Goodbye\n", 3);
-	else
-		return (false);
-	return (true);
-}
-
-void	ft_execve(shell_t *shell, int nb)
-{
-	char	*cmd_path;
-	int		status;
-	
-	//ft_redirect(&shell->cmd[nb], ">>", 1, 6);
-	//ft_redirect(&shell->cmd[nb], ">", 1, 2);
-	//ft_redirect(&shell->cmd[nb], "<", 0, 1);
-	ft_clean_token(shell->cmd[nb].token);
-	if (ft_execute_builtin(nb) == false)
-	{
-		cmd_path = ft_get_path(nb);
-		status = execve(cmd_path, shell->cmd[nb].token, shell->env);
-		dprintf(2, "%s: command not found\n", shell->cmd[nb].token[0]);
-	}
+	ft_putstr_fd(msg, 2);
+	ft_free(shell, flag);
 	exit(status);
 }
 
-void	ft_exec_cmd(shell_t *shell, int nb)
-{
-	int	fd[2];
-	
-	if(pipe(fd) == -1)
-		ft_exit("pipe error\n", 3);
-	shell->cmd[nb].pid = fork();
-	if (shell->cmd[nb].pid == 0)
-	{
-		if (nb < shell->cmd_count - 1)
-		{
-			close(fd[0]);
-			dup2(fd[1], STDOUT_FILENO);
-		}
-		ft_execve(nb);
-	}
-	else if (nb < shell->cmd_count - 1)
-	{
-		close(fd[1]);
-		dup2(fd[0], STDIN_FILENO);
-	}
-}
-
-void	ft_execute_solo(shell_t *shell, int nb)
-{
-	int	status;
-	
-	ft_redirect(&shell->cmd[nb], ">>", 1, 6);
-	ft_redirect(&shell->cmd[nb], ">", 1, 2);
-	ft_redirect(&shell->cmd[nb], "<", 0, 1);
-	ft_clean_token(shell->cmd[nb].token);
-	if (ft_execute_builtin(shell, nb) == false)
-	{
-		shell->cmd[nb]->pid = fork();
-		if (shell->pid[nb] == 0)
-			ft_execve(shell, nb);
-		else
-			waitpid(shell->pid[nb], &status, 0);
-		if (status > 256)
-			error_status = 127;
-		else if (status == 256)
-			error_status = 1;
-		else
-			error_status = 0;
-	}
-}
-
-void	ft_execute_cmd(shell_t *shell, int nb)
-{
-	int old_stdin;
-	int old_stdout;
-	int	status;
-
-	old_stdin = dup(STDIN_FILENO);
-	old_stdout = dup(STDOUT_FILENO);
-	if (shell->nb_cmd > 1){
-		while (nb < shell->nb_cmd) 
-			ft_exec_cmd(shell, nb++);
-		nb = 0;
-		while (nb < shell->nb_cmd)
-			waitpid(shell->cmd[nb++].pid, &status, 0);
-		if (status > 256)
-			error_status = 127;
-		else if (status == 256)
-			error_status = 1;
-		else
-			error_status = 0;
-	}
-	else {
-		ft_execute_solo(shell, nb);
-	}
-	dup2(old_stdin, STDIN_FILENO);
-	dup2(old_stdout, STDOUT_FILENO);
-}
-
-int	main(int ac, char **av, char **env)
-{
-
-	shell_t *shell;
-	
-	shell = ft_init_minishell(ac, av, env);
-	signal(SIGINT, ft_signal);
-	ft_getprompt(shell);
-	ft_exit(shell, "Goodbye\n", 0, 2);
-}
-
-/***environement***/
-
-shell_t	*ft_init_minishell(int ac, char **av, char **env)
-{
-	(void)ac;
-	(void)av;
-	shell_t *shell;
-
-	error_status = 0;
-	shell = ft_calloc(1, sizeof(shell_t));
-	if (!shell)
-		ft_putstr_fd("Error: malloc failed\n", 2);
-	shell->env = ft_remalloc(env, 0, 0);
-	if (shell->env == NULL){
-		free(shell);
-		ft_putstr_fd("Error: malloc failed\n", 2);
-	}
-	return (shell);
-}
-
-/***parsing***/
-
+// on skip les espaces et tabulations
+// si le premier caractere set <$> et le suivant est <?>
+// on imprime le status de la derniere commande
 int	ft_status(shell_t *shell)
 {
 	int	i;
@@ -342,6 +109,10 @@ int	ft_status(shell_t *shell)
 	return (0);
 }
 
+// on avance dans le buffer
+// on incremente <d> ou <s> a chaque simple ou double quote
+// si la division en 2 d'une des deux variables de laisse pas de reste
+// alors on a un nombre impair de quote d'une des 2 types
 int	ft_check_closed_quote(char *buf)
 {
 	int	i;
@@ -364,6 +135,34 @@ int	ft_check_closed_quote(char *buf)
 	return (1);
 }
 
+//pour chaque commande on va compter le nombre de token
+//on va allouer la memoire pour le tableau de token
+//on va remplir le tableau de token avec strtok
+void	ft_parse_token(shell_t *shell)
+{
+	int c;
+	int t;
+	int count;
+
+	c = -1;
+	while (++c < shell->nb_cmd)
+	{
+		count = ft_token_count(shell->cmd[c].buffer, ' ');
+		shell->cmd[c].token = ft_calloc(sizeof(char *), count + 2);
+		if (!shell->cmd[c].token)
+			ft_exit(shell, "Error: malloc failed\n", 15, 5);
+		t = 0;
+		shell->cmd[c].token[t] = ft_strtok(shell->cmd[c].buffer, ' ');
+		while (shell->cmd[c].token[t++])
+			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
+		//ft_parse_heredoc(shell->cmd[c].token);
+	}
+}
+
+// on check si le buffer contient des quotes non fermées
+// on regarde si la commande $? est presente et l'éxecute
+// on compte le nombre de commandes et calloc le tableau de cmd
+// on split le buffer en petit buffer pour chaque commande
 int 	ft_parse(shell_t *shell)
 {
 	int i;
@@ -372,18 +171,27 @@ int 	ft_parse(shell_t *shell)
 	if (ft_check_closed_quote(shell->buffer) == 0 || ft_status(shell))
 		return (0);
 	shell->nb_cmd = ft_token_count(shell->buffer, '|');
-	shell->cmd = ft_calloc(sizeof(t_cmd), shell->nb_cmd);
+	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	if (shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15, 3);
+	shell->pid = ft_calloc(sizeof(int), shell->nb_cmd);
+	if (shell->pid == NULL)
+		ft_exit(shell, "Error: malloc failed\n", 15, 4);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
 	while (++i < shell->nb_cmd)
 		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
-	//ft_parse_token();
+	ft_parse_token(shell);
 	return (1);
 }
 
-/***get prompt***/
-
+// on read sur le 0 avec Readline
+// si le buffer est NULL (ctrl + D) on quitte la boucle
+// si le buffer contient que des espaces on read sur le 0 a nouveau
+// on ajoute l'historique
+// on parse le buffer
+// si valide on execute la commande
+// on free le buffer
+// on read sur le 0 a nouveau
 int	ft_getprompt(shell_t *shell)
 {
 	shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
@@ -393,19 +201,21 @@ int	ft_getprompt(shell_t *shell)
 		{
 			add_history(shell->buffer);
 			if (ft_parse(shell)){
-				ft_execute_cmd(shell, 0);
-				ft_free(shell, 8);
+				//ft_execute_cmd(shell, 0);
+				ft_free(shell, 4);
 			}
-			else
-				ft_free(shell, 9);
 		}
+		free(shell->buffer);
 		shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	}
 	return (0);
 }
 
-/***exit and free***/
-
+//sur CTRL + C on print un retour a la ligne
+//on se deplace sur une nouvelle ligne
+//on efface la ligne
+//on affiche le prompt
+//on set le error status a 130
 void	ft_signal(int signal)
 {
 	if (signal == SIGINT)
@@ -418,21 +228,34 @@ void	ft_signal(int signal)
 	}
 }
 
-void	ft_free(shell_t *shell, int flag)
+// Set le error status a 0
+// calloc de la structure principal
+// copie de la variable environ dans la structure
+shell_t	*ft_init_minishell(int ac, char **av, char **env)
 {
-	if (flag == 1)
-		free(shell);
-	if (flag <= 2)
-		ft_free_array(shell->env);
-	if (flag >= 8)
-		free(shell->cmd);
-	if (flag == 9)
-		free(shell->buffer);
+	(void)ac;
+	(void)av;
+	shell_t *shell;
+
+	error_status = 0;
+	shell = ft_calloc(1, sizeof(shell_t));
+	if (!shell)
+		ft_exit(shell, "Error: malloc failed\n", 15, 0);
+	shell->env = ft_remalloc(env, 0, 0);
+	if (shell->env == NULL){
+		ft_exit(shell, "Error: malloc failed\n", 15, 1);
+	}
+	return (shell);
 }
 
-void	ft_exit(shell_t *shell, char *msg, int status, int flag)
+// Main function
+int	main(int ac, char **av, char **env)
 {
-	ft_putstr_fd(msg, 2);
-	ft_free(shell, flag);
-	exit(status);
+
+	shell_t *shell;
+	
+	shell = ft_init_minishell(ac, av, env);
+	signal(SIGINT, ft_signal);
+	ft_getprompt(shell);
+	ft_exit(shell, "Goodbye\n", 0, 2);
 }
