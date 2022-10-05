@@ -100,6 +100,34 @@ void	ft_exit(shell_t *shell, char *msg, int status, int flag)
 	exit(status);
 }
 
+// print les argument sur le FD 1
+void	ft_echo(char **arg)
+{
+	int	i;
+	int	flag;
+
+	flag = 0;
+	i = 1;
+	if (arg[1] && ft_strncmp(arg[1], "-n\0", 3) == 0)
+	{
+		flag = 1;
+		i++;
+	}
+	while (arg[i])
+	{
+		if (ft_is_only(arg[i], ' '))
+			i++;
+		else
+		{
+			printf("%s", arg[i++]);
+			if (arg[i])
+				printf(" ");
+		}
+	}
+	if (flag == 0)
+		printf("\n");
+}
+
 // cherche dans la variable d'environnement une ligne avec le buffer
 // avant le = et retourne un pointer sur le premier caractere apres le =
 char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
@@ -446,7 +474,6 @@ shell_t	*ft_init_minishell(int ac, char **av, char **env)
 // Main function
 int	main(int ac, char **av, char **env)
 {
-
 	shell_t *shell;
 	
 	shell = ft_init_minishell(ac, av, env);
