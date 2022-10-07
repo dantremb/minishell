@@ -100,34 +100,6 @@ void	ft_exit(shell_t *shell, char *msg, int status, int flag)
 	exit(status);
 }
 
-// print les argument sur le FD 1
-void	ft_echo(char **arg)
-{
-	int	i;
-	int	flag;
-
-	flag = 0;
-	i = 1;
-	if (arg[1] && ft_strncmp(arg[1], "-n\0", 3) == 0)
-	{
-		flag = 1;
-		i++;
-	}
-	while (arg[i])
-	{
-		if (ft_is_only(arg[i], ' '))
-			i++;
-		else
-		{
-			printf("%s", arg[i++]);
-			if (arg[i])
-				printf(" ");
-		}
-	}
-	if (flag == 0)
-		printf("\n");
-}
-
 // cherche dans la variable d'environnement une ligne avec le buffer
 // avant le = et retourne un pointer sur le premier caractere apres le =
 char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
@@ -148,6 +120,137 @@ char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
 	if (flag == 1)
 		buffer[0] = '\0';
 	return (buffer);
+}
+
+// si le flag est a 0 on print les variables d'environnement + ceux cachés
+// si le flag est a 1 on print les variables avec un = seulement
+void	ft_env(shell_t *shell, int flag)
+{
+	int	i;
+
+	i = -1;
+	if (flag == 0)
+	{
+		while (shell->env[++i])
+			printf("[%d]%s\n", i, shell->env[i]);
+	}
+	else
+	{
+		while (shell->env[++i])
+		{
+			if (shell->env[i][0] != '<' && shell->env[i][1] != '-' && ft_strchr(shell->env[i], '='))
+				printf("%s\n", shell->env[i]);
+		}
+	}
+}
+
+// cherche dans la variable d'environnement une ligne avec le buffer
+// et si il est suivi d'un "=" on free le pointer et on déplace les autres
+// pointeurs du tableau vers le bas puis assigne le dernier pointeur a NULL
+void	ft_unset(shell_t *shell, char *buffer)
+{
+	int	i;
+
+	i = -1;
+	while (shell->env[++i])
+	{
+		if (ft_strncmp(shell->env[i], buffer, ft_strlen(buffer)) == 0
+			&& shell->env[i][ft_strlen(buffer)] == '=')
+		{
+			free(shell->env[i]);
+			while (shell->env[i + 1])
+			{
+				shell->env[i] = shell->env[i + 1];
+				i++;
+			}
+			shell->env[i] = NULL;
+		}
+	}
+}
+
+// si aucun argument on imprime les variables d'environnement
+// si le premier argument provenant de l'utilisateur n'est pas aplhabétique on retourne une erreur
+// si l'argument contien un "=" on regarde si elle existe et unset
+// on remalloc l'environement de 1 de plus
+// on ajoute une copie de l'argument a la fin de l'environement
+void	ft_export(shell_t *shell, char *arg, int flag)
+{
+	char	*duplicate;
+
+	if (!arg)
+		ft_env(shell, 0);
+	else if (arg && ft_isalpha(arg[0]) == 0 && flag == 1)
+		printf("-bash: export: `%s': not a valid identifier\n", arg);
+	else
+	{
+		if (ft_strchr(arg, '='))
+		{
+			duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
+			if (ft_get_variable(shell, duplicate, 0))
+				ft_unset(shell, duplicate);
+			free (duplicate);
+		}
+		shell->env = ft_remalloc(shell->env, 1, 1);
+		shell->env[ft_array_size(shell->env) - 1] = ft_strdup(arg);
+	}
+}
+
+//si le buffer est un dossier valide à l'aide de chdir qui change le dossier courant
+// on unset le oldpwd courant
+// on construit le nouveau oldpwd avec le pwd courant et export dans l'environement
+// on unset le pwd courant
+// on construit le nouveau pwd avec le buffer et export dans l'environement
+void	ft_cd(shell_t *shell, char *buffer)
+{
+	char	*temp[2];
+	
+	if (buffer && chdir(buffer) == 0)
+	{
+		ft_unset(shell, "OLDPWD");
+		temp[0] = ft_get_variable(shell, "PWD", 0);
+		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0);
+		ft_export(shell, temp[1], 0);
+		free(temp[1]);
+		ft_unset(shell, "PWD");
+		temp[0] = getcwd(NULL, 0);
+		temp[1] = ft_strjoin("PWD=", temp[0], 0);
+		ft_export(shell, temp[1], 0);
+		free(temp[0]);
+		free(temp[1]);
+	}
+	else
+		printf("cd: %s: No such file or directory\n", buffer);
+}
+
+// Si le premier token est <-n> on donne la valeur 1 au Flag
+// si le token contien que des espaces on passe au token suivant et print un espace
+// sinon on print le token et un espace sauf pour le dernier token
+// si le flag est a 0 on print le retour a la ligne
+void	ft_echo(char **arg)
+{
+	int	i;
+	int	flag;
+
+	flag = 0;
+	i = 1;
+	if (arg[1] && !ft_is_only(&arg[1][1], 'n') == 0)
+	{
+		flag = 1;
+		i++;
+	}
+	while (arg[i])
+	{
+		if (ft_is_only(arg[i], ' '))
+			i++;
+		else
+		{
+			printf("%s", arg[i++]);
+			if (arg[i])
+				printf(" ");
+		}
+	}
+	if (flag == 0)
+		printf("\n");
 }
 
 // on regarde si la commande est deja un path
@@ -203,24 +306,23 @@ void	ft_execve(shell_t *shell, int nb)
 // on regarde si la commande est un builtin et l'éxecute
 bool	ft_execute_builtin(shell_t *shell, int nb)
 {
-	/*if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
+	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(shell->cmd[nb].token);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
-		ft_env(1);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
-		ft_export(shell->cmd[nb].token[1], 1);
+		ft_env(shell, 1);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "unset\0", 6) == 0)
-		ft_unset(shell->cmd[nb].token[1]);
+		ft_unset(shell, shell->cmd[nb].token[1]);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
-		printf("%s\n", ft_get_variable("PWD", 0));
+		printf("%s\n", ft_get_variable(shell, "PWD", 0));
+	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
+		ft_export(shell, shell->cmd[nb].token[1], 1);
 	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
-		ft_cd(shell->cmd[nb].token[1]);
-	else */
-	if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
+		ft_cd(shell, shell->cmd[nb].token[1]);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
 		ft_exit(shell, "Goodbye\n", 0, 7);
-	//else
+	else
 		return (false);
-	//return (true);
+	return (true);
 }
 
 void	ft_exec_cmd(shell_t *shell, int nb)
@@ -237,7 +339,10 @@ void	ft_exec_cmd(shell_t *shell, int nb)
 			close(fd[0]);
 			dup2(fd[1], STDOUT_FILENO);
 		}
-		ft_execve(shell, nb);
+		if (ft_execute_builtin(shell, nb) == false)
+			ft_execve(shell, nb);
+		else
+			exit(0);
 	}
 	else if (nb < shell->nb_cmd - 1)
 	{
@@ -256,14 +361,17 @@ int	ft_subshell(shell_t *shell, int nb)
 	pid_t	pid;
 
 	pid = fork();
-	if (pid == 0) {
+	if (pid == 0)
+	{
 		while (nb < shell->nb_cmd) 
 			ft_exec_cmd(shell, nb++);
 		nb = 0;
 		while (nb < shell->nb_cmd)
 			waitpid(shell->pid[nb++], &status, 0);
+		exit (status);
 	}
-	else {
+	else
+	{
 		waitpid(pid, &status, 0);
 	}
 	return (status);

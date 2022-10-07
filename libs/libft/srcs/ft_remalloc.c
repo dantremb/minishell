@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 20:58:01 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/30 23:41:46 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/06 23:58:09 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,6 @@ char	**ft_remalloc(char **old, int size, int f)
 	while (old[++i])
 		new[i] = ft_strdup(old[i]);
 	if (f == 1)
-		free(old);
+		ft_free_array(old);
 	return (new);
 }
