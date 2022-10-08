@@ -491,6 +491,26 @@ int	ft_pipe_count(shell_t *shell)
 	return (0);
 }
 
+// si le dernier caractere est un pipe
+// on rappel readline pour avoir une nouvelle ligne
+// on concatene la nouvelle ligne a la fin de la ligne precedente
+int	ft_expand_buffer(shell_t *shell)
+{
+	char	*tmp;
+	if (shell->buffer[ft_strlen(shell->buffer) -1] == '|')
+	{
+		shell->buffer[ft_strlen(shell->buffer)] = '\0';
+		tmp = readline(">");
+		while (tmp != NULL)
+		{
+			
+		}
+		shell->buffer = ft_strjoin(shell->buffer, tmp, 1);
+		free(tmp);
+	}
+	return (0);
+}
+
 //pour chaque commande on va compter le nombre de token
 //on va allouer la memoire pour le tableau de token
 //on va remplir le tableau de token avec strtok
@@ -524,8 +544,8 @@ int 	ft_parse(shell_t *shell)
 	int i;
 
 	i = 0;
-	if (ft_check_closed_quote(shell->buffer) == 0 || ft_status(shell) 
-		|| ft_pipe_count(shell))
+	if (ft_check_closed_quote(shell->buffer) == 0 || ft_status(shell)
+		|| ft_expand_buffer(shell) || ft_pipe_count(shell))
 		return (0);
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	if (shell->cmd == NULL)
