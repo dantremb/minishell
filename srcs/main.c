@@ -466,6 +466,31 @@ int	ft_check_closed_quote(char *buf)
 	return (1);
 }
 
+int	ft_pipe_count(shell_t *shell)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 1;
+	while (shell->buffer[i])
+	{	
+		if (shell->buffer[i] == '|')
+		{
+			if (shell->buffer[i + 1] == '|')
+			{
+				shell->buffer[i] = '\0';
+				shell->nb_cmd = count;
+				return (0);
+			}
+			count++;
+		}
+		i++;
+	}
+	shell->nb_cmd = count;
+	return (0);
+}
+
 //pour chaque commande on va compter le nombre de token
 //on va allouer la memoire pour le tableau de token
 //on va remplir le tableau de token avec strtok
@@ -499,9 +524,9 @@ int 	ft_parse(shell_t *shell)
 	int i;
 
 	i = 0;
-	if (ft_check_closed_quote(shell->buffer) == 0 || ft_status(shell))
+	if (ft_check_closed_quote(shell->buffer) == 0 || ft_status(shell) 
+		|| ft_pipe_count(shell))
 		return (0);
-	shell->nb_cmd = ft_token_count(shell->buffer, '|');
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	if (shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15, 3);
