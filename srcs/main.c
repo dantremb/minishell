@@ -491,23 +491,65 @@ int	ft_pipe_count(shell_t *shell)
 	return (0);
 }
 
+//sur CTRL + C on print un retour a la ligne
+//on se deplace sur une nouvelle ligne
+//on efface la ligne
+//on affiche le prompt
+//on set le error status a 130
+void	ft_signal(int signal)
+{
+	if (signal == SIGINT)
+	{
+		write(2, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		error_status = 130;
+	}
+}
+
+void	ft_signal_heredoc(int sig)
+{
+	if (sig == SIGINT)
+	{
+		//write(2, "asdasdasdasdad\n", 15);
+		write(2, "\r", 1);
+		//rl_on_new_line();
+		//rl_replace_line("", 0);
+		//printf("\033[1;33mMini\033[1;31mshell > \033[0;0m");
+	//	rl_redisplay();
+		//error_status = 130;
+	}
+}
+
 // si le dernier caractere est un pipe
 // on rappel readline pour avoir une nouvelle ligne
 // on concatene la nouvelle ligne a la fin de la ligne precedente
 int	ft_expand_buffer(shell_t *shell)
 {
 	char	*tmp;
-	if (shell->buffer[ft_strlen(shell->buffer) -1] == '|')
+
+	signal(SIGINT, ft_signal_heredoc);
+	if (shell->buffer[ft_strlen(shell->buffer) - 1] == '|')
 	{
-		shell->buffer[ft_strlen(shell->buffer)] = '\0';
 		tmp = readline(">");
-		while (tmp != NULL)
+		if (tmp == NULL)
+			ft_exit(shell, "Goodbye\n", 15, 3);
+		else if (tmp[0] == 4)
 		{
-			
+			printf("syntax error near unexpected token `newline'\n");
+			signal(SIGINT, ft_signal);
+			return (0);
 		}
-		shell->buffer = ft_strjoin(shell->buffer, tmp, 1);
-		free(tmp);
+		else if (!ft_is_only(shell->buffer, ' '))
+			ft_expand_buffer(shell);
+		else
+		{
+			shell->buffer = ft_strjoin(shell->buffer, tmp, 1);
+			free(tmp);
+		}
 	}
+	signal(SIGINT, ft_signal);
 	return (0);
 }
 
@@ -585,23 +627,6 @@ int	ft_getprompt(shell_t *shell)
 		shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	}
 	return (0);
-}
-
-//sur CTRL + C on print un retour a la ligne
-//on se deplace sur une nouvelle ligne
-//on efface la ligne
-//on affiche le prompt
-//on set le error status a 130
-void	ft_signal(int signal)
-{
-	if (signal == SIGINT)
-	{
-		printf("\n");
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-		error_status = 130;
-	}
 }
 
 // Set le error status a 0
