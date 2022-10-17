@@ -508,48 +508,14 @@ void	ft_signal(int signal)
 	}
 }
 
-void	ft_signal_heredoc(int sig)
-{
-	if (sig == SIGINT)
-	{
-		//write(2, "asdasdasdasdad\n", 15);
-		write(2, "\r", 1);
-		//rl_on_new_line();
-		//rl_replace_line("", 0);
-		//printf("\033[1;33mMini\033[1;31mshell > \033[0;0m");
-	//	rl_redisplay();
-		//error_status = 130;
-	}
-}
-
 // si le dernier caractere est un pipe
 // on rappel readline pour avoir une nouvelle ligne
 // on concatene la nouvelle ligne a la fin de la ligne precedente
 int	ft_expand_buffer(shell_t *shell)
 {
-	char	*tmp;
-
-	signal(SIGINT, ft_signal_heredoc);
-	if (shell->buffer[ft_strlen(shell->buffer) - 1] == '|')
-	{
-		tmp = readline(">");
-		if (tmp == NULL)
-			ft_exit(shell, "Goodbye\n", 15, 3);
-		else if (tmp[0] == 4)
-		{
-			printf("syntax error near unexpected token `newline'\n");
-			signal(SIGINT, ft_signal);
-			return (0);
-		}
-		else if (!ft_is_only(shell->buffer, ' '))
-			ft_expand_buffer(shell);
-		else
-		{
-			shell->buffer = ft_strjoin(shell->buffer, tmp, 1);
-			free(tmp);
-		}
+	if (shell->buffer[ft_strlen(shell->buffer) - 1] == '|'){
+			printf("last char is a pipe\n");
 	}
-	signal(SIGINT, ft_signal);
 	return (0);
 }
 
@@ -649,8 +615,8 @@ shell_t	*ft_init_minishell(int ac, char **av, char **env)
 	return (shell);
 }
 
-// Main function
-int	main(int ac, char **av, char **env)
+// minishell
+void	ft_minishell(int ac, char **av, char **env)
 {
 	shell_t *shell;
 	
@@ -658,4 +624,11 @@ int	main(int ac, char **av, char **env)
 	signal(SIGINT, ft_signal);
 	ft_getprompt(shell);
 	ft_exit(shell, "Goodbye\n", 0, 2);
+}
+
+// Main function
+int	main(int ac, char **av, char **env)
+{
+	ft_minishell(ac, av, env);
+	return (0);
 }
