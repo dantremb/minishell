@@ -300,6 +300,7 @@ void	ft_execve(shell_t *shell, int nb)
 	if (cmd_path != NULL)
 		execve(cmd_path, shell->cmd[nb].token, shell->env);
 	dprintf(2, "%s: command not found\n", shell->cmd[nb].token[0]);
+	free(cmd_path);
 	exit(127);
 }
 
@@ -339,6 +340,8 @@ void	ft_exec_cmd(shell_t *shell, int nb)
 			close(fd[0]);
 			dup2(fd[1], STDOUT_FILENO);
 		}
+		//ft_check_redirection(shell, nb);
+		//ft_clean_token(shell->cmd[nb].token);
 		if (ft_execute_builtin(shell, nb) == false)
 			ft_execve(shell, nb);
 		else
@@ -385,6 +388,8 @@ int	ft_execute_solo(shell_t *shell, int nb)
 {
 	int	status;
 	
+	status = 0;
+	//ft_check_redirection(shell, nb);
 	//ft_clean_token(shell->cmd[nb].token);
 	if (ft_execute_builtin(shell, nb) == false)
 	{
@@ -474,13 +479,21 @@ int	ft_pipe_count(shell_t *shell)
 	i = 0;
 	count = 1;
 	while (shell->buffer[i])
-	{	
+	{
 		if (shell->buffer[i] == '|')
 		{
 			if (shell->buffer[i + 1] == '|')
 			{
 				shell->buffer[i] = '\0';
 				shell->nb_cmd = count;
+				//printf("pipe count return %d\n", count);
+				return (0);
+			}
+			if (shell->buffer[i + 1] == '\0')
+			{
+				shell->buffer[i] = '\0';
+				shell->nb_cmd = count;
+				//printf("pipe count return %d\n", count);
 				return (0);
 			}
 			count++;
@@ -488,6 +501,7 @@ int	ft_pipe_count(shell_t *shell)
 		i++;
 	}
 	shell->nb_cmd = count;
+	//printf("pipe count return %d\n", count);
 	return (0);
 }
 
@@ -553,7 +567,7 @@ int 	ft_parse(shell_t *shell)
 
 	i = 0;
 	if (ft_check_closed_quote(shell->buffer) == 0 || ft_status(shell)
-		|| ft_expand_buffer(shell) || ft_pipe_count(shell))
+		/*|| ft_expand_buffer(shell) */|| ft_pipe_count(shell))
 		return (0);
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	if (shell->cmd == NULL)

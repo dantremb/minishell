@@ -18,7 +18,7 @@ AR = ar
 CC = gcc
 ARFLAGS = rcs
 CFLAGS = -Wall -Wextra -Werror -g
-RLFLAGS = -lreadline -lncurses
+RLFLAGS = -lreadline -lncurses $(READLINE)
 
 # Includes
 LIBFT = libs/libft/libft.a
@@ -51,7 +51,7 @@ init:
 
 # Creating  executable
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(READLINE) $(RLFLAGS) $(READHISTORY)
+	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(RLFLAGS)
 
 # Cleaning
 REMOVE = rm -rf

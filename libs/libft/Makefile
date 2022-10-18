@@ -34,6 +34,7 @@ SRCS_FILES = ft_isascii.c ft_strlcpy.c ft_toupper.c ft_memchr.c ft_memmove.c \
 		ft_free_array.c ft_split_size.c ft_array_size.c ft_color.c \
 		ft_is_only.c ft_strtok.c ft_remove_char.c ft_trim_token.c \
 		ft_token_count.c ft_open_fd.c ft_remalloc.c
+
 SRCS = $(addprefix $S, $(SRCS_FILES))
 
 # Objects conversion
