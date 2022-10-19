@@ -1,28 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_free_array.c                                    :+:      :+:    :+:   */
+/*   ft_free.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/30 14:10:37 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/18 23:07:29 by dantremb         ###   ########.fr       */
+/*   Created: 2022/10/18 23:02:37 by dantremb          #+#    #+#             */
+/*   Updated: 2022/10/18 23:05:33 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
 
-void	ft_free_array(char **array)
+void	*ft_free(void *ptr)
 {
-	int	i;
-
-	if (!array)
-		return ;
-	i = -1;
-	while (array[++i])
+	if (ptr)
 	{
-		if (array[i])
-			array[i]= ft_free(array[i]);
+		free(ptr);
+		ptr = NULL;
 	}
-	free(array);
+	return (ptr);
 }

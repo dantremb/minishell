@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/01 23:19:42 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/18 22:38:31 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct		shell_s
 	int 	nb_cmd;
 	pid_t	*pid;
 	cmd_t	*cmd;
+	char	expand[2];
 }					shell_t;
 
 #endif

@@ -21,6 +21,7 @@ void	ft_print_table(shell_t *shell)
 	int	j;
 
 	i = 0;
+	printf("while i < %d\n", shell->nb_cmd);
 	while (i < shell->nb_cmd)
 	{
 		j = 0;
@@ -41,62 +42,28 @@ void	ft_print_table(shell_t *shell)
 	ft_color(8);
 }
 
-// free all the allocated memory
-void	ft_free(shell_t *shell, int flag)
+// free all the allocated memory for the last command
+void	ft_clear_command(shell_t *shell)
 {
 	int	i;
-
-	if (flag == 1){
-		free(shell);
-	}
-	if (flag == 2){
-		ft_free_array(shell->env);
-		free(shell);
-	}
-	if (flag == 3){
-		free(shell->buffer);
-		ft_free_array(shell->env);
-		free(shell);
-	}
-	if (flag == 4){
-		free(shell->cmd);
-		free(shell->buffer);
-		ft_free_array(shell->env);
-		free(shell);
-	}
-	if (flag == 5){
-		free(shell->pid);
-		free(shell->cmd);
-		free(shell->buffer);
-		ft_free_array(shell->env);
-		free(shell);
-	}
-	if (flag == 6){
-		i = -1;
-		while (++i < shell->nb_cmd)
-			free(shell->cmd[i].token);
-		free(shell->pid);
-		free(shell->cmd);
-	}
-	if (flag == 7){
-		i = -1;
-		while (++i < shell->nb_cmd)
-			free(shell->cmd[i].token);
-		free(shell->pid);
-		free(shell->cmd);
-		free(shell->buffer);
-		ft_free_array(shell->env);
-		free(shell);
-	}
+	i = -1;
+	while (++i < shell->nb_cmd)
+		shell->cmd[i].token = ft_free(shell->cmd[i].token);
+	shell->pid = ft_free(shell->pid);
+	shell->cmd = ft_free(shell->cmd);
+	shell->buffer = ft_free(shell->buffer);
+	shell->nb_cmd = 0;
 }
 
 // print le message sur le FD 2
 // free les elements malloc
 // exit avec le status de la derniere commande
-void	ft_exit(shell_t *shell, char *msg, int status, int flag)
+void	ft_exit(shell_t *shell, char *msg, int status)
 {
 	ft_putstr_fd(msg, 2);
-	ft_free(shell, flag);
+	ft_clear_command(shell);
+	ft_free_array(shell->env);
+	ft_free(shell);
 	exit(status);
 }
 
@@ -253,6 +220,118 @@ void	ft_echo(char **arg)
 		printf("\n");
 }
 
+// on créé le nouveau token avec la variable en récursion jusqu'au dernier $
+char	*ft_expand(shell_t *shell, char *token, int flag)
+{
+	char	*temp[4];
+
+	temp[0] = ft_strchr(token, '$');
+	temp[1] = ft_remove_char(ft_substr(token, 0, temp[0] - token), '\"');
+	temp[2] = temp[0] + 1;
+	while (++temp[0])
+		if (!ft_isalnum(*temp[0]))
+			break ;
+	temp[2] = ft_substr(temp[2] , 0, temp[0] - temp[2] );
+	temp[3] = ft_get_variable(shell, temp[2], 0);
+	temp[3]  = ft_strjoin(temp[1], temp[3], 1);
+	free (temp[2]);
+	temp[1] = ft_remove_char(ft_substr(temp[0], 0, ft_strlen(temp[0])), '\"');
+	temp[0] = ft_strjoin(temp[3] , temp[1], 1);
+	free(temp[1]);
+	if (flag == 1)
+		free (token);
+	if (ft_strchr(temp[0], '$'))
+		temp[0] = ft_expand(shell, temp[0], 1);
+	return (temp[0]);
+}
+
+//on export une variable d'environement contenant le token etendu
+char	*ft_expand_variable(shell_t *shell, char *token)
+{
+	char	*temps;
+	char	*expand;
+
+	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
+		token = ft_get_variable(shell, &token[1], 0);
+	else
+	{
+		if (token[0] == '\"')
+			token = ft_expand(shell, token + 1, 0);
+		else
+			token = ft_expand(shell, token, 0);
+		expand = ft_strjoin(&shell->expand[0], "-expand=", 0);
+		temps = ft_strjoin(expand, token, 0);
+		free(token);
+		ft_export(shell, temps, 0);
+		free(temps);
+		expand[ft_strlen(expand) - 1] = '\0';
+		token = ft_get_variable(shell, expand, 0);
+		free(expand);
+		shell->expand[0] = shell->expand[0] + 1; 
+	}
+	return (token);
+}
+
+// on enleve les singles, doubles quotes et expand les variables
+void	ft_clean_token(shell_t *shell, char **token)
+{
+	int t;
+
+	t = 0;
+	while (token[t])
+	{
+		if (token[t][0] == '\'' && token[t][ft_strlen(token[t]) - 1] == '\'')
+			ft_remove_char(token[t], '\'');
+		else if (token[t][0] == '\"' && token[t][ft_strlen(token[t]) - 1] == '\"')
+		{
+			if (ft_strchr(token[t], '$'))
+				token[t] = ft_expand_variable(shell, token[t]);
+			else
+				ft_remove_char(token[t], '\"');
+		}
+		else
+		{
+			token[t] = ft_trim_token(token[t], ' ');
+			if (ft_strchr(token[t], '$'))
+				token[t] = ft_expand_variable(shell, token[t]);
+		}
+		t++;
+	}
+}
+
+// redirection can be call with < > or >>
+void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
+{
+	int i;
+	int fd;
+
+	i = -1;
+	while (cmd->token[++i])
+	{
+		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
+		{
+			if (cmd->token[i][ft_strlen(meta)] == '\0')
+			{
+				fd = ft_open_fd(cmd->token[i + 1], flag);
+				dup2(fd, side);
+				if (i == 0)
+					cmd->token = cmd->token + 2;
+				else
+					cmd->token[i] = NULL;
+			}
+			else
+			{
+				fd = ft_open_fd(&cmd->token[i][ft_strlen(meta)], flag);
+				dup2(fd, side);
+				if (i == 0)
+					cmd->token = cmd->token + 1;
+				else
+					cmd->token[i] = NULL;
+			}
+		}
+	}
+}
+
 // on regarde si la commande est deja un path
 // si oui on retourne le path
 // si non on ajoute un / devant la commande
@@ -320,7 +399,7 @@ bool	ft_execute_builtin(shell_t *shell, int nb)
 	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
 		ft_cd(shell, shell->cmd[nb].token[1]);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
-		ft_exit(shell, "Goodbye\n", 0, 7);
+		ft_exit(shell, "Goodbye\n", 0);
 	else
 		return (false);
 	return (true);
@@ -331,7 +410,7 @@ void	ft_exec_cmd(shell_t *shell, int nb)
 	int	fd[2];
 	
 	if(pipe(fd) == -1)
-		ft_exit(shell, "pipe error\n", 14, 7);
+		ft_exit(shell, "pipe error\n", 14);
 	shell->pid[nb] = fork();
 	if (shell->pid[nb] == 0)
 	{
@@ -389,8 +468,10 @@ int	ft_execute_solo(shell_t *shell, int nb)
 	int	status;
 	
 	status = 0;
-	//ft_check_redirection(shell, nb);
-	//ft_clean_token(shell->cmd[nb].token);
+	ft_redirect(&shell->cmd[nb], ">>", 1, 6);
+	ft_redirect(&shell->cmd[nb], ">", 1, 2);
+	ft_redirect(&shell->cmd[nb], "<", 0, 1);
+	ft_clean_token(shell, shell->cmd[nb].token);
 	if (ft_execute_builtin(shell, nb) == false)
 	{
 		shell->pid[nb] = fork();
@@ -486,22 +567,23 @@ int	ft_pipe_count(shell_t *shell)
 			{
 				shell->buffer[i] = '\0';
 				shell->nb_cmd = count;
-				//printf("pipe count return %d\n", count);
+				printf("pipe count return %d\n", count);
 				return (0);
 			}
-			if (shell->buffer[i + 1] == '\0')
+			while(shell->buffer[i] == ' ')
+				i++;
+			if (shell->buffer[i] == '|')
 			{
-				shell->buffer[i] = '\0';
-				shell->nb_cmd = count;
-				//printf("pipe count return %d\n", count);
-				return (0);
+				shell->nb_cmd = 0;
+				printf("syntax error near unexpected token `|'\n");
+				return (1);
 			}
 			count++;
 		}
 		i++;
 	}
 	shell->nb_cmd = count;
-	//printf("pipe count return %d\n", count);
+	printf("pipe count return %d\n", count);
 	return (0);
 }
 
@@ -548,11 +630,12 @@ void	ft_parse_token(shell_t *shell)
 		count = ft_token_count(shell->cmd[c].buffer, ' ');
 		shell->cmd[c].token = ft_calloc(sizeof(char *), count + 2);
 		if (!shell->cmd[c].token)
-			ft_exit(shell, "Error: malloc failed\n", 15, 5);
+			ft_exit(shell, "Error: malloc failed\n", 15);
 		t = 0;
 		shell->cmd[c].token[t] = ft_strtok(shell->cmd[c].buffer, ' ');
 		while (shell->cmd[c].token[t++])
 			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
+		ft_print_table(shell);
 		//ft_parse_heredoc(shell->cmd[c].token);
 	}
 }
@@ -571,10 +654,10 @@ int 	ft_parse(shell_t *shell)
 		return (0);
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	if (shell->cmd == NULL)
-		ft_exit(shell, "Error: malloc failed\n", 15, 3);
+		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->pid = ft_calloc(sizeof(int), shell->nb_cmd);
 	if (shell->pid == NULL)
-		ft_exit(shell, "Error: malloc failed\n", 15, 4);
+		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
 	while (++i < shell->nb_cmd)
 		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
@@ -600,7 +683,7 @@ int	ft_getprompt(shell_t *shell)
 			add_history(shell->buffer);
 			if (ft_parse(shell)){
 				ft_execute_cmd(shell, 0);
-				ft_free(shell, 6);
+				ft_clear_command(shell);
 			}
 		}
 		free(shell->buffer);
@@ -621,10 +704,11 @@ shell_t	*ft_init_minishell(int ac, char **av, char **env)
 	error_status = 0;
 	shell = ft_calloc(1, sizeof(shell_t));
 	if (!shell)
-		ft_exit(shell, "Error: malloc failed\n", 15, 0);
+		ft_exit(shell, "Error: malloc failed\n", 15);
+	shell->expand[0] = 'a';
 	shell->env = ft_remalloc(env, 0, 0);
 	if (shell->env == NULL){
-		ft_exit(shell, "Error: malloc failed\n", 15, 1);
+		ft_exit(shell, "Error: malloc failed\n", 15);
 	}
 	return (shell);
 }
@@ -637,7 +721,7 @@ void	ft_minishell(int ac, char **av, char **env)
 	shell = ft_init_minishell(ac, av, env);
 	signal(SIGINT, ft_signal);
 	ft_getprompt(shell);
-	ft_exit(shell, "Goodbye\n", 0, 2);
+	ft_exit(shell, "Goodbye\n", 0);
 }
 
 // Main function
