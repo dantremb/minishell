@@ -537,6 +537,9 @@ int	ft_expand_buffer(shell_t *shell)
 }
 
 // on avance dans le buffer jusqu'a trouver un quote
+// on regarde avec strchr si il y a une autre quote identique plus loin
+// si non on retourne 1 et on affiche une erreur
+// si oui on avance dans le buffer jusqu'a la quote identique et continue
 int	ft_check_closed_quote(char *buf)
 {
 	char	*tmp;
@@ -590,8 +593,8 @@ int	ft_buffer_integrity(shell_t *shell)
 		return (0);
 	if (ft_check_closed_quote(shell->buffer))
 		return (0);
-//	if 	(ft_pipe_check(shell))
-//		return (0);
+	if 	(ft_pipe_check(shell))
+		return (0);
 	return (1);
 }
 
