@@ -647,17 +647,19 @@ int 	ft_parse(shell_t *shell)
 	if (shell->pid == NULL || shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
+	printf("tokennnnn isssss %s\n", shell->cmd[i].buffer);
 	if (shell->cmd[i].buffer && shell->cmd[i].buffer[0] == '\0'){
 			printf("syntax error near unexpected token `|'\n");
 			return (0);
 		}
 	while (++i < shell->nb_cmd)
 	{
+		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
+		printf("tokennnnn isssss %s\n", shell->cmd[i].buffer);
 		if (shell->cmd[i].buffer && shell->cmd[i].buffer[0] == '\0'){
 			printf("syntax error near unexpected token `|'\n");
 			return (0);
 		}
-		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
 	}
 	ft_parse_token(shell);
 	return (1);
