@@ -507,6 +507,58 @@ void	ft_execute_cmd(shell_t *shell, int nb)
 	dup2(old_stdout, STDOUT_FILENO);
 }
 
+//sur CTRL + C on print un retour a la ligne
+//on se deplace sur une nouvelle ligne
+//on efface la ligne
+//on affiche le prompt
+//on set le error status a 130
+void	ft_signal(int signal)
+{
+	if (signal == SIGINT)
+	{
+		write(2, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+		error_status = 130;
+	}
+}
+
+
+// si le dernier caractere est un pipe
+// on rappel readline pour avoir une nouvelle ligne
+// on concatene la nouvelle ligne a la fin de la ligne precedente
+int	ft_expand_buffer(shell_t *shell)
+{
+	if (shell->buffer[ft_strlen(shell->buffer) - 1] == '|'){
+			printf("last char is a pipe\n");
+	}
+	return (0);
+}
+
+// on avance dans le buffer jusqu'a trouver un quote
+int	ft_check_closed_quote(char *buf)
+{
+	char	*tmp;
+
+	tmp = buf;
+	while (*tmp)
+	{
+		if (*tmp == '\'' || *tmp == '\"')
+		{
+			if (ft_strchr(tmp + 1, *tmp) == NULL)
+			{
+				printf("Error Quote not closed\n");
+				return (1);
+			}
+			else
+				tmp = ft_strchr(tmp + 1, *tmp);
+		}
+		tmp++;
+	}
+	return (0);
+}
+
 // on skip les espaces et tabulations
 // si le premier caractere set <$> et le suivant est <?>
 // on imprime le status de la derniere commande
@@ -526,93 +578,21 @@ int	ft_status(shell_t *shell)
 	return (0);
 }
 
-// on avance dans le buffer
-// on incremente <d> ou <s> a chaque simple ou double quote
-// si la division en 2 d'une des deux variables de laisse pas de reste
-// alors on a un nombre impair de quote d'une des 2 types
-int	ft_check_closed_quote(char *buf)
+// on regarde si le buffer termine par un pipe
+// si la commande status est appelée
+// si il y a des quotes non fermées
+// si il y a des erreurs dans les pipes
+int	ft_buffer_integrity(shell_t *shell)
 {
-	int	i;
-	int	d;
-	int	s;
-
-	i = -1;
-	d = 0;
-	s = 0;
-	while (buf[++i]){
-		if (buf[i] == '\"')
-			d++;
-		if (buf[i] == '\'')
-			s++;
-	}
-	if ((d && (d % 2) != 0) || (s && (s % 2)) != 0){
-		printf("Error Quote not closed\n");
+//	if (!ft_expand_buffer(shell))
+//		return (0);
+	if (ft_status(shell))
 		return (0);
-	}
+	if (ft_check_closed_quote(shell->buffer))
+		return (0);
+//	if 	(ft_pipe_check(shell))
+//		return (0);
 	return (1);
-}
-
-int	ft_pipe_count(shell_t *shell)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 1;
-	while (shell->buffer[i])
-	{
-		if (shell->buffer[i] == '|')
-		{
-			if (shell->buffer[i + 1] == '|')
-			{
-				shell->buffer[i] = '\0';
-				shell->nb_cmd = count;
-				printf("pipe count return %d\n", count);
-				return (0);
-			}
-			while(shell->buffer[i] == ' ')
-				i++;
-			if (shell->buffer[i] == '|')
-			{
-				shell->nb_cmd = 0;
-				printf("syntax error near unexpected token `|'\n");
-				return (1);
-			}
-			count++;
-		}
-		i++;
-	}
-	shell->nb_cmd = count;
-	printf("pipe count return %d\n", count);
-	return (0);
-}
-
-//sur CTRL + C on print un retour a la ligne
-//on se deplace sur une nouvelle ligne
-//on efface la ligne
-//on affiche le prompt
-//on set le error status a 130
-void	ft_signal(int signal)
-{
-	if (signal == SIGINT)
-	{
-		write(2, "\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-		error_status = 130;
-	}
-}
-
-// si le dernier caractere est un pipe
-// on rappel readline pour avoir une nouvelle ligne
-// on concatene la nouvelle ligne a la fin de la ligne precedente
-int	ft_expand_buffer(shell_t *shell)
-{
-	if (shell->buffer[ft_strlen(shell->buffer) - 1] == '|'){
-			printf("last char is a pipe\n");
-	}
-	return (0);
 }
 
 //pour chaque commande on va compter le nombre de token
@@ -635,13 +615,12 @@ void	ft_parse_token(shell_t *shell)
 		shell->cmd[c].token[t] = ft_strtok(shell->cmd[c].buffer, ' ');
 		while (shell->cmd[c].token[t++])
 			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
-		ft_print_table(shell);
+		//ft_print_table(shell);
 		//ft_parse_heredoc(shell->cmd[c].token);
 	}
 }
 
-// on check si le buffer contient des quotes non fermées
-// on regarde si la commande $? est presente et l'éxecute
+// on check si le buffer est valide
 // on compte le nombre de commandes et calloc le tableau de cmd
 // on split le buffer en petit buffer pour chaque commande
 int 	ft_parse(shell_t *shell)
@@ -649,9 +628,9 @@ int 	ft_parse(shell_t *shell)
 	int i;
 
 	i = 0;
-	if (ft_check_closed_quote(shell->buffer) == 0 || ft_status(shell)
-		/*|| ft_expand_buffer(shell) */|| ft_pipe_count(shell))
+	if (ft_buffer_integrity(shell) == 0)
 		return (0);
+	shell->nb_cmd = ft_token_count(shell->buffer, '|');
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	if (shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
