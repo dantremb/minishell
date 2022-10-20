@@ -524,14 +524,29 @@ void	ft_signal(int signal)
 	}
 }
 
-
-// si le dernier caractere est un pipe
-// on rappel readline pour avoir une nouvelle ligne
-// on concatene la nouvelle ligne a la fin de la ligne precedente
-int	ft_expand_buffer(shell_t *shell)
+// on regarde si il y a un pipe au début ou fin du buffer
+// si il y a 2 pipe collé on coupe le buffer
+// si il y a seulement des espaces entre 2 pipes
+int	ft_pipe_check(char *buf)
 {
-	if (shell->buffer[ft_strlen(shell->buffer) - 1] == '|'){
-			printf("last char is a pipe\n");
+	char	*tmp;
+
+	tmp = buf;
+	if (*tmp == '|' || tmp[ft_strlen(tmp) - 1] == '|')
+	{
+		printf("syntax error near unexpected token `|'\n");
+		return (1);
+	}
+	while (*tmp)
+	{
+		if (*tmp == '\'' || *tmp == '\"')
+				tmp = ft_strchr(tmp + 1, *tmp);
+		if (*tmp == '|' && *(tmp + 1) == '|')
+		{
+			*tmp = '\0';
+			return (0);
+		}
+		tmp++;
 	}
 	return (0);
 }
@@ -545,12 +560,9 @@ int	ft_check_closed_quote(char *buf)
 	char	*tmp;
 
 	tmp = buf;
-	while (*tmp)
-	{
-		if (*tmp == '\'' || *tmp == '\"')
-		{
-			if (ft_strchr(tmp + 1, *tmp) == NULL)
-			{
+	while (*tmp){
+		if (*tmp == '\'' || *tmp == '\"'){
+			if (ft_strchr(tmp + 1, *tmp) == NULL){
 				printf("Error Quote not closed\n");
 				return (1);
 			}
@@ -572,8 +584,7 @@ int	ft_status(shell_t *shell)
 	i = 0;
 	while (shell->buffer[i] && (shell->buffer[i] == ' ' || shell->buffer[i] == '\t'))
 		i++;
-	if (shell->buffer[i] == '$' && shell->buffer[i + 1] == '?')
-	{
+	if (shell->buffer[i] == '$' && shell->buffer[i + 1] == '?'){
 		printf("%d: command not found\n", error_status);
 		error_status = 0;
 		return (1);
@@ -581,19 +592,16 @@ int	ft_status(shell_t *shell)
 	return (0);
 }
 
-// on regarde si le buffer termine par un pipe
 // si la commande status est appelée
 // si il y a des quotes non fermées
 // si il y a des erreurs dans les pipes
 int	ft_buffer_integrity(shell_t *shell)
 {
-//	if (!ft_expand_buffer(shell))
-//		return (0);
 	if (ft_status(shell))
 		return (0);
 	if (ft_check_closed_quote(shell->buffer))
 		return (0);
-	if 	(ft_pipe_check(shell))
+	if 	(ft_pipe_check(shell->buffer))
 		return (0);
 	return (1);
 }
@@ -642,7 +650,13 @@ int 	ft_parse(shell_t *shell)
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
 	while (++i < shell->nb_cmd)
+	{
+		if (shell->cmd[i].buffer && shell->cmd[i].buffer[0] == '\0'){
+			printf("syntax error near unexpected token `|'\n");
+			return (0);
+		}
 		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
+	}
 	ft_parse_token(shell);
 	return (1);
 }
