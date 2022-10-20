@@ -376,8 +376,9 @@ void	ft_execve(shell_t *shell, int nb)
 	char	*cmd_path;
 	
 	cmd_path = ft_get_path(shell, nb);
-	if (cmd_path != NULL)
+	if (cmd_path != NULL) {
 		execve(cmd_path, shell->cmd[nb].token, shell->env);
+	}
 	dprintf(2, "%s: command not found\n", shell->cmd[nb].token[0]);
 	free(cmd_path);
 	exit(127);
@@ -518,7 +519,7 @@ void	ft_signal(int signal)
 	{
 		write(2, "\n", 1);
 		rl_on_new_line();
-		rl_replace_line("", 0);
+		//rl_replace_line("", 0);
 		rl_redisplay();
 		error_status = 130;
 	}
@@ -529,8 +530,26 @@ void	ft_signal(int signal)
 // si il y a seulement des espaces entre 2 pipes
 int	ft_pipe_check(char *buf)
 {
-	int	i;
+	char	*tmp;
 
+	tmp = buf;
+	if (buf[0] == '|' || buf[ft_strlen(buf) - 1] == '|')
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
+		return (1);
+	}
+	while (*tmp)
+	{
+		if (*tmp == '|' && *(tmp + 1) == '|'){
+			*tmp = '\0';
+			return (0);
+		}
+		if (*tmp == '|' && ft_is_only(tmp + 1, ' ')){
+			ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
+			return (1);
+		}
+		tmp++;
+	}
 	return (0);
 }
 
@@ -575,6 +594,30 @@ int	ft_status(shell_t *shell)
 	return (0);
 }
 
+int ft_empty_token(char *buf)
+{
+	char *tmp;
+	char *token;
+	int i;
+	
+	i = 0;
+	tmp = ft_strdup(buf);
+	printf("EMPTY TOKEN temp = [%s]\n", tmp);
+	token = ft_strtok(tmp, '|');
+	while(token)
+	{
+		printf("EMPTY TOKEN token = [%s]\n", token);
+		if (ft_is_only(token, ' ')) {
+			printf("parse error near `|'\n");
+			return (1);
+		}
+		i++;
+		token = (ft_strtok(NULL, '|'));
+	}
+	free(tmp);
+	return (0);
+}
+
 // si la commande status est appelée
 // si il y a des quotes non fermées
 // si il y a des erreurs dans les pipes
@@ -585,6 +628,8 @@ int	ft_buffer_integrity(shell_t *shell)
 	if (ft_check_closed_quote(shell->buffer))
 		return (0);
 	if 	(ft_pipe_check(shell->buffer))
+		return (0);
+	if (ft_empty_token(shell->buffer))
 		return (0);
 	return (1);
 }
@@ -625,6 +670,7 @@ int 	ft_parse(shell_t *shell)
 	if (ft_buffer_integrity(shell) == 0)
 		return (0);
 	shell->nb_cmd = ft_token_count(shell->buffer, '|');
+	printf("PARSE cmd count = [%d]\n", shell->nb_cmd);
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	shell->pid = ft_calloc(sizeof(int), shell->nb_cmd);
 	if (shell->pid == NULL || shell->cmd == NULL)
@@ -688,7 +734,7 @@ shell_t	*ft_init_minishell(int ac, char **av, char **env)
 void	ft_minishell(int ac, char **av, char **env)
 {
 	shell_t *shell;
-	
+
 	shell = ft_init_minishell(ac, av, env);
 	signal(SIGINT, ft_signal);
 	ft_getprompt(shell);

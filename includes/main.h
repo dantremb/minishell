@@ -34,6 +34,7 @@ typedef struct		shell_s
 	pid_t	*pid;
 	cmd_t	*cmd;
 	char	expand[2];
+	char	heredoc[2];
 }					shell_t;
 
 #endif

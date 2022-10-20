@@ -49,9 +49,11 @@ init:
 	@$(MAKE) -s -C $(LIBFT_PATH)
 	@printf "$CCreating $(NAME)\n$W"
 
+INCLUDE = ./includes/
+
 # Creating  executable
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(RLFLAGS)
+	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(RLFLAGS) -I $(INCLUDE)
 
 # Cleaning
 REMOVE = rm -rf
