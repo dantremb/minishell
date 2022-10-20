@@ -529,25 +529,8 @@ void	ft_signal(int signal)
 // si il y a seulement des espaces entre 2 pipes
 int	ft_pipe_check(char *buf)
 {
-	char	*tmp;
+	int	i;
 
-	tmp = buf;
-	if (*tmp == '|' || tmp[ft_strlen(tmp) - 1] == '|')
-	{
-		printf("syntax error near unexpected token `|'\n");
-		return (1);
-	}
-	while (*tmp)
-	{
-		if (*tmp == '\'' || *tmp == '\"')
-				tmp = ft_strchr(tmp + 1, *tmp);
-		if (*tmp == '|' && *(tmp + 1) == '|')
-		{
-			*tmp = '\0';
-			return (0);
-		}
-		tmp++;
-	}
 	return (0);
 }
 
@@ -647,20 +630,8 @@ int 	ft_parse(shell_t *shell)
 	if (shell->pid == NULL || shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
-	printf("tokennnnn isssss %s\n", shell->cmd[i].buffer);
-	if (shell->cmd[i].buffer && shell->cmd[i].buffer[0] == '\0'){
-			printf("syntax error near unexpected token `|'\n");
-			return (0);
-		}
 	while (++i < shell->nb_cmd)
-	{
 		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
-		printf("tokennnnn isssss %s\n", shell->cmd[i].buffer);
-		if (shell->cmd[i].buffer && shell->cmd[i].buffer[0] == '\0'){
-			printf("syntax error near unexpected token `|'\n");
-			return (0);
-		}
-	}
 	ft_parse_token(shell);
 	return (1);
 }
