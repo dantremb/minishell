@@ -582,7 +582,7 @@ int	ft_status(shell_t *shell)
 	int	i;
 
 	i = 0;
-	while (shell->buffer[i] && (shell->buffer[i] == ' ' || shell->buffer[i] == '\t'))
+	while (shell->buffer[i] && (shell->buffer[i] == ' '))
 		i++;
 	if (shell->buffer[i] == '$' && shell->buffer[i + 1] == '?'){
 		printf("%d: command not found\n", error_status);
@@ -643,12 +643,14 @@ int 	ft_parse(shell_t *shell)
 		return (0);
 	shell->nb_cmd = ft_token_count(shell->buffer, '|');
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
-	if (shell->cmd == NULL)
-		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->pid = ft_calloc(sizeof(int), shell->nb_cmd);
-	if (shell->pid == NULL)
+	if (shell->pid == NULL || shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
+	if (shell->cmd[i].buffer && shell->cmd[i].buffer[0] == '\0'){
+			printf("syntax error near unexpected token `|'\n");
+			return (0);
+		}
 	while (++i < shell->nb_cmd)
 	{
 		if (shell->cmd[i].buffer && shell->cmd[i].buffer[0] == '\0'){
