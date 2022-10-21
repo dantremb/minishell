@@ -602,13 +602,12 @@ int ft_empty_token(char *buf)
 	
 	i = 0;
 	tmp = ft_strdup(buf);
-	printf("EMPTY TOKEN temp = [%s]\n", tmp);
 	token = ft_strtok(tmp, '|');
 	while(token)
 	{
-		printf("EMPTY TOKEN token = [%s]\n", token);
 		if (ft_is_only(token, ' ')) {
 			printf("parse error near `|'\n");
+			free(tmp);
 			return (1);
 		}
 		i++;
