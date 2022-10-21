@@ -24,6 +24,7 @@ typedef struct		cmd_s
 {
 	char	*buffer;
 	char	**token;
+	char	**args;
 }					cmd_t;
 
 typedef struct		shell_s

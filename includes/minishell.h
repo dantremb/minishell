@@ -24,6 +24,7 @@ typedef struct		s_cmd
 {
 	char	*buffer;
 	char	**token;
+	char	*args;
 	pid_t	pid;
 }					t_cmd;
 
@@ -58,4 +59,3 @@ int		ft_status(void);
 void	ft_update_error();
 
 #endif
-	

@@ -47,11 +47,13 @@ void	ft_clear_command(shell_t *shell)
 {
 	int	i;
 	i = -1;
-	while (++i < shell->nb_cmd)
-		shell->cmd[i].token = ft_free(shell->cmd[i].token);
-	shell->pid = ft_free(shell->pid);
-	shell->cmd = ft_free(shell->cmd);
-	shell->buffer = ft_free(shell->buffer);
+	while (++i < shell->nb_cmd){
+		printf("freeing cmd %d\n", i);
+		ft_free(shell->cmd[i].token);
+	}
+	ft_free(shell->pid);
+	ft_free(shell->cmd);
+	ft_free(shell->buffer);
 	shell->nb_cmd = 0;
 }
 
@@ -124,7 +126,7 @@ void	ft_unset(shell_t *shell, char *buffer)
 		if (ft_strncmp(shell->env[i], buffer, ft_strlen(buffer)) == 0
 			&& shell->env[i][ft_strlen(buffer)] == '=')
 		{
-			free(shell->env[i]);
+			ft_free(shell->env[i]);
 			while (shell->env[i + 1])
 			{
 				shell->env[i] = shell->env[i + 1];
@@ -155,7 +157,7 @@ void	ft_export(shell_t *shell, char *arg, int flag)
 			duplicate = ft_substr(arg, 0, ft_strchr(arg, '=') - arg);
 			if (ft_get_variable(shell, duplicate, 0))
 				ft_unset(shell, duplicate);
-			free (duplicate);
+			ft_free (duplicate);
 		}
 		shell->env = ft_remalloc(shell->env, 1, 1);
 		shell->env[ft_array_size(shell->env) - 1] = ft_strdup(arg);
@@ -177,13 +179,13 @@ void	ft_cd(shell_t *shell, char *buffer)
 		temp[0] = ft_get_variable(shell, "PWD", 0);
 		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0);
 		ft_export(shell, temp[1], 0);
-		free(temp[1]);
+		ft_free(temp[1]);
 		ft_unset(shell, "PWD");
 		temp[0] = getcwd(NULL, 0);
 		temp[1] = ft_strjoin("PWD=", temp[0], 0);
 		ft_export(shell, temp[1], 0);
-		free(temp[0]);
-		free(temp[1]);
+		ft_free(temp[0]);
+		ft_free(temp[1]);
 	}
 	else
 		printf("cd: %s: No such file or directory\n", buffer);
@@ -199,12 +201,10 @@ void	ft_echo(char **arg)
 	int	flag;
 
 	flag = 0;
-	i = 1;
-	if (arg[1] && !ft_is_only(&arg[1][1], 'n') == 0)
-	{
+	i = 0;
+
+	if (arg[1] && !ft_is_only(&arg[1][1], 'n' && ++i) == 0)
 		flag = 1;
-		i++;
-	}
 	while (arg[i])
 	{
 		if (ft_is_only(arg[i], ' '))
@@ -234,12 +234,12 @@ char	*ft_expand(shell_t *shell, char *token, int flag)
 	temp[2] = ft_substr(temp[2] , 0, temp[0] - temp[2] );
 	temp[3] = ft_get_variable(shell, temp[2], 0);
 	temp[3]  = ft_strjoin(temp[1], temp[3], 1);
-	free (temp[2]);
+	ft_free (temp[2]);
 	temp[1] = ft_remove_char(ft_substr(temp[0], 0, ft_strlen(temp[0])), '\"');
 	temp[0] = ft_strjoin(temp[3] , temp[1], 1);
-	free(temp[1]);
+	ft_free(temp[1]);
 	if (flag == 1)
-		free (token);
+		ft_free (token);
 	if (ft_strchr(temp[0], '$'))
 		temp[0] = ft_expand(shell, temp[0], 1);
 	return (temp[0]);
@@ -261,12 +261,12 @@ char	*ft_expand_variable(shell_t *shell, char *token)
 			token = ft_expand(shell, token, 0);
 		expand = ft_strjoin(&shell->expand[0], "-expand=", 0);
 		temps = ft_strjoin(expand, token, 0);
-		free(token);
+		ft_free(token);
 		ft_export(shell, temps, 0);
-		free(temps);
+		ft_free(temps);
 		expand[ft_strlen(expand) - 1] = '\0';
 		token = ft_get_variable(shell, expand, 0);
-		free(expand);
+		ft_free(expand);
 		shell->expand[0] = shell->expand[0] + 1; 
 	}
 	return (token);
@@ -305,28 +305,29 @@ void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 	int i;
 	int fd;
 
+	cmd->args = cmd->token;
 	i = -1;
-	while (cmd->token[++i])
+	while (cmd->args[++i])
 	{
-		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
+		if (ft_strncmp(cmd->args[i], meta, ft_strlen(meta)) == 0)
 		{
-			if (cmd->token[i][ft_strlen(meta)] == '\0')
+			if (cmd->args[i][ft_strlen(meta)] == '\0')
 			{
-				fd = ft_open_fd(cmd->token[i + 1], flag);
+				fd = ft_open_fd(cmd->args[i + 1], flag);
 				dup2(fd, side);
 				if (i == 0)
-					cmd->token = cmd->token + 2;
+					cmd->args = cmd->args + 2;
 				else
-					cmd->token[i] = NULL;
+					cmd->args[i] = NULL;
 			}
 			else
 			{
-				fd = ft_open_fd(&cmd->token[i][ft_strlen(meta)], flag);
+				fd = ft_open_fd(&cmd->args[i][ft_strlen(meta)], flag);
 				dup2(fd, side);
 				if (i == 0)
-					cmd->token = cmd->token + 1;
+					cmd->args = cmd->args + 1;
 				else
-					cmd->token[i] = NULL;
+					cmd->args[i] = NULL;
 			}
 		}
 	}
@@ -360,11 +361,11 @@ char	*ft_get_path(shell_t *shell, int nb)
 		test_path = ft_strjoin(fcnt_path[i], program, 0);
 		if (access(test_path, F_OK | X_OK) == 0)
 			break ;
-		free (test_path);
+		ft_free (test_path);
 		test_path = NULL;
 	}
 	ft_free_array(fcnt_path);
-	free(program);
+	ft_free(program);
 	return (test_path);
 }
 
@@ -377,29 +378,29 @@ void	ft_execve(shell_t *shell, int nb)
 	
 	cmd_path = ft_get_path(shell, nb);
 	if (cmd_path != NULL) {
-		execve(cmd_path, shell->cmd[nb].token, shell->env);
+		execve(cmd_path, shell->cmd[nb].args, shell->env);
 	}
 	dprintf(2, "%s: command not found\n", shell->cmd[nb].token[0]);
-	free(cmd_path);
+	ft_free(cmd_path);
 	exit(127);
 }
 
 // on regarde si la commande est un builtin et l'éxecute
 bool	ft_execute_builtin(shell_t *shell, int nb)
 {
-	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
-		ft_echo(shell->cmd[nb].token);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
+	if (ft_strncmp(shell->cmd[nb].args[0], "echo", 4) == 0)
+		ft_echo(shell->cmd[nb].args);
+	else if (ft_strncmp(shell->cmd[nb].args[0], "env", 3) == 0)
 		ft_env(shell, 1);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "unset\0", 6) == 0)
-		ft_unset(shell, shell->cmd[nb].token[1]);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
+	else if (ft_strncmp(shell->cmd[nb].args[0], "unset\0", 6) == 0)
+		ft_unset(shell, shell->cmd[nb].args[1]);
+	else if (ft_strncmp(shell->cmd[nb].args[0], "pwd\0", 4) == 0)
 		printf("%s\n", ft_get_variable(shell, "PWD", 0));
-	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
-		ft_export(shell, shell->cmd[nb].token[1], 1);
+	else if (ft_strncmp(shell->cmd[nb].args[0], "export", 6) == 0)
+		ft_export(shell, shell->cmd[nb].args[1], 1);
 	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
-		ft_cd(shell, shell->cmd[nb].token[1]);
-	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
+		ft_cd(shell, shell->cmd[nb].args[1]);
+	else if (ft_strncmp(shell->cmd[nb].args[0], "exit\0", 5) == 0)
 		ft_exit(shell, "Goodbye\n", 0);
 	else
 		return (false);
@@ -469,9 +470,9 @@ int	ft_execute_solo(shell_t *shell, int nb)
 	int	status;
 	
 	status = 0;
-	ft_redirect(&shell->cmd[nb], ">>", 1, 6);
-	ft_redirect(&shell->cmd[nb], ">", 1, 2);
-	ft_redirect(&shell->cmd[nb], "<", 0, 1);
+	//ft_redirect(&shell->cmd[nb], ">>", 1, 6);
+	//ft_redirect(&shell->cmd[nb], ">", 1, 2);
+	//ft_redirect(&shell->cmd[nb], "<", 0, 1);
 	ft_clean_token(shell, shell->cmd[nb].token);
 	if (ft_execute_builtin(shell, nb) == false)
 	{
@@ -607,13 +608,13 @@ int ft_empty_token(char *buf)
 	{
 		if (ft_is_only(token, ' ')) {
 			printf("parse error near `|'\n");
-			free(tmp);
+			ft_free(tmp);
 			return (1);
 		}
 		i++;
 		token = (ft_strtok(NULL, '|'));
 	}
-	free(tmp);
+	ft_free(tmp);
 	return (0);
 }
 
@@ -646,7 +647,8 @@ void	ft_parse_token(shell_t *shell)
 	while (++c < shell->nb_cmd)
 	{
 		count = ft_token_count(shell->cmd[c].buffer, ' ');
-		shell->cmd[c].token = ft_calloc(sizeof(char *), count + 2);
+		printf("calloc for %d tokens for cmd no %d\n", count, c);
+		shell->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
 		if (!shell->cmd[c].token)
 			ft_exit(shell, "Error: malloc failed\n", 15);
 		t = 0;
@@ -669,7 +671,7 @@ int 	ft_parse(shell_t *shell)
 	if (ft_buffer_integrity(shell) == 0)
 		return (0);
 	shell->nb_cmd = ft_token_count(shell->buffer, '|');
-	printf("PARSE cmd count = [%d]\n", shell->nb_cmd);
+	printf("WE HAVE CALLOC %d COMMANDS\n", shell->nb_cmd);
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	shell->pid = ft_calloc(sizeof(int), shell->nb_cmd);
 	if (shell->pid == NULL || shell->cmd == NULL)
@@ -702,7 +704,7 @@ int	ft_getprompt(shell_t *shell)
 				ft_clear_command(shell);
 			}
 		}
-		free(shell->buffer);
+		ft_free(shell->buffer);
 		shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	}
 	return (0);
@@ -711,10 +713,8 @@ int	ft_getprompt(shell_t *shell)
 // Set le error status a 0
 // calloc de la structure principal
 // copie de la variable environ dans la structure
-shell_t	*ft_init_minishell(int ac, char **av, char **env)
+shell_t	*ft_init_minishell(char **env)
 {
-	(void)ac;
-	(void)av;
 	shell_t *shell;
 
 	error_status = 0;
@@ -730,11 +730,11 @@ shell_t	*ft_init_minishell(int ac, char **av, char **env)
 }
 
 // minishell
-void	ft_minishell(int ac, char **av, char **env)
+void	ft_minishell(char **env)
 {
 	shell_t *shell;
 
-	shell = ft_init_minishell(ac, av, env);
+	shell = ft_init_minishell(env);
 	signal(SIGINT, ft_signal);
 	ft_getprompt(shell);
 	ft_exit(shell, "Goodbye\n", 0);
@@ -743,6 +743,9 @@ void	ft_minishell(int ac, char **av, char **env)
 // Main function
 int	main(int ac, char **av, char **env)
 {
-	ft_minishell(ac, av, env);
+	(void)ac;
+	(void)av;
+
+	ft_minishell(env);
 	return (0);
 }

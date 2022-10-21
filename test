@@ -1,0 +1,15 @@
+total 168
+drwxr-xr-x  14 dantremb  2022_quebec    476 Oct 21 12:35 .
+drwxr-xr-x  14 dantremb  2022_quebec    476 Oct 20 15:58 ..
+-rw-r--r--@  1 dantremb  2022_quebec   6148 Oct 18 17:26 .DS_Store
+drwxr-xr-x  15 dantremb  2022_quebec    510 Oct 20 21:37 .git
+-rw-r--r--   1 dantremb  2022_quebec      4 Sep 27 12:04 .gitignore
+-rwxr-xr-x   1 dantremb  2022_quebec   2316 Oct 20 18:45 Makefile
+-rwxr-xr-x   1 dantremb  2022_quebec   2593 Oct 19 13:22 README.md
+drwxr-xr-x   4 dantremb  2022_quebec    136 Oct 20 11:13 includes
+drwxr-xr-x   5 dantremb  2022_quebec    170 Oct 19 15:48 libs
+-rwxr-xr-x   1 dantremb  2022_quebec  62168 Oct 21 12:35 minishell
+drwxr-xr-x   3 dantremb  2022_quebec    102 Oct 20 18:50 minishell.dSYM
+drwxr-xr-x   3 dantremb  2022_quebec    102 Oct 21 12:35 objs
+drwxr-xr-x   9 dantremb  2022_quebec    306 Oct 20 11:14 srcs
+-rw-r--r--   1 dantremb  2022_quebec      0 Oct 21 12:35 test
