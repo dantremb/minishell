@@ -6,12 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/26 00:11:18 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/21 23:29:47 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 extern t_data data;
+
 
 void	ft_make_heredoc(char *limiter, char *heredoc)
 {
@@ -41,6 +42,7 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 	}
 	waitpid(pid, NULL, 0);
 }
+
 
 char	*ft_expand_heredoc(char *heredoc)
 {
@@ -85,41 +87,4 @@ void	ft_parse_heredoc(char **token)
 			}
 		}
 	}
-}
-
-void	ft_parse_token(void)
-{
-	int c;
-	int t;
-	int count;
-
-	c = -1;
-	while (++c < data.cmd_count)
-	{
-		count = ft_token_count(data.cmd[c].buffer, ' ');
-		data.cmd[c].token = ft_calloc(sizeof(char *), count + 2);
-		t = 0;
-		data.cmd[c].token[t] = ft_strtok(data.cmd[c].buffer, ' ');
-		while (data.cmd[c].token[t++])
-			data.cmd[c].token[t] = ft_strtok(NULL, ' ');
-		ft_parse_heredoc(data.cmd[c].token);
-	}
-}
-
-int 	ft_parse_cmd(void)
-{
-	int i;
-
-	i = 0;
-	if (ft_check_closed_quote(data.buffer) == 0 || ft_status())
-		return (0);
-	data.cmd_count = ft_token_count(data.buffer, '|');
-	data.cmd = ft_calloc(sizeof(t_cmd), data.cmd_count + 2);
-	if (data.cmd == NULL)
-		ft_exit("Malloc error\n", 2);
-	data.cmd[0].buffer = ft_trim_token(ft_strtok(data.buffer, '|'), ' ');
-	while (++i < data.cmd_count)
-		data.cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
-	ft_parse_token();
-	return (1);
 }

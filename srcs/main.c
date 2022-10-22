@@ -48,10 +48,10 @@ void	ft_clear_command(shell_t *shell)
 	int	i;
 	i = -1;
 	while (++i < shell->nb_cmd)
-		ft_free(shell->cmd[i].token);
+		ft_free(shell->cmd[i].save);
 	shell->pid = ft_free(shell->pid);
 	shell->cmd = ft_free(shell->cmd);
-	shell->buffer = (shell->buffer);
+	shell->buffer = ft_free(shell->buffer);
 	shell->nb_cmd = 0;
 }
 
@@ -304,27 +304,27 @@ void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 	int fd;
 
 	i = -1;
-	while (cmd->args[++i])
+	while (cmd->token[++i])
 	{
-		if (ft_strncmp(cmd->args[i], meta, ft_strlen(meta)) == 0)
+		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
 		{
-			if (cmd->args[i][ft_strlen(meta)] == '\0')
+			if (cmd->token[i][ft_strlen(meta)] == '\0')
 			{
-				fd = ft_open_fd(cmd->args[i + 1], flag);
+				fd = ft_open_fd(cmd->token[i + 1], flag);
 				dup2(fd, side);
 				if (i == 0)
-					cmd->args = cmd->args + 2;
+					cmd->token = cmd->token + 2;
 				else
-					cmd->args[i] = NULL;
+					cmd->token[i] = NULL;
 			}
 			else
 			{
-				fd = ft_open_fd(&cmd->args[i][ft_strlen(meta)], flag);
+				fd = ft_open_fd(&cmd->token[i][ft_strlen(meta)], flag);
 				dup2(fd, side);
 				if (i == 0)
-					cmd->args = cmd->args + 1;
+					cmd->token = cmd->token + 1;
 				else
-					cmd->args[i] = NULL;
+					cmd->token[i] = NULL;
 			}
 		}
 	}
@@ -375,7 +375,7 @@ void	ft_execve(shell_t *shell, int nb)
 	
 	cmd_path = ft_get_path(shell, nb);
 	if (cmd_path != NULL) {
-		execve(cmd_path, shell->cmd[nb].args, shell->env);
+		execve(cmd_path, shell->cmd[nb].token, shell->env);
 	}
 	dprintf(2, "%s: command not found\n", shell->cmd[nb].token[0]);
 	ft_free(cmd_path);
@@ -385,19 +385,19 @@ void	ft_execve(shell_t *shell, int nb)
 // on regarde si la commande est un builtin et l'éxecute
 bool	ft_execute_builtin(shell_t *shell, int nb)
 {
-	if (ft_strncmp(shell->cmd[nb].args[0], "echo", 4) == 0)
-		ft_echo(shell->cmd[nb].args);
-	else if (ft_strncmp(shell->cmd[nb].args[0], "env", 3) == 0)
+	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
+		ft_echo(shell->cmd[nb].token);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
 		ft_env(shell, 1);
-	else if (ft_strncmp(shell->cmd[nb].args[0], "unset\0", 6) == 0)
-		ft_unset(shell, shell->cmd[nb].args[1]);
-	else if (ft_strncmp(shell->cmd[nb].args[0], "pwd\0", 4) == 0)
+	else if (ft_strncmp(shell->cmd[nb].token[0], "unset\0", 6) == 0)
+		ft_unset(shell, shell->cmd[nb].token[1]);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
 		printf("%s\n", ft_get_variable(shell, "PWD", 0));
-	else if (ft_strncmp(shell->cmd[nb].args[0], "export", 6) == 0)
-		ft_export(shell, shell->cmd[nb].args[1], 1);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
+		ft_export(shell, shell->cmd[nb].token[1], 1);
 	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
-		ft_cd(shell, shell->cmd[nb].args[1]);
-	else if (ft_strncmp(shell->cmd[nb].args[0], "exit\0", 5) == 0)
+		ft_cd(shell, shell->cmd[nb].token[1]);
+	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
 		ft_exit(shell, "Goodbye\n", 0);
 	else
 		return (false);
@@ -418,8 +418,10 @@ void	ft_exec_cmd(shell_t *shell, int nb)
 			close(fd[0]);
 			dup2(fd[1], STDOUT_FILENO);
 		}
-		//ft_check_redirection(shell, nb);
-		//ft_clean_token(shell->cmd[nb].token);
+		ft_redirect(&shell->cmd[nb], ">>", 1, 6);
+		ft_redirect(&shell->cmd[nb], ">", 1, 2);
+		ft_redirect(&shell->cmd[nb], "<", 0, 1);
+		ft_clean_token(shell, shell->cmd[nb].token);
 		if (ft_execute_builtin(shell, nb) == false)
 			ft_execve(shell, nb);
 		else
@@ -467,9 +469,9 @@ int	ft_execute_solo(shell_t *shell, int nb)
 	int	status;
 	
 	status = 0;
-	//ft_redirect(&shell->cmd[nb], ">>", 1, 6);
-	//ft_redirect(&shell->cmd[nb], ">", 1, 2);
-	//ft_redirect(&shell->cmd[nb], "<", 0, 1);
+	ft_redirect(&shell->cmd[nb], ">>", 1, 6);
+	ft_redirect(&shell->cmd[nb], ">", 1, 2);
+	ft_redirect(&shell->cmd[nb], "<", 0, 1);
 	ft_clean_token(shell, shell->cmd[nb].token);
 	if (ft_execute_builtin(shell, nb) == false)
 	{
@@ -517,7 +519,7 @@ void	ft_signal(int signal)
 	{
 		write(2, "\n", 1);
 		rl_on_new_line();
-		//rl_replace_line("", 0);
+		rl_replace_line("", 0);
 		rl_redisplay();
 		error_status = 130;
 	}
@@ -631,6 +633,84 @@ int	ft_buffer_integrity(shell_t *shell)
 	return (1);
 }
 
+// créé le child pour créé le heredoc
+void	ft_make_heredoc(shell_t *shell, char *limiter, char *heredoc)
+{
+	char	*str;
+	int		fd;
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		fd = ft_open_fd(heredoc, 2);
+		if (fd == -1)
+			ft_exit(shell, "Error: heredoc file not found", 1);
+		while (1)
+		{
+			write(1, "<heredoc> ", 10);
+			str = ft_get_next_line(0);
+			if (ft_strncmp(str, limiter, ft_strlen(limiter)) == 0
+				&& str[ft_strlen(limiter) + 1] == '\0')
+				break ;
+			ft_putstr_fd(str, fd);
+			free(str);
+		}
+		free(str);
+		close(fd);
+		ft_exit(shell, NULL, 3);
+	}
+	waitpid(pid, NULL, 0);
+	printf("heredoc done\n");
+}
+
+// ajoute le heredoc dans l'environnement
+char	*ft_expand_heredoc(shell_t *shell, char *heredoc)
+{
+	char	*temps;
+	char	*expand;
+
+	expand = ft_strjoin("<", shell->heredoc, 0);
+	expand = ft_strjoin(expand, "=", 1);
+	temps = ft_strjoin(expand, heredoc, 0);
+	free(heredoc);
+	ft_export(shell, temps, 0);
+	free(temps);
+	expand[ft_strlen(expand) - 1] = '\0';
+	temps = ft_get_variable(shell, expand, 0);
+	free(expand);
+	shell->heredoc[0] = shell->heredoc[0] + 1;
+	return (temps);
+}
+
+// cherche les heredoc et rem
+void	ft_parse_heredoc(shell_t *shell, char **token)
+{
+	int i;
+	char	*str;
+
+	i = -1;
+	while (token[++i])
+	{
+		if (ft_strncmp(token[i], "<<", 2) == 0)
+		{
+			if (token[i][2] == '\0')
+			{
+				str = ft_expand_heredoc(shell, ft_strjoin("<", shell->heredoc, 0));
+				ft_make_heredoc(shell, token[i + 1], str);
+				token[i][1] = '\0';
+				token[i + 1] = str + 1;
+			}
+			else
+			{
+				str = ft_expand_heredoc(shell, ft_strjoin("<", shell->heredoc, 0));
+				ft_make_heredoc(shell, &token[i][2], str);
+				token[i] = str;
+			}
+		}
+	}
+}
+
 //pour chaque commande on va compter le nombre de token
 //on va allouer la memoire pour le tableau de token
 //on va remplir le tableau de token avec strtok
@@ -652,9 +732,10 @@ void	ft_parse_token(shell_t *shell)
 		shell->cmd[c].token[t] = ft_strtok(shell->cmd[c].buffer, ' ');
 		while (shell->cmd[c].token[t++])
 			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
-		shell->cmd[c].args = shell->cmd[c].token;
+		shell->cmd[c].save = shell->cmd[c].token;
 		//ft_print_table(shell);
-		//ft_parse_heredoc(shell->cmd[c].token);
+		ft_parse_heredoc(shell, shell->cmd[c].token);
+		ft_print_table(shell);
 	}
 }
 
@@ -720,6 +801,7 @@ shell_t	*ft_init_minishell(char **env)
 	if (!shell)
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->expand[0] = 'a';
+	shell->heredoc[0] = 'a';
 	shell->env = ft_remalloc(env, 0, 0);
 	if (shell->env == NULL){
 		ft_exit(shell, "Error: malloc failed\n", 15);
