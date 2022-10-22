@@ -21,7 +21,7 @@ void	ft_print_table(shell_t *shell)
 	int	j;
 
 	i = 0;
-	printf("while i < %d\n", shell->nb_cmd);
+	//printf("while i < %d\n", shell->nb_cmd);
 	while (i < shell->nb_cmd)
 	{
 		j = 0;
@@ -47,13 +47,11 @@ void	ft_clear_command(shell_t *shell)
 {
 	int	i;
 	i = -1;
-	while (++i < shell->nb_cmd){
-		printf("freeing cmd %d\n", i);
+	while (++i < shell->nb_cmd)
 		ft_free(shell->cmd[i].token);
-	}
-	ft_free(shell->pid);
-	ft_free(shell->cmd);
-	ft_free(shell->buffer);
+	shell->pid = ft_free(shell->pid);
+	shell->cmd = ft_free(shell->cmd);
+	shell->buffer = (shell->buffer);
 	shell->nb_cmd = 0;
 }
 
@@ -305,7 +303,6 @@ void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 	int i;
 	int fd;
 
-	cmd->args = cmd->token;
 	i = -1;
 	while (cmd->args[++i])
 	{
@@ -647,7 +644,7 @@ void	ft_parse_token(shell_t *shell)
 	while (++c < shell->nb_cmd)
 	{
 		count = ft_token_count(shell->cmd[c].buffer, ' ');
-		printf("calloc for %d tokens for cmd no %d\n", count, c);
+		//printf("calloc for %d tokens for cmd no %d\n", count, c);
 		shell->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
 		if (!shell->cmd[c].token)
 			ft_exit(shell, "Error: malloc failed\n", 15);
@@ -655,6 +652,7 @@ void	ft_parse_token(shell_t *shell)
 		shell->cmd[c].token[t] = ft_strtok(shell->cmd[c].buffer, ' ');
 		while (shell->cmd[c].token[t++])
 			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
+		shell->cmd[c].args = shell->cmd[c].token;
 		//ft_print_table(shell);
 		//ft_parse_heredoc(shell->cmd[c].token);
 	}
@@ -671,7 +669,7 @@ int 	ft_parse(shell_t *shell)
 	if (ft_buffer_integrity(shell) == 0)
 		return (0);
 	shell->nb_cmd = ft_token_count(shell->buffer, '|');
-	printf("WE HAVE CALLOC %d COMMANDS\n", shell->nb_cmd);
+	//printf("WE HAVE CALLOC %d COMMANDS\n", shell->nb_cmd);
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
 	shell->pid = ft_calloc(sizeof(int), shell->nb_cmd);
 	if (shell->pid == NULL || shell->cmd == NULL)
@@ -699,12 +697,12 @@ int	ft_getprompt(shell_t *shell)
 		if (!ft_is_only(shell->buffer, ' '))
 		{
 			add_history(shell->buffer);
-			if (ft_parse(shell)){
+			if (ft_parse(shell))
 				ft_execute_cmd(shell, 0);
-				ft_clear_command(shell);
-			}
+			ft_clear_command(shell);
 		}
-		ft_free(shell->buffer);
+		else
+			ft_free(shell->buffer);
 		shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	}
 	return (0);
