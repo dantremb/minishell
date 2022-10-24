@@ -39,7 +39,7 @@ void	ft_print_table(shell_t *shell)
 		i++;
 	}
 		dprintf(2, "------------------------------------\n");
-	ft_color(8);
+	ft_color(7);
 }
 
 // free all the allocated memory for the last command
@@ -519,7 +519,7 @@ void	ft_signal(int signal)
 	{
 		write(2, "\n", 1);
 		rl_on_new_line();
-		rl_replace_line("", 0);
+		//rl_replace_line("", 0);
 		rl_redisplay();
 		error_status = 130;
 	}
