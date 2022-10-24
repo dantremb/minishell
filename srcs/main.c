@@ -29,7 +29,7 @@ void	ft_print_table(shell_t *shell)
 		dprintf(2, "------------ TOKEN -----------------\n");
 		ft_color(6);
 		dprintf(2, "cmd %d = \t", i);
-		while (shell->cmd[i].token[j])
+		while (shell->cmd[i].token && shell->cmd[i].token[j])
 		{
 			ft_color(3);
 			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
@@ -63,7 +63,7 @@ void	ft_exit(shell_t *shell, char *msg, int status)
 	ft_putstr_fd(msg, 2);
 	ft_clear_command(shell);
 	ft_free_array(shell->env);
-	ft_free(shell);
+	shell = ft_free(shell);
 	exit(status);
 }
 
@@ -451,7 +451,7 @@ int	ft_subshell(shell_t *shell, int nb)
 		nb = 0;
 		while (nb < shell->nb_cmd)
 			waitpid(shell->pid[nb++], &status, 0);
-		exit (status);
+		ft_exit(shell, "exit subshell", status);
 	}
 	else
 	{
@@ -724,7 +724,6 @@ void	ft_parse_token(shell_t *shell)
 	while (++c < shell->nb_cmd)
 	{
 		count = ft_token_count(shell->cmd[c].buffer, ' ');
-		//printf("calloc for %d tokens for cmd no %d\n", count, c);
 		shell->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
 		if (!shell->cmd[c].token)
 			ft_exit(shell, "Error: malloc failed\n", 15);
@@ -733,9 +732,9 @@ void	ft_parse_token(shell_t *shell)
 		while (shell->cmd[c].token[t++])
 			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
 		shell->cmd[c].save = shell->cmd[c].token;
-		//ft_print_table(shell);
-		ft_parse_heredoc(shell, shell->cmd[c].token);
 		ft_print_table(shell);
+		//ft_parse_heredoc(shell, shell->cmd[c].token);
+		//ft_print_table(shell);
 	}
 }
 
@@ -750,9 +749,8 @@ int 	ft_parse(shell_t *shell)
 	if (ft_buffer_integrity(shell) == 0)
 		return (0);
 	shell->nb_cmd = ft_token_count(shell->buffer, '|');
-	//printf("WE HAVE CALLOC %d COMMANDS\n", shell->nb_cmd);
 	shell->cmd = ft_calloc(sizeof(shell_t), shell->nb_cmd);
-	shell->pid = ft_calloc(sizeof(int), shell->nb_cmd);
+	shell->pid = ft_calloc(sizeof(pid_t), shell->nb_cmd);
 	if (shell->pid == NULL || shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
@@ -782,8 +780,7 @@ int	ft_getprompt(shell_t *shell)
 				ft_execute_cmd(shell, 0);
 			ft_clear_command(shell);
 		}
-		else
-			ft_free(shell->buffer);
+		shell->buffer = ft_free(shell->buffer);
 		shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	}
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/30 14:10:37 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/18 23:07:29 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/23 23:42:58 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,5 @@ void	ft_free_array(char **array)
 		if (array[i])
 			array[i]= ft_free(array[i]);
 	}
-	free(array);
+	array = ft_free(array);
 }

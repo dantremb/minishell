@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 20:58:01 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/06 23:58:09 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/23 23:41:23 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ char	**ft_remalloc(char **old, int size, int f)
 	char	**new;
 	int		i;
 	
+	if (old == NULL)
+		return (NULL);
 	new = ft_calloc(sizeof(char *), (ft_array_size(old) + size));
 	if (!new)
 		return (NULL);
