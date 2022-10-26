@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/10/23 23:35:56 by dantremb         ###   ########.fr        #
+#    Updated: 2022/10/26 01:19:58 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ AR = ar
 CC = gcc
 ARFLAGS = rcs
 CFLAGS = -Wall -Wextra -Werror -g
-RLFLAGS = -lreadline -lncurses $(READLINE)
+RLFLAGS = -lreadline -lncurses
 
 # Includes
 LIBFT = libs/libft/libft.a

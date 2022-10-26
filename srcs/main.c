@@ -14,22 +14,20 @@
 
 int error_status;
 
-// print le tableau de commandes pour debug
 void	ft_print_table(shell_t *shell)
 {
 	int	i;
 	int	j;
 
 	i = 0;
-	//printf("while i < %d\n", shell->nb_cmd);
 	while (i < shell->nb_cmd)
 	{
 		j = 0;
-		ft_color(1);
-		dprintf(2, "------------ TOKEN -----------------\n");
-		ft_color(6);
+		ft_color(3);
+		dprintf(2, "------------ TOKEN -----------------\n\033[0;0m");
+		ft_color(3);
 		dprintf(2, "cmd %d = \t", i);
-		while (shell->cmd[i].token && shell->cmd[i].token[j])
+		while (j < shell->cmd[i].nb_token)
 		{
 			ft_color(3);
 			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
@@ -38,11 +36,9 @@ void	ft_print_table(shell_t *shell)
 		dprintf(2, "\n");
 		i++;
 	}
-		dprintf(2, "------------------------------------\n");
-	ft_color(7);
+		dprintf(2, "------------------------------------\n\033[0;0m");
 }
 
-// free all the allocated memory for the last command
 void	ft_clear_command(shell_t *shell)
 {
 	int	i;
@@ -55,9 +51,6 @@ void	ft_clear_command(shell_t *shell)
 	shell->nb_cmd = 0;
 }
 
-// print le message sur le FD 2
-// free les elements malloc
-// exit avec le status de la derniere commande
 void	ft_exit(shell_t *shell, char *msg, int status)
 {
 	ft_putstr_fd(msg, 2);
@@ -67,8 +60,6 @@ void	ft_exit(shell_t *shell, char *msg, int status)
 	exit(status);
 }
 
-// cherche dans la variable d'environnement une ligne avec le buffer
-// avant le = et retourne un pointer sur le premier caractere apres le =
 char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
 {
 	int		i;
@@ -89,8 +80,6 @@ char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
 	return (buffer);
 }
 
-// si le flag est a 0 on print les variables d'environnement + ceux cachés
-// si le flag est a 1 on print les variables avec un = seulement
 void	ft_env(shell_t *shell, int flag)
 {
 	int	i;
@@ -111,9 +100,6 @@ void	ft_env(shell_t *shell, int flag)
 	}
 }
 
-// cherche dans la variable d'environnement une ligne avec le buffer
-// et si il est suivi d'un "=" on free le pointer et on déplace les autres
-// pointeurs du tableau vers le bas puis assigne le dernier pointeur a NULL
 void	ft_unset(shell_t *shell, char *buffer)
 {
 	int	i;
@@ -135,11 +121,6 @@ void	ft_unset(shell_t *shell, char *buffer)
 	}
 }
 
-// si aucun argument on imprime les variables d'environnement
-// si le premier argument provenant de l'utilisateur n'est pas aplhabétique on retourne une erreur
-// si l'argument contien un "=" on regarde si elle existe et unset
-// on remalloc l'environement de 1 de plus
-// on ajoute une copie de l'argument a la fin de l'environement
 void	ft_export(shell_t *shell, char *arg, int flag)
 {
 	char	*duplicate;
@@ -162,11 +143,6 @@ void	ft_export(shell_t *shell, char *arg, int flag)
 	}
 }
 
-//si le buffer est un dossier valide à l'aide de chdir qui change le dossier courant
-// on unset le oldpwd courant
-// on construit le nouveau oldpwd avec le pwd courant et export dans l'environement
-// on unset le pwd courant
-// on construit le nouveau pwd avec le buffer et export dans l'environement
 void	ft_cd(shell_t *shell, char *buffer)
 {
 	char	*temp[2];
@@ -189,10 +165,6 @@ void	ft_cd(shell_t *shell, char *buffer)
 		printf("cd: %s: No such file or directory\n", buffer);
 }
 
-// Si le premier token est <-n> on donne la valeur 1 au Flag
-// si le token contien que des espaces on passe au token suivant et print un espace
-// sinon on print le token et un espace sauf pour le dernier token
-// si le flag est a 0 on print le retour a la ligne
 void	ft_echo(char **arg)
 {
 	int	i;
@@ -218,7 +190,6 @@ void	ft_echo(char **arg)
 		printf("\n");
 }
 
-// on créé le nouveau token avec la variable en récursion jusqu'au dernier $
 char	*ft_expand(shell_t *shell, char *token, int flag)
 {
 	char	*temp[4];
@@ -243,7 +214,6 @@ char	*ft_expand(shell_t *shell, char *token, int flag)
 	return (temp[0]);
 }
 
-//on export une variable d'environement contenant le token etendu
 char	*ft_expand_variable(shell_t *shell, char *token)
 {
 	char	*temps;
@@ -270,7 +240,6 @@ char	*ft_expand_variable(shell_t *shell, char *token)
 	return (token);
 }
 
-// on enleve les singles, doubles quotes et expand les variables
 void	ft_clean_token(shell_t *shell, char **token)
 {
 	int t;
@@ -297,14 +266,14 @@ void	ft_clean_token(shell_t *shell, char **token)
 	}
 }
 
-// redirection can be call with < > or >>
 void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 {
 	int i;
 	int fd;
 
 	i = -1;
-	while (cmd->token[++i])
+
+	while (++i < cmd->nb_token)
 	{
 		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
 		{
@@ -319,7 +288,7 @@ void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 			}
 			else
 			{
-				fd = ft_open_fd(&cmd->token[i][ft_strlen(meta)], flag);
+				fd = ft_open_fd(&cmd->token[i][0], flag);
 				dup2(fd, side);
 				if (i == 0)
 					cmd->token = cmd->token + 1;
@@ -330,14 +299,6 @@ void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 	}
 }
 
-// on regarde si la commande est deja un path
-// si oui on retourne le path
-// si non on ajoute un / devant la commande
-// on va chercher la ligne contenant les paths et split avec les <:>
-// on ajoute le path avec la commande path/<commande>
-// on regarde si le programme existe avec access
-// si oui on retourne le path
-// si non on free le path et on continue
 char	*ft_get_path(shell_t *shell, int nb)
 {
 	char	*program;
@@ -366,9 +327,6 @@ char	*ft_get_path(shell_t *shell, int nb)
 	return (test_path);
 }
 
-// trouve le chemin du programme
-// si le chemin est trouvé on execute le programme
-// sinon on affiche un message d'erreur et quitte le child
 void	ft_execve(shell_t *shell, int nb)
 {
 	char	*cmd_path;
@@ -382,7 +340,6 @@ void	ft_execve(shell_t *shell, int nb)
 	exit(127);
 }
 
-// on regarde si la commande est un builtin et l'éxecute
 bool	ft_execute_builtin(shell_t *shell, int nb)
 {
 	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
@@ -421,7 +378,9 @@ void	ft_exec_cmd(shell_t *shell, int nb)
 		ft_redirect(&shell->cmd[nb], ">>", 1, 6);
 		ft_redirect(&shell->cmd[nb], ">", 1, 2);
 		ft_redirect(&shell->cmd[nb], "<", 0, 1);
+		ft_print_table(shell);
 		ft_clean_token(shell, shell->cmd[nb].token);
+		ft_print_table(shell);
 		if (ft_execute_builtin(shell, nb) == false)
 			ft_execve(shell, nb);
 		else
@@ -434,10 +393,6 @@ void	ft_exec_cmd(shell_t *shell, int nb)
 	}
 }
 
-// on crée un child pour executer toutes les commandes
-// a l'intérieur du child on relance un child pour chaque commande
-// on attend la fin de chaque child puis retourne le dernier status
-// on quitte le child du subshell et retourne le status
 int	ft_subshell(shell_t *shell, int nb)
 {
 	int		status;
@@ -451,7 +406,7 @@ int	ft_subshell(shell_t *shell, int nb)
 		nb = 0;
 		while (nb < shell->nb_cmd)
 			waitpid(shell->pid[nb++], &status, 0);
-		ft_exit(shell, "exit subshell", status);
+		ft_exit(shell, NULL, status);
 	}
 	else
 	{
@@ -460,10 +415,6 @@ int	ft_subshell(shell_t *shell, int nb)
 	return (status);
 }
 
-// on execute le builtin si possible
-// sinon on execute le programme dans un child
-// on attend la fin de l'execution du child
-// on retourne le status de la commande
 int	ft_execute_solo(shell_t *shell, int nb)
 {
 	int	status;
@@ -472,7 +423,9 @@ int	ft_execute_solo(shell_t *shell, int nb)
 	ft_redirect(&shell->cmd[nb], ">>", 1, 6);
 	ft_redirect(&shell->cmd[nb], ">", 1, 2);
 	ft_redirect(&shell->cmd[nb], "<", 0, 1);
+	ft_print_table(shell);
 	ft_clean_token(shell, shell->cmd[nb].token);
+	ft_print_table(shell);
 	if (ft_execute_builtin(shell, nb) == false)
 	{
 		shell->pid[nb] = fork();
@@ -484,19 +437,9 @@ int	ft_execute_solo(shell_t *shell, int nb)
 	return (status);
 }
 
-// on sauvegarde le FD de stdin et stdout
-// on lance le subshell si plusieurs commandes
-// sinon on execute la commande solo
-// on récupère le status de la derniere commande
-// on restore le FD de stdin et stdout
 void	ft_execute_cmd(shell_t *shell, int nb)
 {
-	int old_stdin;
-	int old_stdout;
 	int	status;
-
-	old_stdin = dup(STDIN_FILENO);
-	old_stdout = dup(STDOUT_FILENO);
 	if (shell->nb_cmd > 1) {
 		status = ft_subshell(shell, nb);
 	}
@@ -504,15 +447,18 @@ void	ft_execute_cmd(shell_t *shell, int nb)
 		status = ft_execute_solo(shell, nb);
 	}
 	error_status = status;
-	dup2(old_stdin, STDIN_FILENO);
-	dup2(old_stdout, STDOUT_FILENO);
+	dup2(shell->save_fd[0], STDIN_FILENO);
+	dup2(shell->save_fd[0], STDOUT_FILENO);
 }
 
-//sur CTRL + C on print un retour a la ligne
-//on se deplace sur une nouvelle ligne
-//on efface la ligne
-//on affiche le prompt
-//on set le error status a 130
+void	ft_heredoc_signal(int signal)
+{
+	if (signal == SIGINT)
+	{
+		exit(1);
+	}
+}
+
 void	ft_signal(int signal)
 {
 	if (signal == SIGINT)
@@ -525,9 +471,6 @@ void	ft_signal(int signal)
 	}
 }
 
-// on regarde si il y a un pipe au début ou fin du buffer
-// si il y a 2 pipe collé on coupe le buffer
-// si il y a seulement des espaces entre 2 pipes
 int	ft_pipe_check(char *buf)
 {
 	char	*tmp;
@@ -553,10 +496,6 @@ int	ft_pipe_check(char *buf)
 	return (0);
 }
 
-// on avance dans le buffer jusqu'a trouver un quote
-// on regarde avec strchr si il y a une autre quote identique plus loin
-// si non on retourne 1 et on affiche une erreur
-// si oui on avance dans le buffer jusqu'a la quote identique et continue
 int	ft_check_closed_quote(char *buf)
 {
 	char	*tmp;
@@ -576,9 +515,6 @@ int	ft_check_closed_quote(char *buf)
 	return (0);
 }
 
-// on skip les espaces et tabulations
-// si le premier caractere set <$> et le suivant est <?>
-// on imprime le status de la derniere commande
 int	ft_status(shell_t *shell)
 {
 	int	i;
@@ -617,9 +553,6 @@ int ft_empty_token(char *buf)
 	return (0);
 }
 
-// si la commande status est appelée
-// si il y a des quotes non fermées
-// si il y a des erreurs dans les pipes
 int	ft_buffer_integrity(shell_t *shell)
 {
 	if (ft_status(shell))
@@ -633,38 +566,38 @@ int	ft_buffer_integrity(shell_t *shell)
 	return (1);
 }
 
-// créé le child pour créé le heredoc
 void	ft_make_heredoc(shell_t *shell, char *limiter, char *heredoc)
 {
-	char	*str;
 	int		fd;
+	char	*str;
 	pid_t	pid;
 
 	pid = fork();
 	if (pid == 0)
 	{
+		signal(SIGINT, ft_heredoc_signal);
 		fd = ft_open_fd(heredoc, 2);
 		if (fd == -1)
 			ft_exit(shell, "Error: heredoc file not found", 1);
-		while (1)
+		write(1, "heredoc> ", 9);
+		str = ft_get_next_line(0);
+		while (str)
 		{
-			write(1, "<heredoc> ", 10);
-			str = ft_get_next_line(0);
 			if (ft_strncmp(str, limiter, ft_strlen(limiter)) == 0
 				&& str[ft_strlen(limiter) + 1] == '\0')
 				break ;
 			ft_putstr_fd(str, fd);
 			free(str);
+			write(1, "heredoc> ", 9);
+			str = ft_get_next_line(0);
 		}
 		free(str);
 		close(fd);
-		ft_exit(shell, NULL, 3);
 	}
-	waitpid(pid, NULL, 0);
-	printf("heredoc done\n");
+	else
+		waitpid(pid, NULL, 0);
 }
 
-// ajoute le heredoc dans l'environnement
 char	*ft_expand_heredoc(shell_t *shell, char *heredoc)
 {
 	char	*temps;
@@ -683,7 +616,6 @@ char	*ft_expand_heredoc(shell_t *shell, char *heredoc)
 	return (temps);
 }
 
-// cherche les heredoc et rem
 void	ft_parse_heredoc(shell_t *shell, char **token)
 {
 	int i;
@@ -711,20 +643,16 @@ void	ft_parse_heredoc(shell_t *shell, char **token)
 	}
 }
 
-//pour chaque commande on va compter le nombre de token
-//on va allouer la memoire pour le tableau de token
-//on va remplir le tableau de token avec strtok
 void	ft_parse_token(shell_t *shell)
 {
 	int c;
 	int t;
-	int count;
 
 	c = -1;
 	while (++c < shell->nb_cmd)
 	{
-		count = ft_token_count(shell->cmd[c].buffer, ' ');
-		shell->cmd[c].token = ft_calloc(sizeof(char *), count + 1);
+		shell->cmd[c].nb_token = ft_token_count(shell->cmd[c].buffer, ' ');
+		shell->cmd[c].token = ft_calloc(sizeof(char *), shell->cmd[c].nb_token + 1);
 		if (!shell->cmd[c].token)
 			ft_exit(shell, "Error: malloc failed\n", 15);
 		t = 0;
@@ -733,14 +661,11 @@ void	ft_parse_token(shell_t *shell)
 			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
 		shell->cmd[c].save = shell->cmd[c].token;
 		ft_print_table(shell);
-		//ft_parse_heredoc(shell, shell->cmd[c].token);
-		//ft_print_table(shell);
+		ft_parse_heredoc(shell, shell->cmd[c].token);
+		ft_print_table(shell);
 	}
 }
 
-// on check si le buffer est valide
-// on compte le nombre de commandes et calloc le tableau de cmd
-// on split le buffer en petit buffer pour chaque commande
 int 	ft_parse(shell_t *shell)
 {
 	int i;
@@ -760,20 +685,14 @@ int 	ft_parse(shell_t *shell)
 	return (1);
 }
 
-// on read sur le 0 avec Readline
-// si le buffer est NULL (ctrl + D) on quitte la boucle
-// si le buffer contient que des espaces on read sur le 0 a nouveau
-// on ajoute l'historique
-// on parse le buffer
-// si valide on execute la commande
-// on free le buffer
-// on read sur le 0 a nouveau
 int	ft_getprompt(shell_t *shell)
 {
 	shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	while (shell->buffer != NULL)
 	{
-		if (!ft_is_only(shell->buffer, ' '))
+		if (shell->buffer[0] == 4)
+			printf("\n");
+		else if (!ft_is_only(shell->buffer, ' '))
 		{
 			add_history(shell->buffer);
 			if (ft_parse(shell))
@@ -786,9 +705,6 @@ int	ft_getprompt(shell_t *shell)
 	return (0);
 }
 
-// Set le error status a 0
-// calloc de la structure principal
-// copie de la variable environ dans la structure
 shell_t	*ft_init_minishell(char **env)
 {
 	shell_t *shell;
@@ -803,10 +719,11 @@ shell_t	*ft_init_minishell(char **env)
 	if (shell->env == NULL){
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	}
+	shell->save_fd[0] = dup(STDIN_FILENO);
+	shell->save_fd[1] = dup(STDOUT_FILENO);
 	return (shell);
 }
 
-// minishell
 void	ft_minishell(char **env)
 {
 	shell_t *shell;
@@ -817,7 +734,6 @@ void	ft_minishell(char **env)
 	ft_exit(shell, "Goodbye\n", 0);
 }
 
-// Main function
 int	main(int ac, char **av, char **env)
 {
 	(void)ac;
