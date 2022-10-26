@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/14 09:17:02 by pirichar          #+#    #+#             */
-/*   Updated: 2022/07/05 11:41:52 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 16:16:11 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ char	*ft_get_next_line(int fd)
 	box = read_fd(fd, box);
 	if (!box)
 		return (NULL);
+	
 	ret = trim_ret(box);
 	box = trim_box_free(box);
 	return (ret);
@@ -37,22 +38,16 @@ char	*read_fd(int fd, char *box)
 	char	*tmp;
 	int		len;
 
-	tmp = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!tmp)
-		return (NULL);
+	tmp[BUFFER_SIZE + 1];
 	len = 1;
 	while (ft_strchr(box, '\n') == NULL && len != 0)
 	{
 		len = read(fd, tmp, BUFFER_SIZE);
 		if (len < 0)
-		{
-			free(tmp);
 			return (NULL);
-		}
 		tmp[len] = '\0';
 		box = ft_strjoin_and_free(box, tmp);
 	}
-	free (tmp);
 	return (box);
 }
 

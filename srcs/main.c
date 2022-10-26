@@ -60,6 +60,7 @@ void	ft_exit(shell_t *shell, char *msg, int status)
 	exit(status);
 }
 
+/*
 char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
 {
 	int		i;
@@ -79,7 +80,8 @@ char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
 		buffer[0] = '\0';
 	return (buffer);
 }
-
+*/
+/*
 void	ft_env(shell_t *shell, int flag)
 {
 	int	i;
@@ -189,7 +191,9 @@ void	ft_echo(char **arg)
 	if (flag == 0)
 		printf("\n");
 }
+*/
 
+/*
 char	*ft_expand(shell_t *shell, char *token, int flag)
 {
 	char	*temp[4];
@@ -265,7 +269,8 @@ void	ft_clean_token(shell_t *shell, char **token)
 		t++;
 	}
 }
-
+*/
+/*
 void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 {
 	int i;
@@ -339,7 +344,8 @@ void	ft_execve(shell_t *shell, int nb)
 	ft_free(cmd_path);
 	exit(127);
 }
-
+*/
+/*
 bool	ft_execute_builtin(shell_t *shell, int nb)
 {
 	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
@@ -450,6 +456,7 @@ void	ft_execute_cmd(shell_t *shell, int nb)
 	dup2(shell->save_fd[0], STDIN_FILENO);
 	dup2(shell->save_fd[0], STDOUT_FILENO);
 }
+*/
 
 void	ft_heredoc_signal(int signal)
 {
@@ -684,7 +691,7 @@ int 	ft_parse(shell_t *shell)
 	ft_parse_token(shell);
 	return (1);
 }
-
+/*
 int	ft_getprompt(shell_t *shell)
 {
 	shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
@@ -742,3 +749,4 @@ int	main(int ac, char **av, char **env)
 	ft_minishell(env);
 	return (0);
 }
+*/
