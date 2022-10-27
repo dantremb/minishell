@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/22 22:40:58 by root              #+#    #+#             */
-/*   Updated: 2022/10/18 23:04:40 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 23:06:27 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 # define DEC "0123456789"
 # define HEXU "0123456789ABCDEF"
 # define HEXL "0123456789abcdef"
-# define BUFFER_SIZE 1
 # define RED 1
 # define GREEN 2
 # define YELLOW 3

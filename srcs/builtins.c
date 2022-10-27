@@ -6,11 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 14:03:08 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 22:53:18 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+extern int error_status;
 
 void	ft_env(shell_t *shell, int flag)
 {

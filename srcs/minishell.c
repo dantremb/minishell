@@ -6,14 +6,40 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 11:32:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 23:18:15 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+int error_status;
 
-int	ft_getprompt(shell_t *shell)
+void	ft_print_table(shell_t *shell)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i < shell->nb_cmd)
+	{
+		j = 0;
+		ft_color(3);
+		dprintf(2, "------------ TOKEN -----------------\n\033[0;0m");
+		ft_color(3);
+		dprintf(2, "cmd %d = \t", i);
+		while (j < shell->cmd[i].nb_token)
+		{
+			ft_color(3);
+			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
+			j++;
+		}
+		dprintf(2, "\n");
+		i++;
+	}
+		dprintf(2, "------------------------------------\n\033[0;0m");
+}
+
+static int	ft_getprompt(shell_t *shell)
 {
 	shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	while (shell->buffer != NULL)
@@ -33,7 +59,7 @@ int	ft_getprompt(shell_t *shell)
 	return (0);
 }
 
-shell_t	*ft_init_minishell(char **env)
+static shell_t	*ft_init_minishell(char **env)
 {
 	shell_t *shell;
 
@@ -52,7 +78,7 @@ shell_t	*ft_init_minishell(char **env)
 	return (shell);
 }
 
-void	ft_minishell(char **env)
+static void	ft_minishell(char **env)
 {
 	shell_t *shell;
 

@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/10/26 01:19:58 by dantremb         ###   ########.fr        #
+#    Updated: 2022/10/26 22:57:13 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,15 @@ READHISTORY = libs/readline/libhistory.a
 
 # Sources files
 S = srcs/
-SRCS_FILES = main.c
+SRCS_FILES = 	buffer_validation.c \
+				builtins.c \
+				engine.c \
+				execute.c \
+				exit.c \
+				minishell.c \
+				parsing.c \
+				tokens.c \
+			
 SRCS = $(addprefix $S, $(SRCS_FILES))
 
 # Objects conversion
@@ -49,11 +57,9 @@ init:
 	@$(MAKE) -s -C $(LIBFT_PATH)
 	@printf "$CCreating $(NAME)\n$W"
 
-INCLUDE = ./includes/
-
 # Creating  executable
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(RLFLAGS) -I $(INCLUDE)
+	@$(CC) -o $@ $^ $(LIBFT) $(CFLAGS) $(RLFLAGS) $(READLINE) $(READHISTORY)
 
 # Cleaning
 REMOVE = rm -rf

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/14 09:17:02 by pirichar          #+#    #+#             */
-/*   Updated: 2022/10/26 16:16:11 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 23:12:35 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	*ft_get_next_line(int fd)
 	static char		*box;
 	char			*ret;
 
-	if (BUFFER_SIZE < 1 || fd < 0)
+	if (fd < 0)
 		return (0);
 	box = read_fd(fd, box);
 	if (!box)
@@ -38,11 +38,13 @@ char	*read_fd(int fd, char *box)
 	char	*tmp;
 	int		len;
 
-	tmp[BUFFER_SIZE + 1];
+	tmp = malloc(2);
+	if (!tmp)
+		return (NULL);
 	len = 1;
 	while (ft_strchr(box, '\n') == NULL && len != 0)
 	{
-		len = read(fd, tmp, BUFFER_SIZE);
+		len = read(fd, tmp, 1);
 		if (len < 0)
 			return (NULL);
 		tmp[len] = '\0';

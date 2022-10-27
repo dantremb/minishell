@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/26 00:10:58 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 23:15:40 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,42 +20,44 @@
 # include <readline/history.h>
 # include "../libs/libft/includes/libft.h"
 
-typedef struct		s_cmd
+typedef struct		cmd_s
 {
 	char	*buffer;
 	char	**token;
-	char	*args;
-	pid_t	pid;
-}					t_cmd;
+	int		nb_token;
+	char	**save;
+}					cmd_t;
 
-typedef struct		s_data
+typedef struct		shell_s
 {
 	char	**env;
 	char	*buffer;
-	int 	cmd_count;
+	int 	nb_cmd;
+	pid_t	*pid;
+	cmd_t	*cmd;
 	char	expand[2];
 	char	heredoc[2];
-	t_cmd	*cmd;
-	int		err;
-}					t_data;
+	int		save_fd[2];
+}					shell_t;
 
-void	ft_cd(char *buffer);
-void	ft_export(char *arg, int flag);
-void	ft_unset(char *buffer);
-void	ft_env(int flag);
+int		ft_buffer_integrity(shell_t *shell);
+int 	ft_parse(shell_t *shell);
+void	ft_execute_cmd(shell_t *shell, int nb);
+void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag);
+void	ft_clean_token(shell_t *shell, char **token);
+char	*ft_get_variable(shell_t *shell, char *buffer, int flag);
+void	ft_execve(shell_t *shell, int nb);
+
+void	ft_env(shell_t *shell, int flag);
+void	ft_unset(shell_t *shell, char *buffer);
+void	ft_export(shell_t *shell, char *arg, int flag);
+void	ft_cd(shell_t *shell, char *buffer);
 void	ft_echo(char **arg);
-void	ft_exit(char *str, int s);
-void	ft_free_table(void);
-void	ft_print_table(void);
-char	*ft_get_variable(char *buffer, int flag);
-char	*ft_get_path(int nb);
-int 	ft_parse_cmd(void);
-void	ft_execute_cmd(int nb);
-void	ft_clean_token(char **token);
-void	ft_init_environement(char **env, int ac, char **argv);
+
+void	ft_print_table(shell_t *shell);
+void	ft_clear_command(shell_t *shell);
+void	ft_exit(shell_t *shell, char *msg, int status);
+void	ft_heredoc_signal(int signal);
 void	ft_signal(int signal);
-int		ft_check_closed_quote(char *buf);
-int		ft_status(void);
-void	ft_update_error();
 
 #endif
