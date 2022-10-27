@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 23:18:15 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 00:05:40 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int error_status;
+int g_error_status;
 
 void	ft_print_table(shell_t *shell)
 {
@@ -63,16 +63,15 @@ static shell_t	*ft_init_minishell(char **env)
 {
 	shell_t *shell;
 
-	error_status = 0;
+	g_error_status = 0;
 	shell = ft_calloc(1, sizeof(shell_t));
 	if (!shell)
 		ft_exit(shell, "Error: malloc failed\n", 15);
 	shell->expand[0] = 'a';
 	shell->heredoc[0] = 'a';
 	shell->env = ft_remalloc(env, 0, 0);
-	if (shell->env == NULL){
+	if (shell->env == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
-	}
 	shell->save_fd[0] = dup(STDIN_FILENO);
 	shell->save_fd[1] = dup(STDOUT_FILENO);
 	return (shell);

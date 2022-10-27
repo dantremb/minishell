@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 14:04:32 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 00:06:42 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int error_status;
+extern int	g_error_status;
 
 bool	ft_execute_builtin(shell_t *shell, int nb)
 {
@@ -38,8 +38,8 @@ bool	ft_execute_builtin(shell_t *shell, int nb)
 void	ft_exec_cmd(shell_t *shell, int nb)
 {
 	int	fd[2];
-	
-	if(pipe(fd) == -1)
+
+	if (pipe(fd) == -1)
 		ft_exit(shell, "pipe error\n", 14);
 	shell->pid[nb] = fork();
 	if (shell->pid[nb] == 0)
@@ -49,12 +49,8 @@ void	ft_exec_cmd(shell_t *shell, int nb)
 			close(fd[0]);
 			dup2(fd[1], STDOUT_FILENO);
 		}
-		ft_redirect(&shell->cmd[nb], ">>", 1, 6);
-		ft_redirect(&shell->cmd[nb], ">", 1, 2);
-		ft_redirect(&shell->cmd[nb], "<", 0, 1);
-		ft_print_table(shell);
+		ft_find_redirect(&shell->cmd[nb]);
 		ft_clean_token(shell, shell->cmd[nb].token);
-		ft_print_table(shell);
 		if (ft_execute_builtin(shell, nb) == false)
 			ft_execve(shell, nb);
 		else
@@ -75,7 +71,7 @@ int	ft_subshell(shell_t *shell, int nb)
 	pid = fork();
 	if (pid == 0)
 	{
-		while (nb < shell->nb_cmd) 
+		while (nb < shell->nb_cmd)
 			ft_exec_cmd(shell, nb++);
 		nb = 0;
 		while (nb < shell->nb_cmd)
@@ -92,11 +88,9 @@ int	ft_subshell(shell_t *shell, int nb)
 int	ft_execute_solo(shell_t *shell, int nb)
 {
 	int	status;
-	
+
 	status = 0;
-	ft_redirect(&shell->cmd[nb], ">>", 1, 6);
-	ft_redirect(&shell->cmd[nb], ">", 1, 2);
-	ft_redirect(&shell->cmd[nb], "<", 0, 1);
+	ft_find_redirect(&shell->cmd[nb]);
 	ft_print_table(shell);
 	ft_clean_token(shell, shell->cmd[nb].token);
 	ft_print_table(shell);
@@ -114,13 +108,12 @@ int	ft_execute_solo(shell_t *shell, int nb)
 void	ft_execute_cmd(shell_t *shell, int nb)
 {
 	int	status;
-	if (shell->nb_cmd > 1) {
+
+	if (shell->nb_cmd > 1)
 		status = ft_subshell(shell, nb);
-	}
-	else {
+	else
 		status = ft_execute_solo(shell, nb);
-	}
-	error_status = status;
+	g_error_status = status;
 	dup2(shell->save_fd[0], STDIN_FILENO);
 	dup2(shell->save_fd[0], STDOUT_FILENO);
 }

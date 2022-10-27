@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   buffer_validation.c                                :+:      :+:    :+:   */
+/*   validation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 14:22:56 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 00:02:15 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int	error_status;
+extern int	g_error_status;
 
 static int	ft_pipe_check(char *buf)
 {
@@ -66,8 +66,8 @@ static int	ft_status(shell_t *shell)
 	while (shell->buffer[i] && (shell->buffer[i] == ' '))
 		i++;
 	if (shell->buffer[i] == '$' && shell->buffer[i + 1] == '?'){
-		printf("%d: command not found\n", error_status);
-		error_status = 0;
+		printf("%d: command not found\n", g_error_status);
+		g_error_status = 0;
 		return (1);
 	}
 	return (0);

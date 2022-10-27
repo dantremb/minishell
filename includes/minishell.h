@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 23:15:40 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 00:00:35 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ typedef struct		shell_s
 int		ft_buffer_integrity(shell_t *shell);
 int 	ft_parse(shell_t *shell);
 void	ft_execute_cmd(shell_t *shell, int nb);
-void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag);
+void	ft_find_redirect(cmd_t *cmd);
 void	ft_clean_token(shell_t *shell, char **token);
 char	*ft_get_variable(shell_t *shell, char *buffer, int flag);
 void	ft_execve(shell_t *shell, int nb);

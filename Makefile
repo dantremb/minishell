@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/10/26 22:57:13 by dantremb         ###   ########.fr        #
+#    Updated: 2022/10/26 23:40:11 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ READHISTORY = libs/readline/libhistory.a
 
 # Sources files
 S = srcs/
-SRCS_FILES = 	buffer_validation.c \
+SRCS_FILES = 	validation.c \
 				builtins.c \
 				engine.c \
 				execute.c \

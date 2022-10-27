@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 22:53:18 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 23:53:09 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int error_status;
+extern int	g_error_status;
 
 void	ft_env(shell_t *shell, int flag)
 {
@@ -28,7 +28,8 @@ void	ft_env(shell_t *shell, int flag)
 	{
 		while (shell->env[++i])
 		{
-			if (shell->env[i][0] != '<' && shell->env[i][1] != '-' && ft_strchr(shell->env[i], '='))
+			if (shell->env[i][0] != '<' && shell->env[i][1] != '-'
+				&& ft_strchr(shell->env[i], '='))
 				printf("%s\n", shell->env[i]);
 		}
 	}
@@ -80,7 +81,7 @@ void	ft_export(shell_t *shell, char *arg, int flag)
 void	ft_cd(shell_t *shell, char *buffer)
 {
 	char	*temp[2];
-	
+
 	if (buffer && chdir(buffer) == 0)
 	{
 		ft_unset(shell, "OLDPWD");
@@ -106,7 +107,6 @@ void	ft_echo(char **arg)
 
 	flag = 0;
 	i = 0;
-
 	if (arg[1] && !ft_is_only(&arg[1][1], 'n' && ++i) == 0)
 		flag = 1;
 	while (arg[i])

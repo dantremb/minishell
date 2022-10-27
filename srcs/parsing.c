@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 22:53:51 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 23:50:49 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int error_status;
+extern int g_error_status;
 
 void	ft_make_heredoc(shell_t *shell, char *limiter, char *heredoc)
 {

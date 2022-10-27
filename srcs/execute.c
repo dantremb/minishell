@@ -6,21 +6,20 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 14:06:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 00:08:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int error_status;
+extern int	g_error_status;
 
 void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 {
-	int i;
-	int fd;
+	int	i;
+	int	fd;
 
 	i = -1;
-
 	while (++i < cmd->nb_token)
 	{
 		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
@@ -45,6 +44,13 @@ void	ft_redirect(cmd_t *cmd, char *meta, int side, int flag)
 			}
 		}
 	}
+}
+
+void	ft_find_redirect(cmd_t *cmd)
+{
+	ft_redirect(cmd, ">>", 1, 6);
+	ft_redirect(cmd, ">", 1, 2);
+	ft_redirect(cmd, "<", 0, 1);
 }
 
 char	*ft_get_path(shell_t *shell, int nb)

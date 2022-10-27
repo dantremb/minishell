@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 11:59:23 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 23:04:36 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 00:03:48 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int error_status;
+extern int g_error_status;
 
 void	ft_clear_command(shell_t *shell)
 {
@@ -51,6 +51,6 @@ void	ft_signal(int signal)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
-		error_status = 130;
+		g_error_status = 130;
 	}
 }

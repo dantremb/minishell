@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:36:08 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 22:53:59 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/26 23:56:36 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int error_status;
+extern int	g_error_status;
 
 char	*ft_get_variable(shell_t *shell, char *buffer, int flag)
 {
