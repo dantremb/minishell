@@ -6,27 +6,30 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 11:59:23 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/27 00:03:48 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 21:42:58 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int g_error_status;
+extern int	g_error_status;
 
-void	ft_clear_command(shell_t *shell)
+void	ft_clear_command(t_shell *shell)
 {
 	int	i;
+
 	i = -1;
 	while (++i < shell->nb_cmd)
+	{
 		ft_free(shell->cmd[i].save);
+	}
 	shell->pid = ft_free(shell->pid);
 	shell->cmd = ft_free(shell->cmd);
 	shell->buffer = ft_free(shell->buffer);
 	shell->nb_cmd = 0;
 }
 
-void	ft_exit(shell_t *shell, char *msg, int status)
+void	ft_exit(t_shell *shell, char *msg, int status)
 {
 	ft_putstr_fd(msg, 2);
 	ft_clear_command(shell);
@@ -49,7 +52,7 @@ void	ft_signal(int signal)
 	{
 		write(2, "\n", 1);
 		rl_on_new_line();
-		rl_replace_line("", 0);
+		//rl_replace_line("", 0);
 		rl_redisplay();
 		g_error_status = 130;
 	}

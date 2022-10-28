@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/02 16:12:42 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/12 00:09:55 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 18:23:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 bool	ft_is_only(char *buffer, char c)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!buffer)

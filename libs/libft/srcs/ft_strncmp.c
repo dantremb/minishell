@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/28 22:15:16 by root              #+#    #+#             */
-/*   Updated: 2022/09/02 15:20:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 18:22:14 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	size_t	i;
+
 	i = 0;
 	if (!s1 || !s2)
 		return (-1);

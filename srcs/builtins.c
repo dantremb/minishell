@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/26 23:53:09 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 21:30:59 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 extern int	g_error_status;
 
-void	ft_env(shell_t *shell, int flag)
+void	ft_env(t_shell *shell, int flag)
 {
 	int	i;
 
@@ -35,7 +35,7 @@ void	ft_env(shell_t *shell, int flag)
 	}
 }
 
-void	ft_unset(shell_t *shell, char *buffer)
+void	ft_unset(t_shell *shell, char *buffer)
 {
 	int	i;
 
@@ -56,7 +56,7 @@ void	ft_unset(shell_t *shell, char *buffer)
 	}
 }
 
-void	ft_export(shell_t *shell, char *arg, int flag)
+void	ft_export(t_shell *shell, char *arg, int flag)
 {
 	char	*duplicate;
 
@@ -78,7 +78,7 @@ void	ft_export(shell_t *shell, char *arg, int flag)
 	}
 }
 
-void	ft_cd(shell_t *shell, char *buffer)
+void	ft_cd(t_shell *shell, char *buffer)
 {
 	char	*temp[2];
 
@@ -106,9 +106,13 @@ void	ft_echo(char **arg)
 	int	flag;
 
 	flag = 0;
-	i = 0;
-	if (arg[1] && !ft_is_only(&arg[1][1], 'n' && ++i) == 0)
-		flag = 1;
+	i = 1;
+	if (arg[1] && ft_strncmp(arg[1], "-n", 2) == 0)
+	{
+		if (ft_is_only(&arg[1][1], 'n'))
+			flag = 1;
+		i++;
+	}
 	while (arg[i])
 	{
 		if (ft_is_only(arg[i], ' '))

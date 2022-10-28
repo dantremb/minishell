@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/02 16:21:26 by dantremb          #+#    #+#             */
-/*   Updated: 2022/09/02 16:27:27 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/27 18:22:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@ static char	*ft_end_buffer(char *ret, char **save)
 char	*ft_strtok(char *buffer, char sep)
 {
 	static char	*save;
-	char *ret;
-	
+	char		*ret;
+
 	if (!save)
 		save = buffer;
 	ret = save;
 	while (save && *save == ' ')
-		save++; 
+		save++;
 	while (save && *save != sep)
 	{
 		if (*save == '\0')
