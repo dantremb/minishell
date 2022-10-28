@@ -6,15 +6,16 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/27 20:43:43 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/28 13:33:13 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <readline/readline.h>
-# include <readline/history.h>
+# include "readline.h"
+# include "history.h"
+# include "rlstdc.h"
 # include <sys/wait.h>
 # include <stdio.h>
 # include <signal.h>

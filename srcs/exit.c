@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 11:59:23 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/27 21:42:58 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/28 13:45:16 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	ft_signal(int signal)
 	{
 		write(2, "\n", 1);
 		rl_on_new_line();
-		//rl_replace_line("", 0);
+		rl_replace_line("", 0);
 		rl_redisplay();
 		g_error_status = 130;
 	}
