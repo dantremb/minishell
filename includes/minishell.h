@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/28 13:33:13 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 13:36:27 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,46 +21,24 @@
 # include <signal.h>
 # include "../libs/libft/includes/libft.h"
 
-typedef struct t_cmd
+typedef struct	s_cmd
 {
 	char	*buffer;
 	char	**token;
 	int		nb_token;
 	char	**save;
-	int		fd_in;
-	int		fd_out;
-}					t_cmd;
+}	t_cmd;
 
-typedef struct t_shell
+typedef struct	s_shell
 {
 	char	**env;
 	char	*buffer;
-	int		nb_cmd;
+	int 	nb_cmd;
 	pid_t	*pid;
 	t_cmd	*cmd;
 	char	expand[2];
 	char	heredoc[2];
-}					t_shell;
-
-int		ft_buffer_integrity(t_shell *shell);
-int		ft_parse(t_shell *shell);
-char	*ft_exp_heredoc(t_shell *shell, char *heredoc);
-void	ft_execute_cmd(t_shell *shell, int nb);
-void	ft_find_redirect(t_cmd *cmd);
-void	ft_clean_token(t_shell *shell, char **token);
-char	*ft_get_variable(t_shell *shell, char *buffer, int flag);
-void	ft_execve(t_shell *shell, int nb);
-
-void	ft_env(t_shell *shell, int flag);
-void	ft_unset(t_shell *shell, char *buffer);
-void	ft_export(t_shell *shell, char *arg, int flag);
-void	ft_cd(t_shell *shell, char *buffer);
-void	ft_echo(char **arg);
-
-void	ft_print_table(t_shell *shell);
-void	ft_clear_command(t_shell *shell);
-void	ft_exit(t_shell *shell, char *msg, int status);
-void	ft_heredoc_signal(int signal);
-void	ft_signal(int signal);
+	int		save_fd[2];
+}	t_shell;
 
 #endif
