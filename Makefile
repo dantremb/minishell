@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/10/31 13:31:24 by dantremb         ###   ########.fr        #
+#    Updated: 2022/10/28 13:40:47 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ NAME = minishell
 AR = ar
 CC = gcc
 ARFLAGS = rcs
-CFLAGS = -Wall -Wextra -Werror -g -I includes/
+CFLAGS = -Wall -Wextra -Werror -g
 RLFLAGS = -lreadline -lncurses
 
 # Includes
@@ -28,7 +28,14 @@ READHISTORY = libs/readline/libhistory.a
 
 # Sources files
 S = srcs/
-SRCS_FILES =	minishell.c \
+SRCS_FILES = 	validation.c \
+				builtins.c \
+				engine.c \
+				execute.c \
+				exit.c \
+				minishell.c \
+				parsing.c \
+				tokens.c \
 			
 SRCS = $(addprefix $S, $(SRCS_FILES))
 
