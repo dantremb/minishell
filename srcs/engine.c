@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/27 21:45:54 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 15:54:29 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,7 @@ void	ft_exec_cmd(t_shell *shell, int nb)
 			close(fd[0]);
 			dup2(fd[1], STDOUT_FILENO);
 		}
-		ft_find_redirect(&shell->cmd[nb]);
-		ft_clean_token(shell, shell->cmd[nb].token);
+		ft_find_redirect(shell, nb);
 		if (ft_execute_builtin(shell, nb) == false)
 			ft_execve(shell, nb);
 		else
@@ -90,20 +89,19 @@ int	ft_execute_solo(t_shell *shell, int nb)
 	int	status;
 
 	status = 0;
-	ft_find_redirect(&shell->cmd[nb]);
-	ft_clean_token(shell, shell->cmd[nb].token);
-	if (ft_execute_builtin(shell, nb) == false)
+	ft_find_redirect(shell, nb);
+	shell->pid[nb] = fork();
+	if (shell->pid[nb] == 0)
+		ft_execve(shell, nb);
+	else
 	{
-		shell->pid[nb] = fork();
-		if (shell->pid[nb] == 0)
-			ft_execve(shell, nb);
-		else
-			waitpid(shell->pid[nb], &status, 0);
+		waitpid(shell->pid[nb], &g_error_status, 0);
+		dprintf(2, "parent fd in = %d, out = %d\n", shell->cmd[0].fd_in ,shell->cmd[0].fd_out);
+		if (shell->cmd[0].fd_in > 2)
+			close(shell->cmd[0].fd_in);
+		if (shell->cmd[0].fd_out > 2)
+			close(shell->cmd[0].fd_out);
 	}
-	if (shell->cmd[0].fd_in > 0)
-		close(shell->cmd[0].fd_in);
-	if (shell->cmd[0].fd_out > 0)
-		close(shell->cmd[0].fd_out);
 	return (status);
 }
 

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 15:27:17 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 16:02:09 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ static t_shell	*ft_init_minishell(char **env)
 	shell->env = ft_remalloc(env, 0, 0);
 	if (shell->env == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
+	shell->save_stdin = dup(0);
+	shell->save_stdout = dup(1);
 	return (shell);
 }
 

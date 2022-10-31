@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/28 13:33:13 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 16:01:41 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ typedef struct t_shell
 	int		nb_cmd;
 	pid_t	*pid;
 	t_cmd	*cmd;
+	int		save_stdin;
+	int		save_stdout;
 	char	expand[2];
 	char	heredoc[2];
 }					t_shell;
@@ -46,7 +48,7 @@ int		ft_buffer_integrity(t_shell *shell);
 int		ft_parse(t_shell *shell);
 char	*ft_exp_heredoc(t_shell *shell, char *heredoc);
 void	ft_execute_cmd(t_shell *shell, int nb);
-void	ft_find_redirect(t_cmd *cmd);
+void	ft_find_redirect(t_shell *shell, int nb);
 void	ft_clean_token(t_shell *shell, char **token);
 char	*ft_get_variable(t_shell *shell, char *buffer, int flag);
 void	ft_execve(t_shell *shell, int nb);

@@ -6,42 +6,27 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/27 21:36:16 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 15:57:25 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-static void	ft_dup(t_cmd *cmd, int i, int flag, int side)
-{
-	if (side == 0)
-	{
-		if (cmd->fd_in > 0)
-			close(cmd->fd_in);
-		cmd->fd_in = ft_open_fd(cmd->token[i + 1], flag);
-		dup2(cmd->fd_in, side);
-	}
-	else
-	{
-		if (cmd->fd_out > 0)
-			close(cmd->fd_out);
-		cmd->fd_out = ft_open_fd(&cmd->token[i][0], flag);
-		dup2(cmd->fd_in, side);
-	}
-}
-
-static void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
+void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
 {
 	int	i;
+	int	fd;
 
 	i = -1;
+	dprintf(2, "redirect fd in = %d, out = %d\n", cmd->fd_in ,cmd->fd_out);
 	while (++i < cmd->nb_token)
 	{
 		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
 		{
 			if (cmd->token[i][ft_strlen(meta)] == '\0')
 			{
-				ft_dup(cmd, i, flag, side);
+				fd = ft_open_fd(cmd->token[i + 1], flag);
+				dup2(fd, side);
 				if (i == 0)
 					cmd->token = cmd->token + 2;
 				else
@@ -49,7 +34,8 @@ static void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
 			}
 			else
 			{
-				ft_dup(cmd, i, flag, side);
+				fd = ft_open_fd(&cmd->token[i][0], flag);
+				dup2(fd, side);
 				if (i == 0)
 					cmd->token = cmd->token + 1;
 				else
@@ -57,13 +43,18 @@ static void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
 			}
 		}
 	}
+	if (side == 0)
+		cmd->fd_in = fd;
+	else
+		cmd->fd_out = fd;
 }
 
-void	ft_find_redirect(t_cmd *cmd)
+void	ft_find_redirect(t_shell *shell, int nb)
 {
-	ft_redirect(cmd, ">>", 1, 6);
-	ft_redirect(cmd, ">", 1, 2);
-	ft_redirect(cmd, "<", 0, 1);
+	ft_redirect(&shell->cmd[nb], ">>", 1, 6);
+	ft_redirect(&shell->cmd[nb], ">", 1, 2);
+	ft_redirect(&shell->cmd[nb], "<", 0, 1);
+	ft_clean_token(shell, shell->cmd[nb].token);
 }
 
 static char	*ft_get_path(t_shell *shell, int nb)
