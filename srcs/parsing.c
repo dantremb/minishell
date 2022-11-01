@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 15:47:08 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 23:04:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,6 @@ void	ft_parse_token(t_shell *shell)
 			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
 		shell->cmd[c].save = shell->cmd[c].token;
 		ft_parse_heredoc(shell, shell->cmd[c].token);
-		shell->cmd[c].fd_in = -1;
-		shell->cmd[c].fd_out = -1;
 	}
 }
 

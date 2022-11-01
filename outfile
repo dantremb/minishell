@@ -5,7 +5,9 @@ libs
 minishell
 minishell.dSYM
 objs
+out
 outfile
+outfile2
 outfile222
 srcs
 [?2004h[1;33mMini[1;31mshell > [0;0m[?2004l

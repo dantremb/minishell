@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 16:01:41 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 23:18:00 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ typedef struct t_cmd
 	char	**token;
 	int		nb_token;
 	char	**save;
-	int		fd_in;
-	int		fd_out;
 }					t_cmd;
 
 typedef struct t_shell
@@ -38,8 +36,6 @@ typedef struct t_shell
 	int		nb_cmd;
 	pid_t	*pid;
 	t_cmd	*cmd;
-	int		save_stdin;
-	int		save_stdout;
 	char	expand[2];
 	char	heredoc[2];
 }					t_shell;

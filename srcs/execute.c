@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 15:57:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 23:01:37 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
 	int	fd;
 
 	i = -1;
-	dprintf(2, "redirect fd in = %d, out = %d\n", cmd->fd_in ,cmd->fd_out);
+	fd = -1;
 	while (++i < cmd->nb_token)
 	{
 		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
@@ -43,10 +43,6 @@ void	ft_redirect(t_cmd *cmd, char *meta, int side, int flag)
 			}
 		}
 	}
-	if (side == 0)
-		cmd->fd_in = fd;
-	else
-		cmd->fd_out = fd;
 }
 
 void	ft_find_redirect(t_shell *shell, int nb)
@@ -55,6 +51,7 @@ void	ft_find_redirect(t_shell *shell, int nb)
 	ft_redirect(&shell->cmd[nb], ">", 1, 2);
 	ft_redirect(&shell->cmd[nb], "<", 0, 1);
 	ft_clean_token(shell, shell->cmd[nb].token);
+
 }
 
 static char	*ft_get_path(t_shell *shell, int nb)

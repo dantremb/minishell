@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/10 18:35:49 by nadesjar          #+#    #+#             */
-/*   Updated: 2022/10/25 23:54:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/10/31 23:25:43 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ int	ft_open_fd(char *str, int i)
 	else if (i == 6)
 		fd = open(str, O_RDWR | O_APPEND | O_CREAT, 0777);
 	if (!fd)
-		return (-1);
+		{
+			ft_putstr_fd("minishell: open() error\n", 2);
+			return (-1);
+		}
 	return (fd);
 }
