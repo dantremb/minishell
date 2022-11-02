@@ -1,0 +1,9 @@
+Makefile
+README.md
+includes
+libs
+minishell
+minishell.dSYM
+objs
+outfile
+srcs
