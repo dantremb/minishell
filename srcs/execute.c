@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 22:42:06 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 23:02:18 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 			}
 			else
 			{
-				cmd->fd = ft_open_fd(&cmd->token[i][0], flag);
+				cmd->fd = ft_open_fd(&cmd->token[i][1], flag);
 				if (i == 0)
 					cmd->token = cmd->token + 1;
 				else
