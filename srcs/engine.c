@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 23:26:03 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 22:11:15 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ extern int	g_error_status;
 
 bool	ft_execute_builtin(t_shell *shell, int nb)
 {
+	int	i;
+
 	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(shell->cmd[nb].token);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
@@ -25,7 +27,11 @@ bool	ft_execute_builtin(t_shell *shell, int nb)
 	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
 		printf("%s\n", ft_get_variable(shell, "PWD", 0));
 	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
-		ft_export(shell, shell->cmd[nb].token[1], 1);
+	{
+		i = 0;
+		while (++i < shell->cmd[nb].nb_token)
+			ft_export(shell, shell->cmd[nb].token[i], 1);
+	}
 	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
 		ft_cd(shell, shell->cmd[nb].token[1]);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
@@ -90,11 +96,11 @@ int	ft_execute_solo(t_shell *shell, int nb)
 
 	status = 0;
 	ft_find_redirect(shell, nb);
-	shell->pid[nb] = fork();
-	if (shell->pid[nb] == 0)
-		ft_execve(shell, nb);
-	else
+	if (ft_execute_builtin(shell, nb) == false)
 	{
+		shell->pid[nb] = fork();
+		if (shell->pid[nb] == 0)
+			ft_execve(shell, nb);
 		waitpid(shell->pid[nb], &g_error_status, 0);
 	}
 	return (status);
@@ -104,14 +110,20 @@ void	ft_execute_cmd(t_shell *shell, int nb)
 {
 	char	*status;
 	char	*export_status;
+	int		save_stdout;
+	int		save_stdin;
 
+	save_stdout = dup(STDOUT_FILENO);
+	save_stdin = dup(STDIN_FILENO);
 	if (shell->nb_cmd > 1)
-		g_error_status = ft_subshell(shell, nb);
+		ft_subshell(shell, nb);
 	else
-		g_error_status = ft_execute_solo(shell, nb);
+		ft_execute_solo(shell, nb);
 	status = ft_itoa(g_error_status);
 	export_status = ft_strjoin("?=", status, 0);
 	ft_export(shell, export_status, 0);
 	free (export_status);
 	free (status);
+	dup2(save_stdout, STDOUT_FILENO);
+	dup2(save_stdin, STDIN_FILENO);
 }

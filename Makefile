@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/10/28 13:40:47 by dantremb         ###   ########.fr        #
+#    Updated: 2022/11/01 16:08:23 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -91,3 +91,8 @@ signature:
 	@echo "$G|$C	$(NAME) by Dantremb	$G|"
 	@echo "$G+---+---+---+---+---+---+---+---+"
 
+sum:
+	valgrind --leak-check=summary --trace-children=yes --track-fds=yes ./$(NAME)
+
+full:
+	valgrind --leak-check=full --trace-children=yes --track-fds=yes ./$(NAME)

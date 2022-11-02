@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 23:18:00 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 21:10:52 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct t_shell
 	t_cmd	*cmd;
 	char	expand[2];
 	char	heredoc[2];
+	int		fd_save[2];
 }					t_shell;
 
 int		ft_buffer_integrity(t_shell *shell);

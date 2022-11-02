@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 23:20:13 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 21:10:08 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ static int	ft_getprompt(t_shell *shell)
 				ft_execute_cmd(shell, 0);
 			ft_clear_command(shell);
 		}
-		shell->buffer = ft_free(shell->buffer);
+		else
+			shell->buffer = ft_free(shell->buffer);
 		shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 	}
 	return (0);

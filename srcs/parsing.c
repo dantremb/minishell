@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 23:04:51 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 21:10:16 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,40 +14,51 @@
 
 extern int	g_error_status;
 
-void	ft_heredoc_fork(char *limiter, char *heredoc)
+void	ft_make_heredoc(char *limiter, char *heredoc)
 {
 	int		fd;
 	char	*str;
-
-	signal(SIGINT, ft_heredoc_signal);
-	fd = ft_open_fd(heredoc, 2);
-	if (fd == -1)
-		exit(1);
-	write(1, "heredoc> ", 9);
-	str = ft_get_next_line(0);
-	while (str)
-	{
-		if (ft_strncmp(str, limiter, ft_strlen(limiter)) == 0
-			&& str[ft_strlen(limiter) + 1] == '\0')
-			break ;
-		ft_putstr_fd(str, fd);
-		free(str);
-		write(1, "heredoc> ", 9);
-		str = ft_get_next_line(0);
-	}
-	ft_free(str);
-	close(fd);
-}
-
-void	ft_make_heredoc(char *limiter, char *heredoc)
-{
 	pid_t	pid;
 
 	pid = fork();
 	if (pid == 0)
-		ft_heredoc_fork(limiter, heredoc);
+	{
+		signal(SIGINT, ft_heredoc_signal);
+		fd = ft_open_fd(heredoc, 2);
+		str = readline("heredoc > ");
+		while (str)
+		{
+			if (ft_strncmp(str, limiter, ft_strlen(limiter)) == 0)
+				break ;
+			ft_putstr_fd(str, fd);
+			ft_putstr_fd("\n", fd);
+			ft_free(str);
+			str = readline("heredoc > ");
+		}
+		ft_free(str);
+		close(fd);
+		exit(0);
+	}
 	else
 		waitpid(pid, &g_error_status, 0);
+}
+
+char	*ft_expand_heredoc(t_shell *shell, char *heredoc)
+{
+	char	*temps;
+	char	*expand;
+
+	expand = ft_strjoin("<", shell->heredoc, 0);
+	expand = ft_strjoin(expand, "=", 1);
+	temps = ft_strjoin(expand, heredoc, 0);
+	free(heredoc);
+	ft_export(shell, temps, 0);
+	free(temps);
+	expand[ft_strlen(expand) - 1] = '\0';
+	temps = ft_get_variable(shell, expand, 0);
+	free(expand);
+	shell->heredoc[0] = shell->heredoc[0] + 1;
+	return (temps);
 }
 
 void	ft_parse_heredoc(t_shell *shell, char **token)
@@ -62,14 +73,16 @@ void	ft_parse_heredoc(t_shell *shell, char **token)
 		{
 			if (token[i][2] == '\0')
 			{
-				str = ft_exp_heredoc(shell, ft_strjoin("<", shell->heredoc, 0));
+				str = ft_expand_heredoc(shell, ft_strjoin("<",
+							shell->heredoc, 0));
 				ft_make_heredoc(token[i + 1], str);
 				token[i][1] = '\0';
 				token[i + 1] = str + 1;
 			}
 			else
 			{
-				str = ft_exp_heredoc(shell, ft_strjoin("<", shell->heredoc, 0));
+				str = ft_expand_heredoc(shell, ft_strjoin("<",
+							shell->heredoc, 0));
 				ft_make_heredoc(&token[i][2], str);
 				token[i] = str;
 			}

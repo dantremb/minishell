@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/27 21:00:09 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 21:12:34 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ static int	ft_status(t_shell *shell)
 	if (shell->buffer[i] == '$' && shell->buffer[i + 1] == '?')
 	{
 		printf("Minishell: %d: command not found\n", g_error_status);
-		printf("quoiuquoiqouqoiqoiqoiq\n");
 		g_error_status = 127;
 		return (1);
 	}

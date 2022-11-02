@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 11:59:23 by dantremb          #+#    #+#             */
-/*   Updated: 2022/10/31 23:17:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 17:53:48 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	ft_clear_command(t_shell *shell)
 	shell->nb_cmd = 0;
 	i = 2;
 	while (++i < 100)
-		close(i);
+		close (i);
 }
 
 void	ft_exit(t_shell *shell, char *msg, int status)
