@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 22:47:30 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 23:41:12 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	ft_clean_token(t_shell *shell, char **token);
 char	*ft_get_variable(t_shell *shell, char *buffer, int flag);
 void	ft_execve(t_shell *shell, int nb);
 
+void	ft_parse_export(t_shell *shell, int nb);
 void	ft_env(t_shell *shell, int flag);
 void	ft_unset(t_shell *shell, char *buffer);
 void	ft_export(t_shell *shell, char *arg, int flag);

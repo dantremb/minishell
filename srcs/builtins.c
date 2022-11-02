@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 21:08:39 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 23:12:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,7 @@ void	ft_export(t_shell *shell, char *arg, int flag)
 {
 	char	*duplicate;
 
-	if (!arg)
-		ft_env(shell, 0);
-	else if (arg && ft_isalpha(arg[0]) == 0 && flag == 1)
+	if (arg && ft_isalpha(arg[0]) == 0 && flag == 1)
 		printf("-bash: export: `%s': not a valid identifier\n", arg);
 	else
 	{

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 22:56:46 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 23:42:05 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,18 @@
 
 int	g_error_status;
 
-void	ft_print_table(t_shell *shell)
+void	ft_parse_export(t_shell *shell, int nb)
 {
 	int	i;
-	int	j;
 
-	i = 0;
-	while (i < shell->nb_cmd)
+	if (shell->cmd[nb].nb_token == 1)
+		ft_env(shell, 0);
+	else
 	{
-		j = 0;
-		ft_color(3);
-		dprintf(2, "------------ TOKEN -----------------\n\033[0;0m");
-		ft_color(3);
-		dprintf(2, "cmd %d = \t", i);
-		while (j < shell->cmd[i].nb_token)
-		{
-			ft_color(3);
-			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
-			j++;
-		}
-		dprintf(2, "\n");
-		i++;
+		i = 0;
+		while (++i < shell->cmd[nb].nb_token)
+			ft_export(shell, shell->cmd[nb].token[i], 1);
 	}
-	dprintf(2, "------------------------------------\n\033[0;0m");
 }
 
 static int	ft_getprompt(t_shell *shell)

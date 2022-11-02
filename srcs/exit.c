@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 11:59:23 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 17:53:48 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 23:42:10 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,4 +59,29 @@ void	ft_signal(int signal)
 		rl_redisplay();
 		g_error_status = 130;
 	}
+}
+
+void	ft_print_table(t_shell *shell)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i < shell->nb_cmd)
+	{
+		j = 0;
+		ft_color(3);
+		dprintf(2, "------------ TOKEN -----------------\n\033[0;0m");
+		ft_color(3);
+		dprintf(2, "cmd %d = \t", i);
+		while (j < shell->cmd[i].nb_token)
+		{
+			ft_color(3);
+			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
+			j++;
+		}
+		dprintf(2, "\n");
+		i++;
+	}
+	dprintf(2, "------------------------------------\n\033[0;0m");
 }

@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:36:08 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 21:10:37 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 23:09:31 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ char	*ft_exp_heredoc(t_shell *shell, char *heredoc)
 	char	*temps;
 	char	*expand;
 
-	expand = ft_strjoin("<", shell->heredoc, 0);
+	expand = ft_strjoin("<<", shell->heredoc, 0);
 	expand = ft_strjoin(expand, "=", 1);
 	temps = ft_strjoin(expand, heredoc, 0);
 	free(heredoc);

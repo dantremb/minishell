@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 22:11:15 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/01 23:39:23 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@ extern int	g_error_status;
 
 bool	ft_execute_builtin(t_shell *shell, int nb)
 {
-	int	i;
-
 	if (ft_strncmp(shell->cmd[nb].token[0], "echo", 4) == 0)
 		ft_echo(shell->cmd[nb].token);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
@@ -27,11 +25,7 @@ bool	ft_execute_builtin(t_shell *shell, int nb)
 	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
 		printf("%s\n", ft_get_variable(shell, "PWD", 0));
 	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
-	{
-		i = 0;
-		while (++i < shell->cmd[nb].nb_token)
-			ft_export(shell, shell->cmd[nb].token[i], 1);
-	}
+		ft_parse_export(shell, nb);
 	else if (ft_strncmp(shell->cmd[nb].buffer, "cd", 2) == 0)
 		ft_cd(shell, shell->cmd[nb].token[1]);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
