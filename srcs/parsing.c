@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 01:18:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 22:27:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/02 00:56:44 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	ft_parse_heredoc(t_shell *shell, char **token)
 							shell->heredoc, 0));
 				ft_make_heredoc(token[i + 1], str);
 				token[i][1] = '\0';
-				token[i + 1] = str + 1;
+				token[i + 1] = str;
 			}
 			else
 			{

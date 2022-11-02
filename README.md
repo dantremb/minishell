@@ -33,9 +33,6 @@ echo test >>outfile
 echo test >> outfile
 echo test > outfile
 echo test >outfile
-cat sans argument -> ctrl-c doit fermer la fork seulement
-
-<<end cat | << end cat | <infile cat | < infile cat | echo test > outfile | echo test >outfile | echo test >> outfile | echo test >>outfile
 
 ## Defense ##
 
