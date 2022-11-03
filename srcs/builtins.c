@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/12 22:17:47 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/02 02:47:21 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/03 07:07:02 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,11 @@ void	ft_export(t_shell *shell, char *arg, int flag)
 	char	*duplicate;
 
 	if (arg && ft_isalpha(arg[0]) == 0 && flag == 1)
-		printf("-bash: export: `%s': not a valid identifier\n", arg);
+	{
+		ft_putstr_fd("minishell: export: `", 2);
+		ft_putstr_fd(arg, 2);
+		ft_putstr_fd("': not a valid identifier\n", 2);
+	}
 	else
 	{
 		if (ft_strchr(arg, '='))
@@ -80,6 +84,8 @@ void	ft_cd(t_shell *shell, char *buffer)
 {
 	char	*temp[2];
 
+	if (!buffer)
+		buffer = ft_get_variable(shell, "HOME", 0);
 	if (buffer && chdir(buffer) == 0)
 	{
 		ft_unset(shell, "OLDPWD");
@@ -95,7 +101,11 @@ void	ft_cd(t_shell *shell, char *buffer)
 		ft_free(temp[1]);
 	}
 	else
-		printf("cd: %s: No such file or directory\n", buffer);
+	{
+		ft_putstr_fd("cd: ", 2);
+		ft_putstr_fd(buffer, 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
+	}
 }
 
 void	ft_echo(char **arg)

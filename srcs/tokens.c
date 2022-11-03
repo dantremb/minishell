@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:36:08 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 23:09:31 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/03 05:57:33 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ char	*ft_expand(t_shell *shell, char *token, int flag)
 		if (!ft_isalnum(*temp[0]))
 			break ;
 	temp[2] = ft_substr(temp[2], 0, temp[0] - temp[2]);
-	temp[3] = ft_get_variable(shell, temp[2], 0);
+	temp[3] = ft_get_variable(shell, temp[2], 1);
 	temp[3] = ft_strjoin(temp[1], temp[3], 1);
 	ft_free (temp[2]);
 	temp[1] = ft_remove_char(ft_substr(temp[0], 0, ft_strlen(temp[0])), '\"');
@@ -80,7 +80,7 @@ char	*ft_expand_variable(t_shell *shell, char *token)
 	char	*expand;
 
 	if (token[0] == '$' && ft_strchr(&token[1], '$') == NULL)
-		token = ft_get_variable(shell, &token[1], 0);
+		token = ft_get_variable(shell, &token[1], 1);
 	else
 	{
 		if (token[0] == '\"')
@@ -93,7 +93,7 @@ char	*ft_expand_variable(t_shell *shell, char *token)
 		ft_export(shell, temps, 0);
 		ft_free(temps);
 		expand[ft_strlen(expand) - 1] = '\0';
-		token = ft_get_variable(shell, expand, 0);
+		token = ft_get_variable(shell, expand, 1);
 		ft_free(expand);
 		shell->expand[0] = shell->expand[0] + 1;
 	}

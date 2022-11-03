@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 23:41:49 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/03 06:57:15 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,9 @@ void	ft_execve(t_shell *shell, int nb)
 	cmd_path = ft_get_path(shell, nb);
 	if (cmd_path != NULL)
 		execve(cmd_path, shell->cmd[nb].token, shell->env);
-	dprintf(2, "%s: command not found\n", shell->cmd[nb].token[0]);
+	write(2, shell->cmd[nb].token[0], ft_strlen(shell->cmd[nb].token[0]));
+	write(2, ": command not found\n", 20);
 	ft_free(cmd_path);
+	ft_clear_fd();
 	exit(127);
 }
