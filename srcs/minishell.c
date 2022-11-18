@@ -6,77 +6,96 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/02 00:01:36 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/17 22:12:55 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-int	g_error_status;
+char	**g_env;
 
-void	ft_parse_export(t_shell *shell, int nb)
+void	ft_rl_reset(int signal)
+{
+	if (signal == SIGINT)
+	{
+		write(1, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
+}
+
+void	ft_signal_on(void)
+{
+	struct sigaction	signal;
+
+	ft_memset(&signal, 0, sizeof(signal));
+	signal.sa_handler = &ft_rl_reset;
+	sigaction(SIGINT, &signal, NULL);
+}
+
+void	ft_clear_command(t_shell *shell)
+{
+	ft_free(shell->pid);
+	ft_free(shell->cmd);
+	ft_free(shell->buffer);
+	ft_memset(shell, 0, sizeof(t_shell));
+	shell->expand[0] = 'a';
+	shell->heredoc[0] = 'a';
+}
+
+void	ft_exit(t_shell *shell, char *msg)
+{
+	ft_putstr_fd(msg, 2);
+	ft_clear_command(shell);
+	ft_free_array(g_env);
+	exit(1);
+}
+
+void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
+{
+	(void)ac;
+	(void)av;
+	g_env = NULL;
+	ft_memset(shell, 0, sizeof(t_shell));
+	shell->expand[0] = 'a';
+	shell->heredoc[0] = 'a';
+	g_env = ft_remalloc(env, 0, 0);
+	if (!g_env)
+		ft_exit(shell, "Error: malloc failed\n");
+}
+
+int	ft_parse(t_shell *shell)
 {
 	int	i;
 
-	if (shell->cmd[nb].nb_token == 1)
-		ft_env(shell, 0);
-	else
-	{
-		i = 0;
-		while (++i < shell->cmd[nb].nb_token)
-			ft_export(shell, shell->cmd[nb].token[i], 1);
-	}
-}
-
-static int	ft_getprompt(t_shell *shell)
-{
-	shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
-	while (shell->buffer != NULL)
-	{
-		if (!ft_is_only(shell->buffer, ' '))
-		{
-			add_history(shell->buffer);
-			if (ft_parse(shell))
-				ft_execute_cmd(shell, 0);
-			ft_clear_command(shell);
-		}
-		else
-			shell->buffer = ft_free(shell->buffer);
-		shell->buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
-	}
-	return (0);
-}
-
-static t_shell	*ft_init_minishell(char **env)
-{
-	t_shell	*shell;
-
-	g_error_status = 0;
-	shell = ft_calloc(1, sizeof(t_shell));
-	if (!shell)
+	i = 0;
+	if (ft_buffer_integrity(shell) == 0)
+		return (0);
+	/*shell->nb_cmd = ft_token_count(shell->buffer, '|');
+	shell->cmd = ft_calloc(sizeof(t_cmd), shell->nb_cmd);
+	shell->pid = ft_calloc(sizeof(pid_t), shell->nb_cmd);
+	if (shell->pid == NULL || shell->cmd == NULL)
 		ft_exit(shell, "Error: malloc failed\n", 15);
-	shell->expand[0] = 'a';
-	shell->heredoc[0] = 'a';
-	shell->env = ft_remalloc(env, 0, 0);
-	if (shell->env == NULL)
-		ft_exit(shell, "Error: malloc failed\n", 15);
-	return (shell);
-}
-
-static void	ft_minishell(char **env)
-{
-	t_shell	*shell;
-
-	shell = ft_init_minishell(env);
-	signal(SIGINT, ft_signal);
-	ft_getprompt(shell);
-	ft_exit(shell, "Goodbye\n", 0);
+	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
+	while (++i < shell->nb_cmd)
+		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
+	ft_parse_token(shell);*/
+	return (1);
 }
 
 int	main(int ac, char **av, char **env)
 {
-	(void)ac;
-	(void)av;
-	ft_minishell(env);
+	t_shell	shell;
+
+	ft_init_shell(&shell, env, ac, av);
+	while (1)
+	{
+		ft_signal_on();
+		shell.buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
+		if (ft_parse == 0)
+			continue ;
+		ft_clear_command(&shell);
+	}
 	return (0);
 }

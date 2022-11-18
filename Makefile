@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/11/02 00:37:15 by dantremb         ###   ########.fr        #
+#    Updated: 2022/11/17 21:54:42 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,14 +28,8 @@ READHISTORY = libs/readline/libhistory.a
 
 # Sources files
 S = srcs/
-SRCS_FILES = 	validation.c \
-				builtins.c \
-				engine.c \
-				execute.c \
-				exit.c \
-				minishell.c \
-				parsing.c \
-				tokens.c \
+SRCS_FILES =	minishell.c \
+				validation.c \
 			
 SRCS = $(addprefix $S, $(SRCS_FILES))
 

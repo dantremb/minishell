@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/01 21:12:34 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/17 22:11:06 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern int	g_error_status;
+char	**g_env;
 
 static int	ft_pipe_check(char *buf)
 {
@@ -72,8 +72,8 @@ static int	ft_status(t_shell *shell)
 		i++;
 	if (shell->buffer[i] == '$' && shell->buffer[i + 1] == '?')
 	{
-		printf("Minishell: %d: command not found\n", g_error_status);
-		g_error_status = 127;
+		printf("Minishell: %d: command not found\n", shell->error);
+		shell->error = 127;
 		return (1);
 	}
 	return (0);
@@ -105,6 +105,10 @@ static int	ft_empty_token(char *buf)
 
 int	ft_buffer_integrity(t_shell *shell)
 {
+	if (!shell->buffer)
+		ft_exit(shell, "Goodbye!\n");
+	if (ft_is_only(shell->buffer, ' '))
+		return (0);
 	if (ft_status(shell))
 		return (0);
 	if (ft_check_closed_quote(shell->buffer))
