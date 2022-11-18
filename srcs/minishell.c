@@ -6,7 +6,7 @@
 /*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/18 17:40:37 by root             ###   ########.fr       */
+/*   Updated: 2022/11/18 18:01:21 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ void	ft_print_table(t_shell *shell)
 	i = -1;
 	while (++i < shell->nb_cmd)
 	{
-		//printf("cmd no %d = %s\n", i, shell->cmd[i].buffer);
 		dprintf(2, "\033[1;33m------------ TOKEN -----------------\n\033[0;0m");
 		ft_color(3);
 		dprintf(2, "\033[1;34mcmd %d\033[0;0m = \t", i);
@@ -56,6 +55,11 @@ void	ft_signal_on(void)
 
 void	ft_clear_command(t_shell *shell)
 {
+	int	i;
+
+	i = -1;
+	while (++i < shell->nb_cmd)
+		ft_free(shell->cmd[i].token);
 	ft_free(shell->pid);
 	ft_free(shell->cmd);
 	ft_free(shell->buffer);
