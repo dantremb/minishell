@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
+#    By: root <root@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/11/17 21:54:42 by dantremb         ###   ########.fr        #
+#    Updated: 2022/11/18 16:11:27 by root             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -89,4 +89,4 @@ sum:
 	valgrind --leak-check=summary --trace-children=yes --track-fds=yes ./$(NAME)
 
 full:
-	valgrind --leak-check=full --trace-children=yes --track-fds=yes ./$(NAME)
+	valgrind --leak-check=full --show-leak-kinds=all --trace-children=yes --track-fds=yes ./$(NAME)

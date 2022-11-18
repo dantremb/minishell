@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/17 21:56:30 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/18 16:07:45 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef struct t_shell
 
 }					t_shell;
 
-int	ft_buffer_integrity(t_shell *shell);
+void	ft_exit(t_shell *shell, char *msg);
+int		ft_buffer_integrity(t_shell *shell);
 
 #endif
