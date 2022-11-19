@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/18 18:01:21 by root             ###   ########.fr       */
+/*   Updated: 2022/11/18 20:42:42 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,26 @@ void	ft_exit(t_shell *shell, char *msg)
 	exit(1);
 }
 
+char	*ft_get_variable(char *buffer, int flag)
+{
+	int		i;
+
+	i = -1;
+	if (!buffer)
+		return (NULL);
+	while (g_env[++i])
+	{
+		if (ft_strncmp(g_env[i], buffer, ft_strlen(buffer)) == 0)
+		{
+			if (g_env[i][ft_strlen(buffer)] == '=')
+				return (g_env[i] + (ft_strlen(buffer) + 1));
+		}
+	}
+	if (flag == 1)
+		buffer[0] = '\0';
+	return (buffer);
+}
+
 void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
 {
 	(void)ac;
@@ -87,50 +107,6 @@ void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
 	g_env = ft_remalloc(env, 0, 0);
 	if (!g_env)
 		ft_exit(shell, "Error: malloc failed\n");
-}
-
-void	ft_parse_token(t_shell *shell)
-{
-	int	c;
-	int	t;
-
-	c = -1;
-	while (++c < shell->nb_cmd)
-	{
-		shell->cmd[c].nb_token = ft_token_count(shell->cmd[c].buffer, ' ');
-		shell->cmd[c].token = ft_calloc(sizeof(char *),
-				shell->cmd[c].nb_token + 1);
-		if (!shell->cmd[c].token)
-			ft_exit(shell, "Error: malloc failed\n");
-		t = 0;
-		shell->cmd[c].token[t] = ft_strtok(shell->cmd[c].buffer, ' ');
-		while (shell->cmd[c].token[t++])
-			shell->cmd[c].token[t] = ft_strtok(NULL, ' ');
-		shell->cmd[c].save = shell->cmd[c].token;
-		shell->cmd[c].fd_in = -1;
-		shell->cmd[c].fd_out = -1;
-	}
-}
-
-int	ft_parse(t_shell *shell)
-{
-	int	i;
-
-	i = 0;
-	if (ft_buffer_integrity(shell) == 0)
-		return (0);
-	shell->nb_cmd = ft_token_count(shell->buffer, '|');
-	shell->cmd = ft_calloc(sizeof(t_cmd), shell->nb_cmd);
-	shell->pid = ft_calloc(sizeof(pid_t), shell->nb_cmd);
-	if (shell->pid == NULL || shell->cmd == NULL)
-		ft_exit(shell, "Error: malloc failed\n");
-	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
-	while (++i < shell->nb_cmd)
-	{
-		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
-	}
-	ft_parse_token(shell);
-	return (1);
 }
 
 int	main(int ac, char **av, char **env)

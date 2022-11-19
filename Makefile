@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: root <root@student.42.fr>                  +#+  +:+       +#+         #
+#    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/11/18 16:11:27 by root             ###   ########.fr        #
+#    Updated: 2022/11/18 21:14:00 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,8 @@ READHISTORY = libs/readline/libhistory.a
 S = srcs/
 SRCS_FILES =	minishell.c \
 				validation.c \
+				parsing.c \
+				builtins.c \
 			
 SRCS = $(addprefix $S, $(SRCS_FILES))
 
