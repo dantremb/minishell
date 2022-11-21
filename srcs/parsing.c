@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 20:21:33 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/18 21:15:04 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/21 16:01:14 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 	char	*str;
 	pid_t	pid;
 
+	ft_signal_off();
 	pid = fork();
 	if (pid == 0)
 	{
@@ -39,7 +40,11 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 		exit(0);
 	}
 	else
+	{
 		waitpid(pid, NULL, 0);
+		printf("child is dead\n");
+		ft_signal_on();
+	}
 }
 
 char	*ft_expand_heredoc(t_shell *shell, char *heredoc)
@@ -51,7 +56,7 @@ char	*ft_expand_heredoc(t_shell *shell, char *heredoc)
 	expand = ft_strjoin(expand, "=", 1);
 	temps = ft_strjoin(expand, heredoc, 0);
 	free(heredoc);
-	ft_export(shell, temps, 0);
+	ft_export(temps, 0);
 	free(temps);
 	expand[ft_strlen(expand) - 1] = '\0';
 	temps = ft_get_variable(expand, 0);
@@ -108,6 +113,7 @@ void	ft_parse_token(t_shell *shell)
 		shell->cmd[c].save = shell->cmd[c].token;
 		shell->cmd[c].fd_in = -1;
 		shell->cmd[c].fd_out = -1;
+		ft_parse_heredoc(shell, shell->cmd[c].token);
 	}
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/18 20:42:42 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/21 16:04:49 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,20 @@ void	ft_print_table(t_shell *shell)
 		dprintf(2, "\n");
 		dprintf(2, "\033[1;33m------------------------------------\n\033[0;0m");
 	}
+}
+void	ft_rl_newline(int signal)
+{
+	(void)signal;
+	rl_on_new_line();
+}
+
+void	ft_signal_off(void)
+{
+	struct sigaction	signal;
+
+	ft_memset(&signal, 0, sizeof(signal));
+	signal.sa_handler = &ft_rl_newline;
+	sigaction(SIGINT, &signal, NULL);
 }
 
 void	ft_rl_reset(int signal)
@@ -119,8 +133,8 @@ int	main(int ac, char **av, char **env)
 		ft_signal_on();
 		shell.buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 		if (ft_parse(&shell) == 1)
-			printf("BOOOM!\n");
-		ft_print_table(&shell);
+			printf("BOOM!!! buffer ==== [%s]\n", shell.buffer);
+		//ft_print_table(&shell);
 		ft_clear_command(&shell);
 	}
 	return (0);
