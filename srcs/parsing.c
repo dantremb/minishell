@@ -6,7 +6,7 @@
 /*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 20:21:33 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/21 16:01:14 by root             ###   ########.fr       */
+/*   Updated: 2022/11/21 16:12:10 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,33 +18,22 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 {
 	int		fd;
 	char	*str;
-	pid_t	pid;
 
 	ft_signal_off();
-	pid = fork();
-	if (pid == 0)
+	fd = ft_open_fd(heredoc, 2);
+	str = readline("heredoc > ");
+	while (str)
 	{
-		fd = ft_open_fd(heredoc, 2);
-		str = readline("heredoc > ");
-		while (str)
-		{
-			if (ft_strncmp(str, limiter, ft_strlen(limiter)) == 0)
-				break ;
-			ft_putstr_fd(str, fd);
-			ft_putstr_fd("\n", fd);
-			ft_free(str);
-			str = readline("heredoc > ");
-		}
+		if (ft_strncmp(str, limiter, ft_strlen(limiter)) == 0)
+			break ;
+		ft_putstr_fd(str, fd);
+		ft_putstr_fd("\n", fd);
 		ft_free(str);
-		close(fd);
-		exit(0);
+		str = readline("heredoc > ");
 	}
-	else
-	{
-		waitpid(pid, NULL, 0);
-		printf("child is dead\n");
-		ft_signal_on();
-	}
+	ft_free(str);
+	close(fd);
+	ft_signal_on();
 }
 
 char	*ft_expand_heredoc(t_shell *shell, char *heredoc)

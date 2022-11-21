@@ -6,7 +6,7 @@
 /*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/21 16:04:49 by root             ###   ########.fr       */
+/*   Updated: 2022/11/21 16:13:12 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,10 @@ void	ft_print_table(t_shell *shell)
 void	ft_rl_newline(int signal)
 {
 	(void)signal;
+	write(1, "\n", 1);
 	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 void	ft_signal_off(void)
@@ -45,6 +48,7 @@ void	ft_signal_off(void)
 	ft_memset(&signal, 0, sizeof(signal));
 	signal.sa_handler = &ft_rl_newline;
 	sigaction(SIGINT, &signal, NULL);
+	sigaction(SIGQUIT, &signal, NULL);
 }
 
 void	ft_rl_reset(int signal)
