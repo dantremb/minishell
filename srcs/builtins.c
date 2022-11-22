@@ -6,13 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 21:12:22 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/18 21:23:15 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 18:34:17 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern char **g_env;
+extern char	**g_env;
 
 void	ft_env(int flag)
 {

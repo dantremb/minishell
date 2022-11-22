@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 17:26:31 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:51:01 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,40 +33,6 @@ void	ft_print_table(t_shell *shell)
 	}
 }
 
-void	ft_rl_reset(int signal)
-{
-	(void)signal;
-	write(1, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void	ft_signal_on(void)
-{
-	struct sigaction	signal;
-
-	ft_memset(&signal, 0, sizeof(signal));
-	signal.sa_handler = &ft_rl_reset;
-	sigaction(SIGINT, &signal, NULL);
-}
-
-void	ft_interupt_signal(int signal)
-{
-	(void)signal;
-	rl_on_new_line();
-}
-
-void	ft_signal_off(void)
-{
-	struct sigaction	signal;
-
-	ft_memset(&signal, 0, sizeof(signal));
-	signal.sa_handler = &ft_interupt_signal;
-	sigaction(SIGINT, &signal, NULL);
-	sigaction(SIGQUIT, &signal, NULL);
-}
-
 void	ft_clear_command(t_shell *shell)
 {
 	int	i;
@@ -89,20 +55,6 @@ void	ft_exit(t_shell *shell, char *msg)
 	ft_clear_command(shell);
 	ft_free_array(g_env);
 	exit(1);
-}
-
-void	ft_parse_export(t_shell *shell, int nb)
-{
-	int	i;
-
-	if (shell->cmd[nb].nb_token == 1)
-		ft_env(0);
-	else
-	{
-		i = 0;
-		while (++i < shell->cmd[nb].nb_token)
-			ft_export(shell->cmd[nb].token[i], 1);
-	}
 }
 
 void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)

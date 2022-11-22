@@ -6,13 +6,27 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 17:21:45 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:50:27 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char	**g_env;
+
+void	ft_parse_export(t_shell *shell, int nb)
+{
+	int	i;
+
+	if (shell->cmd[nb].nb_token == 1)
+		ft_env(0);
+	else
+	{
+		i = 0;
+		while (++i < shell->cmd[nb].nb_token)
+			ft_export(shell->cmd[nb].token[i], 1);
+	}
+}
 
 void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 {

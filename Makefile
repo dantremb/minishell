@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/11/22 15:23:50 by dantremb         ###   ########.fr        #
+#    Updated: 2022/11/22 17:51:30 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,7 @@ SRCS_FILES =	minishell.c \
 				engine.c \
 				execute.c \
 				tokens.c \
+				signals.c \
 
 SRCS = $(addprefix $S, $(SRCS_FILES))
 

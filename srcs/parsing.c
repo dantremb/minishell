@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 20:21:33 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 17:06:06 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 18:35:00 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ void	ft_parse_heredoc(t_shell *shell, char **token)
 		}
 	}
 }
+
 void	ft_parse_token(t_shell *shell)
 {
 	int	c;
