@@ -3,16 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/21 16:13:12 by root             ###   ########.fr       */
+/*   Updated: 2022/11/22 11:07:10 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 char	**g_env;
+
+void	ft_parse_export(t_shell *shell, int nb)
+{
+	int	i;
+
+	if (shell->cmd[nb].nb_token == 1)
+		ft_env(0);
+	else
+	{
+		i = 0;
+		while (++i < shell->cmd[nb].nb_token)
+			ft_export(shell->cmd[nb].token[i], 1);
+	}
+}
 
 void	ft_print_table(t_shell *shell)
 {
@@ -78,10 +92,9 @@ void	ft_clear_command(t_shell *shell)
 	i = -1;
 	while (++i < shell->nb_cmd)
 		ft_free(shell->cmd[i].token);
-	ft_free(shell->pid);
-	ft_free(shell->cmd);
-	ft_free(shell->buffer);
-	ft_memset(shell, 0, sizeof(t_shell));
+	shell->cmd = ft_free(shell->cmd);
+	shell->pid = ft_free(shell->pid);
+	shell->buffer = ft_free(shell->buffer);
 	shell->expand[0] = 'a';
 	shell->heredoc[0] = 'a';
 }
@@ -92,26 +105,6 @@ void	ft_exit(t_shell *shell, char *msg)
 	ft_clear_command(shell);
 	ft_free_array(g_env);
 	exit(1);
-}
-
-char	*ft_get_variable(char *buffer, int flag)
-{
-	int		i;
-
-	i = -1;
-	if (!buffer)
-		return (NULL);
-	while (g_env[++i])
-	{
-		if (ft_strncmp(g_env[i], buffer, ft_strlen(buffer)) == 0)
-		{
-			if (g_env[i][ft_strlen(buffer)] == '=')
-				return (g_env[i] + (ft_strlen(buffer) + 1));
-		}
-	}
-	if (flag == 1)
-		buffer[0] = '\0';
-	return (buffer);
 }
 
 void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
@@ -137,8 +130,7 @@ int	main(int ac, char **av, char **env)
 		ft_signal_on();
 		shell.buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 		if (ft_parse(&shell) == 1)
-			printf("BOOM!!! buffer ==== [%s]\n", shell.buffer);
-		//ft_print_table(&shell);
+			ft_execute_cmd(&shell, 0);
 		ft_clear_command(&shell);
 	}
 	return (0);

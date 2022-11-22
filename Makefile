@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/11/18 21:14:00 by dantremb         ###   ########.fr        #
+#    Updated: 2022/11/22 10:39:50 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,10 @@ SRCS_FILES =	minishell.c \
 				validation.c \
 				parsing.c \
 				builtins.c \
-			
+				engine.c \
+				execute.c \
+				tokens.c \
+
 SRCS = $(addprefix $S, $(SRCS_FILES))
 
 # Objects conversion

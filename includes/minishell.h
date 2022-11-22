@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/21 15:49:10 by root             ###   ########.fr       */
+/*   Updated: 2022/11/22 10:53:36 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,5 +54,9 @@ void	ft_cd(char *buffer);
 void	ft_echo(char **arg);
 void	ft_signal_off(void);
 void	ft_signal_on(void);
+void	ft_execute_cmd(t_shell *shell, int nb);
+void	ft_parse_export(t_shell *shell, int nb);
+void	ft_execve(t_shell *shell, int nb);
+void	ft_clean_token(t_shell *shell, char **token);
 
 #endif
