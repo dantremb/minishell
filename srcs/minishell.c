@@ -6,27 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 11:07:10 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:26:31 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 char	**g_env;
-
-void	ft_parse_export(t_shell *shell, int nb)
-{
-	int	i;
-
-	if (shell->cmd[nb].nb_token == 1)
-		ft_env(0);
-	else
-	{
-		i = 0;
-		while (++i < shell->cmd[nb].nb_token)
-			ft_export(shell->cmd[nb].token[i], 1);
-	}
-}
 
 void	ft_print_table(t_shell *shell)
 {
@@ -46,34 +32,14 @@ void	ft_print_table(t_shell *shell)
 		dprintf(2, "\033[1;33m------------------------------------\n\033[0;0m");
 	}
 }
-void	ft_rl_newline(int signal)
+
+void	ft_rl_reset(int signal)
 {
 	(void)signal;
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-}
-
-void	ft_signal_off(void)
-{
-	struct sigaction	signal;
-
-	ft_memset(&signal, 0, sizeof(signal));
-	signal.sa_handler = &ft_rl_newline;
-	sigaction(SIGINT, &signal, NULL);
-	sigaction(SIGQUIT, &signal, NULL);
-}
-
-void	ft_rl_reset(int signal)
-{
-	if (signal == SIGINT)
-	{
-		write(1, "\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
 }
 
 void	ft_signal_on(void)
@@ -85,6 +51,22 @@ void	ft_signal_on(void)
 	sigaction(SIGINT, &signal, NULL);
 }
 
+void	ft_interupt_signal(int signal)
+{
+	(void)signal;
+	rl_on_new_line();
+}
+
+void	ft_signal_off(void)
+{
+	struct sigaction	signal;
+
+	ft_memset(&signal, 0, sizeof(signal));
+	signal.sa_handler = &ft_interupt_signal;
+	sigaction(SIGINT, &signal, NULL);
+	sigaction(SIGQUIT, &signal, NULL);
+}
+
 void	ft_clear_command(t_shell *shell)
 {
 	int	i;
@@ -92,11 +74,13 @@ void	ft_clear_command(t_shell *shell)
 	i = -1;
 	while (++i < shell->nb_cmd)
 		ft_free(shell->cmd[i].token);
-	shell->cmd = ft_free(shell->cmd);
-	shell->pid = ft_free(shell->pid);
-	shell->buffer = ft_free(shell->buffer);
+	ft_free(shell->pid);
+	ft_free(shell->cmd);
+	ft_free(shell->buffer);
+	ft_memset(shell, 0, sizeof(t_shell));
 	shell->expand[0] = 'a';
 	shell->heredoc[0] = 'a';
+	ft_clear_fd();
 }
 
 void	ft_exit(t_shell *shell, char *msg)
@@ -105,6 +89,20 @@ void	ft_exit(t_shell *shell, char *msg)
 	ft_clear_command(shell);
 	ft_free_array(g_env);
 	exit(1);
+}
+
+void	ft_parse_export(t_shell *shell, int nb)
+{
+	int	i;
+
+	if (shell->cmd[nb].nb_token == 1)
+		ft_env(0);
+	else
+	{
+		i = 0;
+		while (++i < shell->cmd[nb].nb_token)
+			ft_export(shell->cmd[nb].token[i], 1);
+	}
 }
 
 void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
@@ -130,7 +128,10 @@ int	main(int ac, char **av, char **env)
 		ft_signal_on();
 		shell.buffer = readline("\033[1;33mMini\033[1;31mshell > \033[0;0m");
 		if (ft_parse(&shell) == 1)
+		{
+			ft_signal_off();
 			ft_execute_cmd(&shell, 0);
+		}
 		ft_clear_command(&shell);
 	}
 	return (0);

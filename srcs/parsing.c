@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 20:21:33 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/21 16:12:10 by root             ###   ########.fr       */
+/*   Updated: 2022/11/22 17:06:06 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 	int		fd;
 	char	*str;
 
-	ft_signal_off();
 	fd = ft_open_fd(heredoc, 2);
 	str = readline("heredoc > ");
 	while (str)
@@ -33,7 +32,6 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 	}
 	ft_free(str);
 	close(fd);
-	ft_signal_on();
 }
 
 char	*ft_expand_heredoc(t_shell *shell, char *heredoc)

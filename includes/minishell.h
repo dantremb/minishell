@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 10:53:36 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 15:26:13 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct t_cmd
 	int		nb_token;
 	int		fd_in;
 	int		fd_out;
+	int		fd;
 }					t_cmd;
 
 typedef struct t_shell
@@ -58,5 +59,6 @@ void	ft_execute_cmd(t_shell *shell, int nb);
 void	ft_parse_export(t_shell *shell, int nb);
 void	ft_execve(t_shell *shell, int nb);
 void	ft_clean_token(t_shell *shell, char **token);
+void	ft_find_redirect(t_shell *shell, int nb);
 
 #endif

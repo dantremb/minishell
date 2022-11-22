@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 10:42:24 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:23:12 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,7 @@ void	ft_exec_cmd(t_shell *shell, int nb)
 			close(fd[0]);
 			dup2(fd[1], STDOUT_FILENO);
 		}
-		//ft_find_redirect(shell, nb);
-		ft_clean_token(shell, shell->cmd[nb].token);
+		ft_find_redirect(shell, nb);
 		if (ft_execute_builtin(shell, nb) == false)
 			ft_execve(shell, nb);
 		else
@@ -90,8 +89,7 @@ int	ft_execute_solo(t_shell *shell, int nb)
 	int	status;
 
 	status = 0;
-	//ft_find_redirect(shell, nb);
-	ft_clean_token(shell, shell->cmd[nb].token);
+	ft_find_redirect(shell, nb);
 	if (ft_execute_builtin(shell, nb) == false)
 	{
 		shell->pid[nb] = fork();
@@ -106,7 +104,11 @@ void	ft_execute_cmd(t_shell *shell, int nb)
 {
 	char	*status;
 	char	*export_status;
+	int		save_stdout;
+	int		save_stdin;
 
+	save_stdout = dup(STDOUT_FILENO);
+	save_stdin = dup(STDIN_FILENO);
 	if (shell->nb_cmd > 1)
 		ft_subshell(shell, nb);
 	else
@@ -116,4 +118,6 @@ void	ft_execute_cmd(t_shell *shell, int nb)
 	ft_export(export_status, 0);
 	free (export_status);
 	free (status);
+	dup2(save_stdout, STDOUT_FILENO);
+	dup2(save_stdin, STDIN_FILENO);
 }

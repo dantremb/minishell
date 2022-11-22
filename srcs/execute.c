@@ -6,13 +6,60 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 10:42:10 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 17:21:45 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char	**g_env;
+
+void	ft_redirect(t_cmd *cmd, char *meta, int flag)
+{
+	int	i;
+
+	i = -1;
+	while (++i < cmd->nb_token)
+	{
+		if (ft_strncmp(cmd->token[i], meta, ft_strlen(meta)) == 0)
+		{
+			if (cmd->token[i][ft_strlen(meta)] == '\0')
+			{
+				cmd->fd = ft_open_fd(cmd->token[i + 1], flag);
+				if (i == 0)
+					cmd->token = cmd->token + 2;
+				else
+					cmd->token[i] = NULL;
+			}
+			else
+			{
+				cmd->fd = ft_open_fd(&cmd->token[i][0], flag);
+				if (i == 0)
+					cmd->token = cmd->token + 1;
+				else
+					cmd->token[i] = NULL;
+			}
+		}
+	}
+}
+
+void	ft_find_redirect(t_shell *shell, int nb)
+{
+	ft_redirect(&shell->cmd[nb], ">>", 6);
+	ft_redirect(&shell->cmd[nb], ">", 2);
+	if (shell->cmd[nb].fd > 2)
+	{
+		dup2(shell->cmd[nb].fd, 1);
+		shell->cmd[nb].fd = -1;
+	}
+	ft_redirect(&shell->cmd[nb], "<", 1);
+	if (shell->cmd[nb].fd > 2)
+	{
+		dup2(shell->cmd[nb].fd, 0);
+		shell->cmd[nb].fd = -1;
+	}
+	ft_clean_token(shell, shell->cmd[nb].token);
+}
 
 static char	*ft_get_path(t_shell *shell, int nb)
 {
