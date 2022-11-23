@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 20:21:33 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 18:41:03 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 19:32:17 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,9 +117,7 @@ int	ft_parse(t_shell *shell)
 		ft_exit(shell, "Error: malloc failed\n");
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
 	while (++i < shell->nb_cmd)
-	{
 		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');
-	}
 	ft_parse_token(shell);
 	return (1);
 }

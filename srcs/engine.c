@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 17:23:12 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 19:32:57 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,7 @@ int	ft_subshell(t_shell *shell, int nb)
 		ft_exit(shell, NULL);
 	}
 	else
-	{
 		waitpid(pid, &status, 0);
-	}
 	return (status);
 }
 

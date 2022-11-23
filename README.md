@@ -67,3 +67,4 @@ echo test >outfile
 
 - executez des commandes avec des redirections < << > >> (heredoc n'est pas obliger de mettre a jour l'historique)
 - cat | cat | ls doit fonctionner
+

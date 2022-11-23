@@ -6,32 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 17:51:01 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/22 19:33:26 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 char	**g_env;
-
-void	ft_print_table(t_shell *shell)
-{
-	int	i;
-	int	j;
-
-	i = -1;
-	while (++i < shell->nb_cmd)
-	{
-		dprintf(2, "\033[1;33m------------ TOKEN -----------------\n\033[0;0m");
-		ft_color(3);
-		dprintf(2, "\033[1;34mcmd %d\033[0;0m = \t", i);
-		j = -1;
-		while (++j < shell->cmd[i].nb_token)
-			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
-		dprintf(2, "\n");
-		dprintf(2, "\033[1;33m------------------------------------\n\033[0;0m");
-	}
-}
 
 void	ft_clear_command(t_shell *shell)
 {
