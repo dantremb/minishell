@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 19:33:26 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 10:41:16 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	ft_clear_command(t_shell *shell)
 
 	i = -1;
 	while (++i < shell->nb_cmd)
-		ft_free(shell->cmd[i].token);
+		ft_free(shell->cmd[i].save);
 	ft_free(shell->pid);
 	ft_free(shell->cmd);
 	ft_free(shell->buffer);
