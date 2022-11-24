@@ -6,13 +6,34 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 23:04:01 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 23:19:36 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char	**g_env;
+
+int	ft_open(t_cmd *cmd, char *str, int i)
+{
+	static int	fd;
+
+	while (str && str[0] == '>')
+		str++;
+	if (i == 1)
+		fd = open(str, O_RDONLY, 0644);
+	else if (i == 2)
+		fd = open(str, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else if (i == 3)
+		fd = open(str, O_RDWR | O_APPEND | O_CREAT, 0644);
+	if (fd < 0)
+	{
+		ft_putstr_fd("minishell: open() error\n", 2);
+		cmd->open_error = 1;
+		return (-1);
+	}
+	return (fd);
+}
 
 void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 {
@@ -25,7 +46,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 		{
 			if (cmd->token[i][ft_strlen(meta)] == '\0')
 			{
-				cmd->fd = ft_open_fd(cmd->token[i + 1], flag);
+				cmd->fd = ft_open(cmd, cmd->token[i + 1], flag);
 				if (i == 0)
 					cmd->token = cmd->token + 2;
 				else
@@ -33,7 +54,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 			}
 			else
 			{
-				cmd->fd = ft_open_fd(&cmd->token[i][0], flag);
+				cmd->fd = ft_open(cmd, &cmd->token[i][0], flag);
 				if (i == 0)
 					cmd->token = cmd->token + 1;
 				else
@@ -45,7 +66,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 
 void	ft_find_redirect(t_shell *shell, int nb)
 {
-	ft_redirect(&shell->cmd[nb], ">>", 6);
+	ft_redirect(&shell->cmd[nb], ">>", 3);
 	ft_redirect(&shell->cmd[nb], ">", 2);
 	if (shell->cmd[nb].fd > 2)
 	{
