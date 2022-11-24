@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/22 22:40:58 by root              #+#    #+#             */
-/*   Updated: 2022/11/03 06:53:32 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 14:09:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void			ft_put_nbr(int nbr, int *p);
 void			ft_put_ptr(unsigned long int nbr, int *p);
 void			ft_put_hex(unsigned long int nbr, unsigned int base,
 					char *hex, int *p);
-void			ft_free_array(char **array);
+void			**ft_free_array(char **array);
 int				ft_split_size(char *src, char sep);
 int				ft_array_size(char **array);
 void			ft_color(int color);

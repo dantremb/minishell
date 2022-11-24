@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 17:50:27 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 22:04:39 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,20 @@
 
 extern char	**g_env;
 
-void	ft_parse_export(t_shell *shell, int nb)
+void	ft_clear_command(t_shell *shell)
 {
 	int	i;
 
-	if (shell->cmd[nb].nb_token == 1)
-		ft_env(0);
-	else
-	{
-		i = 0;
-		while (++i < shell->cmd[nb].nb_token)
-			ft_export(shell->cmd[nb].token[i], 1);
-	}
+	i = -1;
+	while (++i < shell->nb_cmd)
+		ft_free(shell->cmd[i].save);
+	shell->cmd = ft_free(shell->cmd);
+	shell->pid = ft_free(shell->pid);
+	shell->buffer = ft_free(shell->buffer);
+	shell->nb_cmd = 0;
+	shell->expand[0] = 'a';
+	shell->heredoc[0] = 'a';
+	ft_clear_fd();
 }
 
 void	ft_redirect(t_cmd *cmd, char *meta, int flag)
@@ -75,7 +77,7 @@ void	ft_find_redirect(t_shell *shell, int nb)
 	ft_clean_token(shell, shell->cmd[nb].token);
 }
 
-static char	*ft_get_path(t_shell *shell, int nb)
+char	*ft_get_path(t_shell *shell, int nb)
 {
 	char	*program;
 	char	*env_path;
@@ -109,11 +111,7 @@ void	ft_execve(t_shell *shell, int nb)
 	char	*cmd_path;
 
 	cmd_path = ft_get_path(shell, nb);
-	if (cmd_path != NULL)
+	if (cmd_path)
 		execve(cmd_path, shell->cmd[nb].token, g_env);
-	write(2, shell->cmd[nb].token[0], ft_strlen(shell->cmd[nb].token[0]));
-	write(2, ": command not found\n", 20);
-	ft_free(cmd_path);
-	ft_clear_fd();
-	exit(127);
+	ft_exit(shell, "command not found");
 }

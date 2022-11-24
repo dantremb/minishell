@@ -6,42 +6,49 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 17:51:07 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 19:32:06 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 21:02:04 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-void	ft_rl_reset(int signal)
+void	ft_interactive(int signal)
 {
-	(void)signal;
-	write(1, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	if (signal == SIGINT)
+	{
+		write(1, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
+	if (signal == SIGQUIT)
+		rl_redisplay();
 }
 
 void	ft_signal_on(void)
 {
-	struct sigaction	signal;
-
-	ft_memset(&signal, 0, sizeof(signal));
-	signal.sa_handler = &ft_rl_reset;
-	sigaction(SIGINT, &signal, NULL);
+	signal(SIGINT, ft_interactive);
+	signal(SIGQUIT, ft_interactive);
 }
 
-void	ft_interupt_signal(int signal)
+void	ft_interupt(int signal)
 {
-	(void)signal;
-	rl_on_new_line();
+	if (signal == SIGINT)
+	{
+		kill(0, 0);
+		ft_putchar_fd('\n', STDOUT_FILENO);
+		rl_on_new_line();
+	}
+	if (signal == SIGQUIT)
+	{
+		kill(0, 0);
+		ft_putchar_fd('\n', STDOUT_FILENO);
+		rl_on_new_line();
+	}
 }
 
 void	ft_signal_off(void)
 {
-	struct sigaction	signal;
-
-	ft_memset(&signal, 0, sizeof(signal));
-	signal.sa_handler = &ft_interupt_signal;
-	sigaction(SIGINT, &signal, NULL);
-	sigaction(SIGQUIT, &signal, NULL);
+	signal(SIGINT, ft_interupt);
+	signal(SIGQUIT, ft_interupt);
 }

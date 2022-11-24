@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 19:32:57 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 22:12:23 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ bool	ft_execute_builtin(t_shell *shell, int nb)
 	else if (ft_strncmp(shell->cmd[nb].token[0], "env", 3) == 0)
 		ft_env(1);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "unset\0", 6) == 0)
-		ft_unset(shell->cmd[nb].token[1]);
+		ft_parse_unset(shell, nb);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "pwd\0", 4) == 0)
 		printf("%s\n", ft_get_variable("PWD", 0));
 	else if (ft_strncmp(shell->cmd[nb].token[0], "export", 6) == 0)
@@ -37,7 +37,7 @@ bool	ft_execute_builtin(t_shell *shell, int nb)
 
 void	ft_exec_cmd(t_shell *shell, int nb)
 {
-	int	fd[2];
+	int		fd[2];
 
 	if (pipe(fd) == -1)
 		ft_exit(shell, "pipe error\n");
@@ -82,7 +82,7 @@ int	ft_subshell(t_shell *shell, int nb)
 	return (status);
 }
 
-int	ft_execute_solo(t_shell *shell, int nb)
+void	ft_execute_solo(t_shell *shell, int nb)
 {
 	int	status;
 
@@ -93,9 +93,10 @@ int	ft_execute_solo(t_shell *shell, int nb)
 		shell->pid[nb] = fork();
 		if (shell->pid[nb] == 0)
 			ft_execve(shell, nb);
+		dprintf(2, "parent waiting for child\n");
 		waitpid(shell->pid[nb], &shell->error, 0);
+		dprintf(2, "child done\n");
 	}
-	return (status);
 }
 
 void	ft_execute_cmd(t_shell *shell, int nb)
