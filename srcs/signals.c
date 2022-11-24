@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 17:51:07 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 21:02:04 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 23:04:14 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,20 @@ void	ft_signal_off(void)
 {
 	signal(SIGINT, ft_interupt);
 	signal(SIGQUIT, ft_interupt);
+}
+
+void	ft_clear_command(t_shell *shell)
+{
+	int	i;
+
+	i = -1;
+	while (++i < shell->nb_cmd)
+		ft_free(shell->cmd[i].save);
+	shell->cmd = ft_free(shell->cmd);
+	shell->pid = ft_free(shell->pid);
+	shell->buffer = ft_free(shell->buffer);
+	shell->nb_cmd = 0;
+	shell->expand[0] = 'a';
+	shell->heredoc[0] = 'a';
+	ft_clear_fd();
 }

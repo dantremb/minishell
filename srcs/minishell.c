@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 22:21:45 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 22:24:14 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ int	main(int ac, char **av, char **env)
 		if (ft_parse(&shell) == 1)
 		{
 			ft_signal_off();
-			add_history(shell.buffer);
 			ft_execute_cmd(&shell, 0);
 		}
 		ft_clear_command(&shell);

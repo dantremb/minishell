@@ -6,29 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 22:04:39 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 23:04:01 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char	**g_env;
-
-void	ft_clear_command(t_shell *shell)
-{
-	int	i;
-
-	i = -1;
-	while (++i < shell->nb_cmd)
-		ft_free(shell->cmd[i].save);
-	shell->cmd = ft_free(shell->cmd);
-	shell->pid = ft_free(shell->pid);
-	shell->buffer = ft_free(shell->buffer);
-	shell->nb_cmd = 0;
-	shell->expand[0] = 'a';
-	shell->heredoc[0] = 'a';
-	ft_clear_fd();
-}
 
 void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 {

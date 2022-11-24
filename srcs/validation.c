@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 19:33:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/11/23 22:24:50 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ int	ft_buffer_integrity(t_shell *shell)
 		ft_exit(shell, "Goodbye!\n");
 	if (ft_is_only(shell->buffer, ' '))
 		return (0);
+	add_history(shell->buffer);
 	if (ft_status(shell))
 		return (0);
 	if (ft_check_closed_quote(shell->buffer))
