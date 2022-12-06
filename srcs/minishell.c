@@ -6,13 +6,38 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 22:24:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 16:00:07 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 char	**g_env;
+
+void	ft_print_table(t_shell *shell)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i < shell->nb_cmd)
+	{
+		j = 0;
+		ft_color(3);
+		dprintf(2, "------------ TOKEN -----------------\n\033[0;0m");
+		ft_color(3);
+		dprintf(2, "cmd %d = \t", i);
+		while (j < shell->cmd[i].nb_token)
+		{
+			ft_color(3);
+			dprintf(2, "[\033[1;34m%s\033[1;33m]", shell->cmd[i].token[j]);
+			j++;
+		}
+		dprintf(2, "\n");
+		i++;
+	}
+	dprintf(2, "------------------------------------\n\033[0;0m");
+}
 
 void	ft_parse_export(t_shell *shell, int nb)
 {
@@ -24,7 +49,7 @@ void	ft_parse_export(t_shell *shell, int nb)
 	{
 		i = 0;
 		while (++i < shell->cmd[nb].nb_token)
-			ft_export(shell->cmd[nb].token[i], 1);
+			ft_export(shell, shell->cmd[nb].token[i], 1);
 	}
 }
 
@@ -37,13 +62,13 @@ void	ft_parse_unset(t_shell *shell, int nb)
 		ft_unset(shell->cmd[nb].token[i]);
 }
 
-void	ft_exit(t_shell *shell, char *msg)
+void	ft_exit(t_shell *shell, char *msg, int errno)
 {
 	ft_putstr_fd(msg, 2);
 	ft_clear_command(shell);
 	g_env = (char **)ft_free_array(g_env);
 	rl_clear_history();
-	exit(1);
+	exit(errno);
 }
 
 void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
@@ -55,7 +80,7 @@ void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
 	shell->heredoc[0] = 'a';
 	g_env = ft_remalloc(env, 0, 0);
 	if (!g_env)
-		ft_exit(shell, "Error: malloc failed\n");
+		ft_exit(shell, "Error: malloc failed\n", 1);
 }
 
 int	main(int ac, char **av, char **env)

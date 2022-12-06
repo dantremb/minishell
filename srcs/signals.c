@@ -6,11 +6,13 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 17:51:07 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 23:04:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 16:16:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+extern char	**g_env;
 
 void	ft_interactive(int signal)
 {

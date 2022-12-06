@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:36:08 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/22 15:27:14 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 15:57:45 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	*ft_exp_heredoc(t_shell *shell, char *heredoc)
 	expand = ft_strjoin(expand, "=", 1);
 	temps = ft_strjoin(expand, heredoc, 0);
 	free(heredoc);
-	ft_export(temps, 0);
+	ft_export(shell, temps, 0);
 	free(temps);
 	expand[ft_strlen(expand) - 1] = '\0';
 	temps = ft_get_variable(expand, 0);
@@ -92,7 +92,7 @@ char	*ft_expand_variable(t_shell *shell, char *token)
 		expand = ft_strjoin(&shell->expand[0], "-expand=", 0);
 		temps = ft_strjoin(expand, token, 0);
 		ft_free(token);
-		ft_export(temps, 0);
+		ft_export(shell, temps, 0);
 		ft_free(temps);
 		expand[ft_strlen(expand) - 1] = '\0';
 		token = ft_get_variable(expand, 1);

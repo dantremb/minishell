@@ -6,13 +6,25 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 22:24:50 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 15:57:30 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char	**g_env;
+
+void	ft_export_error(t_shell *shell)
+{
+	char	*status;
+	char	*export_status;
+
+	status = ft_itoa(shell->error);
+	export_status = ft_strjoin("?=", status, 0);
+	ft_export(shell, export_status, 0);
+	free (export_status);
+	free (status);
+}
 
 static int	ft_pipe_check(char *buf)
 {
@@ -63,22 +75,6 @@ static int	ft_check_closed_quote(char *buf)
 	return (0);
 }
 
-static int	ft_status(t_shell *shell)
-{
-	int	i;
-
-	i = 0;
-	while (shell->buffer[i] && (shell->buffer[i] == ' '))
-		i++;
-	if (shell->buffer[i] == '$' && shell->buffer[i + 1] == '?')
-	{
-		printf("Minishell: %d: command not found\n", shell->error);
-		shell->error = 127;
-		return (1);
-	}
-	return (0);
-}
-
 static int	ft_empty_token(char *buf)
 {
 	char	*tmp;
@@ -106,17 +102,17 @@ static int	ft_empty_token(char *buf)
 int	ft_buffer_integrity(t_shell *shell)
 {
 	if (!shell->buffer)
-		ft_exit(shell, "Goodbye!\n");
+		ft_exit(shell, "Goodbye!\n", 0);
 	if (ft_is_only(shell->buffer, ' '))
+	{
+		shell->error = 1;
 		return (0);
+	}
 	add_history(shell->buffer);
-	if (ft_status(shell))
+	if (ft_check_closed_quote(shell->buffer) || ft_pipe_check(shell->buffer) || ft_empty_token(shell->buffer))
+	{
+		shell->error = 127;
 		return (0);
-	if (ft_check_closed_quote(shell->buffer))
-		return (0);
-	if (ft_pipe_check(shell->buffer))
-		return (0);
-	if (ft_empty_token(shell->buffer))
-		return (0);
+	}
 	return (1);
 }

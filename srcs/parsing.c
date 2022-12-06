@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 20:21:33 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 23:20:12 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 15:57:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	*ft_expand_heredoc(t_shell *shell, char *heredoc)
 	expand = ft_strjoin(expand, "=", 1);
 	temps = ft_strjoin(expand, heredoc, 0);
 	free(heredoc);
-	ft_export(temps, 0);
+	ft_export(shell, temps, 0);
 	free(temps);
 	expand[ft_strlen(expand) - 1] = '\0';
 	temps = ft_get_variable(expand, 0);
@@ -93,7 +93,7 @@ void	ft_parse_token(t_shell *shell)
 		shell->cmd[c].token = ft_calloc(sizeof(char *),
 				shell->cmd[c].nb_token + 1);
 		if (!shell->cmd[c].token)
-			ft_exit(shell, "Error: malloc failed\n");
+			ft_exit(shell, "Error: malloc failed\n", 1);
 		t = 0;
 		shell->cmd[c].token[t] = ft_strtok(shell->cmd[c].buffer, ' ');
 		while (shell->cmd[c].token[t++])
@@ -106,16 +106,19 @@ void	ft_parse_token(t_shell *shell)
 
 int	ft_parse(t_shell *shell)
 {
-	int	i;
+	int		i;
 
 	i = 0;
 	if (ft_buffer_integrity(shell) == 0)
+	{
+		ft_export_error(shell);
 		return (0);
+	}
 	shell->nb_cmd = ft_token_count(shell->buffer, '|');
 	shell->cmd = ft_calloc(sizeof(t_cmd), shell->nb_cmd);
 	shell->pid = ft_calloc(sizeof(pid_t), shell->nb_cmd);
 	if (shell->pid == NULL || shell->cmd == NULL)
-		ft_exit(shell, "Error: malloc failed\n");
+		ft_exit(shell, "Error: malloc failed\n", 1);
 	shell->cmd[0].buffer = ft_trim_token(ft_strtok(shell->buffer, '|'), ' ');
 	while (++i < shell->nb_cmd)
 		shell->cmd[i].buffer = ft_trim_token(ft_strtok(NULL, '|'), ' ');

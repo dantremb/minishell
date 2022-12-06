@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 23:14:05 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 15:59:49 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,15 @@ void	ft_clear_command(t_shell *shell);
 
 void	ft_env(int flag);
 void	ft_unset(char *buffer);
-void	ft_export(char *arg, int flag);
-void	ft_cd(char *buffer);
+void	ft_export(t_shell *shell, char *arg, int flag);
+void	ft_cd(t_shell *shell, char *buffer);
 void	ft_echo(char **arg);
 
 void	ft_signal_off(void);
 void	ft_signal_on(void);
 
-void	ft_exit(t_shell *shell, char *msg);
+void	ft_exit(t_shell *shell, char *msg, int errno);
+void	ft_export_error(t_shell *shell);
+void	ft_print_table(t_shell *shell);
 
 #endif

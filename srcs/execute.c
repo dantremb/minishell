@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 23:19:36 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 15:35:06 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,5 +118,8 @@ void	ft_execve(t_shell *shell, int nb)
 	cmd_path = ft_get_path(shell, nb);
 	if (cmd_path)
 		execve(cmd_path, shell->cmd[nb].token, g_env);
-	ft_exit(shell, "command not found");
+	write(2, "minishell: ", 11);
+	write(2, shell->cmd[nb].token[0], ft_strlen(shell->cmd[nb].token[0]));
+	write(2, ": command not found\n", 20);
+	ft_exit(shell, NULL, 1);
 }

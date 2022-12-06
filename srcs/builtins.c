@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 21:12:22 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 22:10:38 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 15:58:35 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	ft_unset(char *buffer)
 	}
 }
 
-void	ft_export(char *arg, int flag)
+void	ft_export(t_shell *shell, char *arg, int flag)
 {
 	char	*duplicate;
 
@@ -65,6 +65,7 @@ void	ft_export(char *arg, int flag)
 		ft_putstr_fd("minishell: export: `", 2);
 		ft_putstr_fd(arg, 2);
 		ft_putstr_fd("': not a valid identifier\n", 2);
+		shell->error = 1;
 	}
 	else
 	{
@@ -80,7 +81,7 @@ void	ft_export(char *arg, int flag)
 	}
 }
 
-void	ft_cd(char *buffer)
+void	ft_cd(t_shell *shell, char *buffer)
 {
 	char	*temp[2];
 
@@ -91,12 +92,12 @@ void	ft_cd(char *buffer)
 		ft_unset("OLDPWD");
 		temp[0] = ft_get_variable("PWD", 0);
 		temp[1] = ft_strjoin("OLDPWD=", temp[0], 0);
-		ft_export(temp[1], 0);
+		ft_export(shell, temp[1], 0);
 		ft_free(temp[1]);
 		ft_unset("PWD");
 		temp[0] = getcwd(NULL, 0);
 		temp[1] = ft_strjoin("PWD=", temp[0], 0);
-		ft_export(temp[1], 0);
+		ft_export(shell, temp[1], 0);
 		ft_free(temp[0]);
 		ft_free(temp[1]);
 	}
