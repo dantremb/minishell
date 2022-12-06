@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/11/23 20:53:22 by dantremb         ###   ########.fr        #
+#    Updated: 2022/12/06 10:48:29 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,7 +59,7 @@ init:
 
 # Creating  executable
 $(NAME): $(OBJS)
-	@$(CC) -o $@ $^ $(CFLAGS) $(RLFLAGS) $(READLINE) $(READHISTORY) $(LIBFT) 
+	@$(CC) -o $@ $^ $(CFLAGS) $(RLFLAGS) $(READLINE) $(READHISTORY) $(LIBFT)
 
 # Cleaning
 REMOVE = rm -rf
