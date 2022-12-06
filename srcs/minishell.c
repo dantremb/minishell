@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/06 16:00:07 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 16:22:56 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
 	g_env = ft_remalloc(env, 0, 0);
 	if (!g_env)
 		ft_exit(shell, "Error: malloc failed\n", 1);
+	ft_export_error(shell);
 }
 
 int	main(int ac, char **av, char **env)
