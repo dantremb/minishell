@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 12:31:58 by root             ###   ########.fr       */
+/*   Updated: 2022/12/07 13:41:50 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 extern char	**g_env;
 
-static void	ft_clean_redirect(int *nb, char ***token, int *i,  int size)
+static void	ft_clean_redirect(int *nb, char ***token, int *i, int size)
 {
 	*nb = *nb - size;
 	*token = *token + size;
@@ -68,10 +68,8 @@ int	ft_find_redirect(t_shell *shell, int nb)
 	ft_clean_token(shell, shell->cmd[nb].token);
 	if (shell->cmd[nb].open_error == 1)
 	{
-		//dprintf(2, "return 1 after redirection cuz err = %d\n", shell->cmd[nb].open_error);
 		return (1);
 	}
-		//dprintf(2, "return 0 after redirection cuz err = %d\n", shell->cmd[nb].open_error);
 	return (0);
 }
 
