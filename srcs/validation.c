@@ -3,16 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   validation.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/06 16:24:50 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/07 12:12:28 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char	**g_env;
+
+int	ft_open(t_cmd *cmd, char *str, int i)
+{
+	int	fd;
+
+	while (str && (str[0] == '>' || str[0] == '<'))
+		str++;
+	if (i == 1)
+		fd = open(str, O_RDONLY, 0644);
+	else if (i == 2)
+		fd = open(str, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else if (i == 3)
+		fd = open(str, O_RDWR | O_APPEND | O_CREAT, 0644);
+	if (fd < 0)
+	{
+		ft_putstr_fd("minishell: open() error\n", 2);
+		cmd->open_error = 1;
+	}
+	return (fd);
+}
 
 void	ft_export_error(t_shell *shell)
 {
@@ -47,28 +67,6 @@ static int	ft_pipe_check(char *buf)
 		{
 			ft_putstr_fd("minishell: syntax error\n", 2);
 			return (1);
-		}
-		tmp++;
-	}
-	return (0);
-}
-
-static int	ft_check_closed_quote(char *buf)
-{
-	char	*tmp;
-
-	tmp = buf;
-	while (*tmp)
-	{
-		if (*tmp == '\'' || *tmp == '\"')
-		{
-			if (ft_strchr(tmp + 1, *tmp) == NULL)
-			{
-				printf("Error Quote not closed\n");
-				return (1);
-			}
-			else
-				tmp = ft_strchr(tmp + 1, *tmp);
 		}
 		tmp++;
 	}

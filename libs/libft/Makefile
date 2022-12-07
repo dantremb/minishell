@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
+#    By: root <root@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/11/03 06:53:11 by dantremb         ###   ########.fr        #
+#    Updated: 2022/12/07 11:13:53 by root             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,6 +34,7 @@ SRCS_FILES = ft_isascii.c ft_strlcpy.c ft_toupper.c ft_memchr.c ft_memmove.c \
 		ft_free_array.c ft_split_size.c ft_array_size.c ft_color.c \
 		ft_is_only.c ft_strtok.c ft_remove_char.c ft_trim_token.c \
 		ft_token_count.c ft_open_fd.c ft_remalloc.c ft_free.c ft_clear_fd.c \
+		ft_check_closed_quote.c \
 
 SRCS = $(addprefix $S, $(SRCS_FILES))
 

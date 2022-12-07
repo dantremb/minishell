@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 17:51:07 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/06 16:16:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/07 11:21:57 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 extern char	**g_env;
 
-void	ft_interactive(int signal)
+static void	ft_interactive(int signal)
 {
 	if (signal == SIGINT)
 	{
@@ -33,7 +33,7 @@ void	ft_signal_on(void)
 	signal(SIGQUIT, ft_interactive);
 }
 
-void	ft_interupt(int signal)
+static void	ft_interupt(int signal)
 {
 	if (signal == SIGINT)
 	{
@@ -53,20 +53,4 @@ void	ft_signal_off(void)
 {
 	signal(SIGINT, ft_interupt);
 	signal(SIGQUIT, ft_interupt);
-}
-
-void	ft_clear_command(t_shell *shell)
-{
-	int	i;
-
-	i = -1;
-	while (++i < shell->nb_cmd)
-		ft_free(shell->cmd[i].save);
-	shell->cmd = ft_free(shell->cmd);
-	shell->pid = ft_free(shell->pid);
-	shell->buffer = ft_free(shell->buffer);
-	shell->nb_cmd = 0;
-	shell->expand[0] = 'a';
-	shell->heredoc[0] = 'a';
-	ft_clear_fd();
 }

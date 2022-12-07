@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/06 15:59:49 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/07 11:53:17 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,13 @@ typedef struct t_shell
 int		ft_parse(t_shell *shell);
 int		ft_buffer_integrity(t_shell *shell);
 char	*ft_get_variable(char *buffer, int flag);
-void	ft_find_redirect(t_shell *shell, int nb);
+int		ft_find_redirect(t_shell *shell, int nb);
 void	ft_clean_token(t_shell *shell, char **token);
 void	ft_execute_cmd(t_shell *shell, int nb);
 void	ft_parse_export(t_shell *shell, int nb);
 void	ft_parse_unset(t_shell *shell, int nb);
 void	ft_execve(t_shell *shell, int nb);
+int		ft_open(t_cmd *cmd, char *str, int i);
 void	ft_clear_command(t_shell *shell);
 
 void	ft_env(int flag);

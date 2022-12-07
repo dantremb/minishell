@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/22 22:40:58 by root              #+#    #+#             */
-/*   Updated: 2022/11/23 14:09:51 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/07 11:13:32 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,5 +107,6 @@ int				ft_open_fd(char *str, int i);
 char			**ft_remalloc(char **tab, int size, int f);
 void			*ft_free(void *ptr);
 void			ft_clear_fd(void);
+int				ft_check_closed_quote(char *buf);
 
 #endif

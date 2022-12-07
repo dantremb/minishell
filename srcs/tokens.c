@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokens.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:36:08 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/06 15:57:45 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/07 11:59:44 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,45 +14,7 @@
 
 extern char	**g_env;
 
-char	*ft_get_variable(char *buffer, int flag)
-{
-	int		i;
-
-	i = -1;
-	if (!buffer)
-		return (NULL);
-	while (g_env[++i])
-	{
-		if (ft_strncmp(g_env[i], buffer, ft_strlen(buffer)) == 0)
-		{
-			if (g_env[i][ft_strlen(buffer)] == '=')
-				return (g_env[i] + (ft_strlen(buffer) + 1));
-		}
-	}
-	if (flag == 1)
-		buffer[0] = '\0';
-	return (buffer);
-}
-
-char	*ft_exp_heredoc(t_shell *shell, char *heredoc)
-{
-	char	*temps;
-	char	*expand;
-
-	expand = ft_strjoin("<<", shell->heredoc, 0);
-	expand = ft_strjoin(expand, "=", 1);
-	temps = ft_strjoin(expand, heredoc, 0);
-	free(heredoc);
-	ft_export(shell, temps, 0);
-	free(temps);
-	expand[ft_strlen(expand) - 1] = '\0';
-	temps = ft_get_variable(expand, 0);
-	free(expand);
-	shell->heredoc[0] = shell->heredoc[0] + 1;
-	return (temps);
-}
-
-char	*ft_expand(t_shell *shell, char *token, int flag)
+static char	*ft_expand(t_shell *shell, char *token, int flag)
 {
 	char	*temp[4];
 
@@ -127,4 +89,42 @@ void	ft_clean_token(t_shell *shell, char **token)
 		}
 		t++;
 	}
+}
+
+char	*ft_get_variable(char *buffer, int flag)
+{
+	int		i;
+
+	i = -1;
+	if (!buffer)
+		return (NULL);
+	while (g_env[++i])
+	{
+		if (ft_strncmp(g_env[i], buffer, ft_strlen(buffer)) == 0)
+		{
+			if (g_env[i][ft_strlen(buffer)] == '=')
+				return (g_env[i] + (ft_strlen(buffer) + 1));
+		}
+	}
+	if (flag == 1)
+		buffer[0] = '\0';
+	return (buffer);
+}
+
+char	*ft_exp_heredoc(t_shell *shell, char *heredoc)
+{
+	char	*temps;
+	char	*expand;
+
+	expand = ft_strjoin("<<", shell->heredoc, 0);
+	expand = ft_strjoin(expand, "=", 1);
+	temps = ft_strjoin(expand, heredoc, 0);
+	free(heredoc);
+	ft_export(shell, temps, 0);
+	free(temps);
+	expand[ft_strlen(expand) - 1] = '\0';
+	temps = ft_get_variable(expand, 0);
+	free(expand);
+	shell->heredoc[0] = shell->heredoc[0] + 1;
+	return (temps);
 }
