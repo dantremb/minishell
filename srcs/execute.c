@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/06 15:35:06 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/06 19:30:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,9 @@ int	ft_open(t_cmd *cmd, char *str, int i)
 {
 	static int	fd;
 
-	while (str && str[0] == '>')
+	while (str && (str[0] == '>' || str[0] == '<'))
 		str++;
+	dprintf(2, "open %s\n", str);
 	if (i == 1)
 		fd = open(str, O_RDONLY, 0644);
 	else if (i == 2)
@@ -48,7 +49,11 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 			{
 				cmd->fd = ft_open(cmd, cmd->token[i + 1], flag);
 				if (i == 0)
+				{
+					cmd->nb_token = cmd->nb_token - 2;
 					cmd->token = cmd->token + 2;
+					i = -1;
+				}
 				else
 					cmd->token[i] = NULL;
 			}
@@ -56,7 +61,11 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 			{
 				cmd->fd = ft_open(cmd, &cmd->token[i][0], flag);
 				if (i == 0)
+				{
+					cmd->nb_token = cmd->nb_token - 1;
 					cmd->token = cmd->token + 1;
+					i = -1;
+				}
 				else
 					cmd->token[i] = NULL;
 			}
@@ -66,20 +75,25 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 
 void	ft_find_redirect(t_shell *shell, int nb)
 {
+	ft_print_table(shell);
 	ft_redirect(&shell->cmd[nb], ">>", 3);
+	ft_print_table(shell);
 	ft_redirect(&shell->cmd[nb], ">", 2);
+	ft_print_table(shell);
 	if (shell->cmd[nb].fd > 2)
 	{
 		dup2(shell->cmd[nb].fd, 1);
 		shell->cmd[nb].fd = -1;
 	}
 	ft_redirect(&shell->cmd[nb], "<", 1);
+	ft_print_table(shell);
 	if (shell->cmd[nb].fd > 2)
 	{
 		dup2(shell->cmd[nb].fd, 0);
 		shell->cmd[nb].fd = -1;
 	}
 	ft_clean_token(shell, shell->cmd[nb].token);
+	ft_print_table(shell);
 }
 
 char	*ft_get_path(t_shell *shell, int nb)

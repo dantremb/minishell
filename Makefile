@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/12/06 10:48:29 by dantremb         ###   ########.fr        #
+#    Updated: 2022/12/06 19:22:14 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -97,5 +97,5 @@ sum:
 full:
 	valgrind --leak-check=full --show-leak-kinds=all --trace-children=yes --track-fds=yes ./$(NAME)
 
-test:
+val:
 	valgrind --leak-check=full --show-leak-kinds=all --gen-suppressions=yes --trace-children=yes --track-fds=yes ./$(NAME)
