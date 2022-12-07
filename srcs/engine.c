@@ -6,7 +6,7 @@
 /*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 11:54:19 by root             ###   ########.fr       */
+/*   Updated: 2022/12/07 12:36:17 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ bool	ft_execute_builtin(t_shell *shell, int nb)
 	return (true);
 }
 
-void	ft_exec_cmd(t_shell *shell, int nb)
+static int	ft_exec_cmd(t_shell *shell, int nb)
 {
 	int		fd[2];
 
@@ -51,7 +51,8 @@ void	ft_exec_cmd(t_shell *shell, int nb)
 			dup2(fd[1], STDOUT_FILENO);
 		}
 		ft_find_redirect(shell, nb);
-		//if open error return 0
+		if (shell->cmd[nb].open_error == 1)
+			return (1);
 		if (ft_execute_builtin(shell, nb) == false)
 			ft_execve(shell, nb);
 		else
@@ -62,6 +63,7 @@ void	ft_exec_cmd(t_shell *shell, int nb)
 		close(fd[1]);
 		dup2(fd[0], STDIN_FILENO);
 	}
+	return (0);
 }
 
 int	ft_subshell(t_shell *shell, int nb)

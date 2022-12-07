@@ -6,7 +6,7 @@
 /*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/26 14:05:32 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 12:06:06 by root             ###   ########.fr       */
+/*   Updated: 2022/12/07 12:31:58 by root             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 		{
 			if (cmd->token[i][ft_strlen(meta)] == '\0')
 			{
-				cmd->fd = ft_open_fd(cmd->token[i + 1], flag);
+				cmd->fd = ft_open(cmd, cmd->token[i + 1], flag);
 				if (i == 0)
 					ft_clean_redirect(&cmd->nb_token, &cmd->token, &i, 2);
 				else
@@ -40,7 +40,7 @@ void	ft_redirect(t_cmd *cmd, char *meta, int flag)
 			}
 			else
 			{
-				cmd->fd = ft_open_fd(&cmd->token[i][0], flag);
+				cmd->fd = ft_open(cmd, &cmd->token[i][0], flag);
 				if (i == 0)
 					ft_clean_redirect(&cmd->nb_token, &cmd->token, &i, 1);
 				else
@@ -68,9 +68,10 @@ int	ft_find_redirect(t_shell *shell, int nb)
 	ft_clean_token(shell, shell->cmd[nb].token);
 	if (shell->cmd[nb].open_error == 1)
 	{
-		dprintf(2, "return 1 after redirection\n");
+		//dprintf(2, "return 1 after redirection cuz err = %d\n", shell->cmd[nb].open_error);
 		return (1);
 	}
+		//dprintf(2, "return 0 after redirection cuz err = %d\n", shell->cmd[nb].open_error);
 	return (0);
 }
 
