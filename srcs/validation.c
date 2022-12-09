@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/09 10:57:36 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/09 13:08:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,24 @@
 
 extern char	**g_env;
 
+void	ft_unlink_heredoc(t_shell *shell)
+{
+	int	i;
+
+	shell->heredoc[0] = 'a';
+	i = -1;
+	while (++i < 26)
+	{
+		unlink(shell->heredoc);
+		shell->heredoc[0] = shell->heredoc[0] + 1;
+	}
+}
+
 int	ft_open(t_cmd *cmd, char *str, int i)
 {
 	int	fd;
 
-	fd = 0;
+	fd = -1;
 	while (str && (str[0] == '>' || str[0] == '<'))
 		str++;
 	if (i == 1)
@@ -45,33 +58,6 @@ void	ft_export_error(t_shell *shell)
 	ft_export(shell, export_status, 0);
 	free (export_status);
 	free (status);
-}
-
-static int	ft_pipe_check(char *buf)
-{
-	char	*tmp;
-
-	tmp = buf;
-	if (buf[0] == '|' || buf[ft_strlen(buf) - 1] == '|')
-	{
-		ft_putstr_fd("minishell: syntax error\n", 2);
-		return (1);
-	}
-	while (*tmp)
-	{
-		if (*tmp == '|' && *(tmp + 1) == '|')
-		{
-			*tmp = '\0';
-			return (0);
-		}
-		if (*tmp == '|' && ft_is_only(tmp + 1, ' '))
-		{
-			ft_putstr_fd("minishell: syntax error\n", 2);
-			return (1);
-		}
-		tmp++;
-	}
-	return (0);
 }
 
 static int	ft_empty_token(char *buf)

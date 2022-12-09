@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 13:43:53 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/09 13:06:32 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@ bool	ft_execute_builtin(t_shell *shell, int nb)
 	else if (ft_strncmp(shell->cmd[nb].buffer, "cd\0", 3) == 0)
 		ft_cd(shell, shell->cmd[nb].token[1]);
 	else if (ft_strncmp(shell->cmd[nb].token[0], "exit\0", 5) == 0)
+	{
+		ft_unlink_heredoc(shell);
 		ft_exit(shell, "Goodbye\n", 1);
+	}
 	else
 		return (false);
 	return (true);

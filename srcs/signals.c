@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/22 17:51:07 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 12:39:47 by root             ###   ########.fr       */
+/*   Updated: 2022/12/09 12:27:28 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,5 @@ void	ft_clear_command(t_shell *shell)
 	shell->pid = ft_free(shell->pid);
 	shell->buffer = ft_free(shell->buffer);
 	shell->nb_cmd = 0;
-	shell->expand[0] = 'a';
-	shell->heredoc[0] = 'a';
 	ft_clear_fd();
 }

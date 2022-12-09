@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/18 20:21:33 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/09 11:25:25 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/09 13:13:47 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 extern char	**g_env;
 
-void	ft_make_heredoc(char *limiter, char *heredoc)
+static void	ft_make_heredoc(char *limiter, char *heredoc)
 {
 	int		fd;
 	char	*str;
@@ -34,7 +34,7 @@ void	ft_make_heredoc(char *limiter, char *heredoc)
 	close(fd);
 }
 
-char	*ft_expand_heredoc(t_shell *shell, char *heredoc)
+static char	*ft_exp_heredoc(t_shell *shell, char *heredoc)
 {
 	char	*temps;
 	char	*expand;
@@ -48,7 +48,6 @@ char	*ft_expand_heredoc(t_shell *shell, char *heredoc)
 	expand[ft_strlen(expand) - 1] = '\0';
 	temps = ft_get_variable(expand, 0);
 	free(expand);
-	shell->heredoc[0] = shell->heredoc[0] + 1;
 	return (temps);
 }
 
@@ -64,19 +63,18 @@ void	ft_parse_heredoc(t_shell *shell, char **token)
 		{
 			if (token[i][2] == '\0')
 			{
-				str = ft_expand_heredoc(shell, ft_strjoin("<",
-							shell->heredoc, 0));
+				str = ft_exp_heredoc(shell, ft_strjoin("<", shell->heredoc, 0));
 				ft_make_heredoc(token[i + 1], str);
 				token[i][1] = '\0';
 				token[i + 1] = str;
 			}
 			else
 			{
-				str = ft_expand_heredoc(shell, ft_strjoin("<",
-							shell->heredoc, 0));
+				str = ft_exp_heredoc(shell, ft_strjoin("<", shell->heredoc, 0));
 				ft_make_heredoc(&token[i][2], str);
 				token[i] = str;
 			}
+			shell->heredoc[0] = shell->heredoc[0] + 1;
 		}
 	}
 }

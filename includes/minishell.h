@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 23:54:05 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 13:59:02 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/09 13:07:22 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	ft_signal_off(void);
 void	ft_signal_on(void);
 
 void	ft_exit(t_shell *shell, char *msg, int errno);
+void	ft_unlink_heredoc(t_shell *shell);
 void	ft_export_error(t_shell *shell);
-void	ft_print_table(t_shell *shell);
 
 #endif

@@ -1,25 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_clean_heredoc.c                                 :+:      :+:    :+:   */
+/*   ft_pipe_check.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/09 10:49:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/09 10:52:18 by dantremb         ###   ########.fr       */
+/*   Created: 2022/12/09 13:00:48 by dantremb          #+#    #+#             */
+/*   Updated: 2022/12/09 13:01:10 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/libft.h"
 
-void	ft_buildin_exit(void)
+int	ft_pipe_check(char *buf)
 {
-	char	**cmd;
+	char	*tmp;
 
-	cmd = malloc(sizeof(char *) * 3);
-	cmd[0] = ft_strdup("make");
-	cmd[1] = ft_strdup("cleandoc");
-	cmd[3] = NULL;
-	execve("", cmd, NULL);
-	exit(0);
+	tmp = buf;
+	if (buf[0] == '|' || buf[ft_strlen(buf) - 1] == '|')
+	{
+		ft_putstr_fd("minishell: syntax error\n", 2);
+		return (1);
+	}
+	while (*tmp)
+	{
+		if (*tmp == '|' && *(tmp + 1) == '|')
+		{
+			*tmp = '\0';
+			return (0);
+		}
+		if (*tmp == '|' && ft_is_only(tmp + 1, ' '))
+		{
+			ft_putstr_fd("minishell: syntax error\n", 2);
+			return (1);
+		}
+		tmp++;
+	}
+	return (0);
 }
