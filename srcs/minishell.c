@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 12:40:53 by root             ###   ########.fr       */
+/*   Updated: 2022/12/09 11:19:04 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,15 @@ void	ft_parse_unset(t_shell *shell, int nb)
 
 void	ft_exit(t_shell *shell, char *msg, int errno)
 {
+	int	i;
+
 	ft_putstr_fd(msg, 2);
 	ft_clear_command(shell);
 	g_env = (char **)ft_free_array(g_env);
 	rl_clear_history();
+	i = -1;
+	while (++i < 26)
+		unlink(shell->heredoc + i);
 	exit(errno);
 }
 

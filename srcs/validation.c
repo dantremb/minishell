@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:46:12 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/07 14:00:00 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/09 10:57:36 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	ft_open(t_cmd *cmd, char *str, int i)
 {
 	int	fd;
 
+	fd = 0;
 	while (str && (str[0] == '>' || str[0] == '<'))
 		str++;
 	if (i == 1)

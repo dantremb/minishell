@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/10 18:35:49 by nadesjar          #+#    #+#             */
-/*   Updated: 2022/12/07 13:59:31 by dantremb         ###   ########.fr       */
+/*   Updated: 2022/12/09 11:26:30 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ int	ft_open_fd(char *str, int i)
 {
 	static int	fd;
 
+	while (str && (str[0] == '>' || str[0] == '<'))
+		str++;
 	if (i == 1)
 		fd = open(str, O_RDONLY, 0644);
 	else if (i == 2)

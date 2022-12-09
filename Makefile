@@ -6,7 +6,7 @@
 #    By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/02 23:33:38 by root              #+#    #+#              #
-#    Updated: 2022/12/07 13:47:12 by dantremb         ###   ########.fr        #
+#    Updated: 2022/12/09 11:28:47 by dantremb         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -67,6 +67,7 @@ REMOVE = rm -rf
 clean:
 	@$(REMOVE) $O
 	@$(MAKE) -s clean -C $(LIBFT_PATH)
+	@$(REMOVE) minishell.dSYM
 
 fclean: clean
 	@$(REMOVE) $(NAME)
