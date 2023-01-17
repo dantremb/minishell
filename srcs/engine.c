@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 00:33:28 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/09 13:06:32 by dantremb         ###   ########.fr       */
+/*   Updated: 2023/01/06 14:02:49 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static void	ft_exec_cmd(t_shell *shell, int nb)
 	shell->pid[nb] = fork();
 	if (shell->pid[nb] == 0)
 	{
-		if (nb < shell->nb_cmd - 1)
+		if (nb < shell->nb_cmd - 1 )
 		{
 			close(fd[0]);
 			dup2(fd[1], STDOUT_FILENO);

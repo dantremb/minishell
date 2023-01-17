@@ -6,9 +6,10 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 00:04:50 by dantremb          #+#    #+#             */
-/*   Updated: 2022/12/09 12:15:42 by dantremb         ###   ########.fr       */
+/*   Updated: 2023/01/17 13:58:53 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "../includes/minishell.h"
 
@@ -50,6 +51,7 @@ void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
 {
 	(void)ac;
 	(void)av;
+
 	ft_memset(shell, 0, sizeof(t_shell));
 	shell->expand[0] = 'a';
 	shell->heredoc[0] = 'a';
@@ -62,7 +64,7 @@ void	ft_init_shell(t_shell *shell, char **env, int ac, char **av)
 int	main(int ac, char **av, char **env)
 {
 	t_shell	shell;
-
+	
 	ft_init_shell(&shell, env, ac, av);
 	while (1)
 	{
