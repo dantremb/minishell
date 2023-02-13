@@ -6,7 +6,7 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/18 23:02:37 by dantremb          #+#    #+#             */
-/*   Updated: 2022/11/23 23:12:49 by dantremb         ###   ########.fr       */
+/*   Updated: 2023/02/07 20:10:40 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,3 +18,5 @@ void	*ft_free(void *ptr)
 		free(ptr);
 	return (NULL);
 }
+
+char test[20] = "Hello World";

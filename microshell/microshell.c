@@ -6,91 +6,78 @@
 /*   By: dantremb <dantremb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 13:49:37 by dantremb          #+#    #+#             */
-/*   Updated: 2023/01/17 13:51:44 by dantremb         ###   ########.fr       */
+/*   Updated: 2023/02/13 16:44:51 by dantremb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
-#include <sys/wait.h>
 #include <string.h>
+#include <sys/wait.h>
 
-int	ft_putstr_fd2(char *str, char *arg)
-{
-	while (*str)
-		write(2, str++, 1);
-	if (arg)
-		while(*arg)
-			write(2, arg++, 1);
-	write(2, "\n", 1);
-	return (1);
+void    perr(char *str){
+    while (*str)
+        write(2, str++, 1);
 }
 
-int ft_execute(char *argv[], int i, int tmp_fd, char *env[])
+void cd(char **argv)
 {
-	argv[i] = NULL;
-	dup2(tmp_fd, STDIN_FILENO);
-	close(tmp_fd);
-	execve(argv[0], argv, env);
-	return (ft_putstr_fd2("error: cannot execute ", argv[0]));
+    if (argv[1] == NULL)
+        return (perr("error: cd: bad arguments\n"), 1);
+    else if (chdir(argv[1]) == -1)
+    {
+        perr("error: cd: cannot change directory to ")
+        perr(argv[1])
+        perr("\n")
+    }
 }
 
-int	main(int argc, char *argv[], char *env[])
+void exec(char **argv, char **envp, int i)
 {
-	int	i;
-	int fd[2];
-	int tmp_fd;
-	(void)argc;
+    int fd[2];
+    int pip;
 
-	i = 0;
-	tmp_fd = dup(STDIN_FILENO);
-	while (argv[i] && argv[i + 1])
-	{
-		argv = &argv[i + 1];
-		i = 0;
+    if (argv[i] && !strcmp(argv[i], "|"))
+        pip = 1;
+    else
+        pip = 0;
+    if (pipe(fd) == -1)
+        return (perr("error: fatal\n"), 1);
+    int pid = fork();
+    if (!pid)
+    {
+        argv[i] = 0;
+        close(fd[0]);
+        if (pip)
+            dup2(fd[1], 1);
+        else
+            close(fd[1]);
+        execve(*argv, argv, envp);
+        return (perr("error: cannot execute "), perr(*argv), perr("\n"), 1);
+    }
+    close(fd[1]);
+    if (pip)
+        dup2(fd[0], 0);
+    else
+        close(fd[0]);
+    waitpid(pid, NULL, 0);
+}
 
-		while (argv[i] && strcmp(argv[i], ";") && strcmp(argv[i], "|"))
-			i++;
-		if (strcmp(argv[0], "cd") == 0)
-		{
-			if (i != 2)
-				ft_putstr_fd2("error: cd: bad arguments", NULL);
-			else if (chdir(argv[1]) != 0)
-				ft_putstr_fd2("error: cd: cannot change directory to ", argv[1]	);
-		}
-		else if (i != 0 && (argv[i] == NULL || strcmp(argv[i], ";") == 0))
-		{
-			if ( fork() == 0)
-			{
-				if (ft_execute(argv, i, tmp_fd, env))
-					return (1);
-			}
-			else
-			{
-				close(tmp_fd);
-				while(waitpid(-1, NULL, WUNTRACED) != -1)
-					;
-				tmp_fd = dup(STDIN_FILENO);
-			}
-		}
-		else if(i != 0 && strcmp(argv[i], "|") == 0) //pipe
-		{
-			pipe(fd);
-			if ( fork() == 0)
-			{
-				dup2(fd[1], STDOUT_FILENO);
-				close(fd[0]);
-				close(fd[1]);
-				if (ft_execute(argv, i, tmp_fd, env))
-					return (1);
-			}
-			else
-			{
-				close(fd[1]);
-				close(tmp_fd);
-				tmp_fd = fd[0];
-			}
-		}
-	}
-	close(tmp_fd);
-	return (0);
+int main(int argc, char **argv, char **envp)
+{
+    (void)argc;
+    int i = 0;
+  
+    while (*argv && *(argv + 1))
+    {
+        ++argv;
+        i = 0;
+        while (argv[i] && strcmp(argv[i], ";") && strcmp(argv[i], "|"))
+            i++;
+        if (!strcmp(*argv, "cd"))
+            cd(argv);
+        else if (i)
+            exec(argv, envp, i);
+        argv += i;
+    }
+    return(0);
 }
