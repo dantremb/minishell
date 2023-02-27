@@ -62,9 +62,6 @@ echo test >outfile
 - executez des commandes avec des pipes, avec des commandes valide et invalide entre 2 pipes
 - vérifier des commandes qui ne fonctionne pas
 - valeur de retour des processus avec $?
-
-*** TODO ***
-
 - executez des commandes avec des redirections < << > >> (heredoc n'est pas obliger de mettre a jour l'historique)
 - cat | cat | ls doit fonctionner
 
